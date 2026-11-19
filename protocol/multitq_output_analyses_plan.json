@@ -1,0 +1,69 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "name": "output_analyses_plan",
+ "track": "research track 2026-11, output analyses (plan steps 'Tabulate absolute rewrite accuracy', 'Compute coverage-conditioned outcomes')",
+ "project": "PAKDD 2027 research track paper 'Data-Efficient TKGQA via Structural Guidance and Symbolic Execution' (MultiTQ)",
+ "status": "DESCRIPTIVE / POST HOC. Analyses of already-frozen, already-scored outputs only: no new arm, no new model inference, no new test predictions, no GPU. Nothing here changes or re-labels any registered result (k% rule [id], amendments [id] / [id], R1 audit protocol [id], R2 rule [id] + A1 [id] + A2 [id]). No decision criterion is attached; no PASS/FAIL label is produced. Every test-split number is labelled as reuse of the official MultiTQ test split (n = 54,584) or of the R1/R2 perturbed subsets drawn from it.",
+ "registered_before": "any number of analysis A1 (other than the existing audit results being reproduced) and any number of analysis A2 was computed. Already read before registration: the existing audit results [id] / [id], the scorers, file structures (field names, one bundle row), and the sha256 of the three test bundle files.",
+ "A1_absolute_rewrite_accuracy": {
+  "inputs": {
+   "R1": {
+    "set": "(frozen file of the reported run)",
+    "predictions": "(frozen file of the reported run)",
+    "gold": "(frozen file of the reported run)",
+    "review_key": "(frozen file of the reported run)",
+    "audit_sheet": "(frozen file of the reported run)",
+    "selection_key": "(frozen file of the reported run)",
+    "scorer": "(frozen file of the reported run)",
+    "existing_result": "(frozen file of the reported run)"
+   },
+   "R2": {
+    "set": "(frozen file of the reported run)",
+    "predictions": "(frozen file of the reported run)",
+    "gold": "(frozen file of the reported run)",
+    "freeze": "(frozen file of the reported run)",
+    "audit_sheet": "(frozen file of the reported run)",
+    "selection_key": "(frozen file of the reported run)",
+    "scorer": "(frozen file of the reported run)",
+    "scorer_dependency_score_R2": "(frozen file of the reported run)",
+    "existing_result": "(frozen file of the reported run)"
+   },
+   "evaluator": "(multitq_eval.hit_at_k, official MultiQA semantics)"
+  },
+  "arms_levels": "S_k (Ranker; Hits@1 averaged over the 3 ranker-seed files), G_k (Reader, LoRA seed 0), P_k (Parser; averaged over the 3 ranker-seed files), RULE_k (deterministic Rules list, variants_RULE.jsonl) at k = 1, 5, 100 (k01_s0, k05_s0, k100); GU_k (Dense-RAG) at k = 1, 100 only (no GU_5 variant predictions exist in R1 or R2; GU_5 is not run here).",
+  "variants": "ORIGINAL = synthetic quid 10*quid + 0; REWRITE = 10*quid + 3 (R1 paraphrase P3, R2 rewrite RW).",
+  "statistics": "Per arm and population: original Hits@1, rewrite Hits@1, drop = original - rewrite. 95% CIs by paired Poisson(1) bootstrap over questions, B = 2,000, seed 0, percentile; one weight matrix per population (B x n, drawn row by row with numpy default_rng(0).poisson(1, n), the same stream as audit_score_R1.boot and score_R2.summarise(., 2000, 0)), shared by original, rewrite, drop and all arms, so all quantities are paired. Descriptive paired arm contrasts on rewrite Hits@1 and on drop: P_k - G_k, P_k - S_k, G_k - S_k, P_k - RULE_k at k = 1, 5, 100; P_k - GU_k and G_k - GU_k at k = 1, 100 (two-sided percentile CIs, no multiplicity correction, not decision-relevant).",
+  "populations": {
+   "ALL": "all judge-accepted rewrites (= every quid of the gold file: R1 569, R2 570)",
+   "HUMAN_FILTERED": "ALL minus the human-rejected rows (reviewed rows with not (same_answer_set == Y and same_constraint_time == Y)); unreviewed rows stay in (the audit protocols' BOUND population)",
+   "RANDOM100": "the simple random 100 of each probe alone (in_random100 == True), all 100 rows regardless of human verdict: an unbiased sample of the judge-accepted rewrites (descriptive)",
+   "RANDOM100_ACCEPTED": "RANDOM100 rows the human accepted (descriptive; unbiased for human-valid judge-accepted rewrites)"
+  },
+  "reproduction_check": "Re-run audit_score_R1.py and audit_score_R2.py (with score_R2.py) unchanged on the frozen inputs; their JSON outputs must equal [id] / [id] exactly (parsed-JSON equality). In addition, this track's drop estimates and CIs on HUMAN_FILTERED (B = 2000, seed 0) must equal the drops_after_removal entries of both files to floating-point identity. Any mismatch is reported and the tables are labelled provisional."
+ },
+ "A2_coverage_conditioned_outcomes": {
+  "population": "official MultiTQ test split, n = 54,584 (reuse of the official test split; outcomes already scored and frozen)",
+  "levels": "k = 1, 5, 100 (k01_s0, k05_s0, k100). Reader G_k (seed 0), Parser P_k (mean over the 3 ranker seeds and per seed), Dense-RAG GU_k at k = 1 and 100 (GU_5 does not exist as a frozen arm). Reference rows: Ranker S_k (3-seed mean) and RULE_k on the same partitions.",
+  "outcome": "Hits@1 per question taken from the frozen per-question hits [id] (columns G_k@1, P_k_seed{0,1,2}@1, GU_k@1, S_k_seed{0,1,2}@1, RULE_k@1). As a check, G_k@1, GU_k@1 and P_k_seed*@1 are recomputed from the frozen prediction files with multitq_eval.hit_at_k and must agree on every question.",
+  "displayed_bundle": "the frozen structural guidance bundle of level k (multitq_kpct_structural_bundles.tar [id]; decompressed sha256 must equal the guided-freeze bundle_inputs sha256: k01_s0 c9f18dc2..., k05_s0 6d45bb51..., k100 01b48bce...), normalised with the frozen gk_common.normalize_bundle (top-20 candidates in S order, facts[:20]), facts shown as the fact groups that survive the 2,048-token prompt cap of fit_g_prompt. If the Reader's test inference recorded n_truncated = 0 the displayed facts are all normalised facts; otherwise the per-question truncation is recomputed with the Llama-3.1-8B-Instruct tokenizer and the frozen renderer (CPU, read-only, on the GPU host). If neither is possible, fact coverage is labelled provisional.",
+  "coverage_definitions": {
+   "F (fact-covered)": "some gold answer string equals, under official answer matching (multitq_eval: '_' -> ' ', time predictions truncated to len(answers[0]) when that length is 4 or 7), the subject, object or date of at least one displayed provenance fact",
+   "C (candidate-covered)": "official hit_at_k(gold, displayed top-20 candidate strings, k = 20) = 1",
+   "GU_F": "Dense-RAG: some gold answer string matches the subject, object or date of at least one of the 20 BGE-retrieved facts as displayed to GU (gu_test.jsonl.gz, sha256 23fef275...; truncation per GU inference stats as above). GU has no candidate list; its 'candidate' axis is not defined.",
+   "P_own20 (secondary, not displayed to any LLM)": "gold in the top-20 of the Parser pipeline's own final ranked list (per ranker seed; mean over seeds). The Parser LLM sees only the question; its bundle-coverage cells are a partition by what the structural pipeline displays to the Reader, not by what the Parser saw."
+  },
+  "tables": [
+   "2x2 F x C per k: n, share of test, Hits@1 (95% bootstrap CI, B = 2000, seed 0, percentile, per cell) of G_k, P_k (seed mean), S_k, RULE_k; paired contrast G_k - P_k per cell (descriptive)",
+   "GU_k by GU_F (2 cells) and GU_F crossed with bundle F x C",
+   "common-covered subset: per k, questions with F_k and C_k and GU_F; plus the single subset covered at every k (F_1 C_1 F_5 C_5 F_100 C_100 and GU_F); Hits@1 of every arm there and paired contrasts G_k - P_k, G_k - GU_k, P_k - GU_k",
+   "successes without displayed coverage: G_k hits with not F and not C (count, share of all G_k hits, rate in the cell); GU_k hits with not GU_F; P_k hits in the bundle not-F-not-C cell (for reference); and G_k hits with C false (answer outside the displayed candidate list)",
+   "P_own20 coverage table for P_k (secondary)"
+  ],
+  "caveat": "Presence of a gold string in a displayed fact or candidate does not certify that the displayed material semantically supports the answer (the string can occur in an unrelated fact). Coverage cells are observational partitions, not causal."
+ },
+ "selection_discipline": "No parameter is tuned; definitions above are fixed before computation. Anything added after this registration is labelled post hoc in the report.",
+ "compute": "CPU only. Local CPU plus at most one read-only CPU job on the GPU host (copying gu_test.jsonl.gz, the Parser test prediction files and the Reader/GU inference stats, with sha256 checks against the frozen manifests; optional tokenizer-based truncation recount). 0 GPU-h.",
+ "deliverables": "this plan; A1 tables (CSV + md) and per-question CSV keyed by (probe, quid); A2 tables (CSV + md) and per-question coverage flags CSV keyed by quid; results JSON; short report md; archived copies with a manifest.",
+ "registered_utc": "2026-11-17T16:43:55Z",
+ "sha256": "0e29ccd4e4a9e83aa63edc36edee2b6baf3e7614e8162bb28e31b21d9bf2aeeb"
+}

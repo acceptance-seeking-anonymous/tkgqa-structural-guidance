@@ -1,0 +1,154 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_R3_probe_sets",
+ "rule_version": "v1.0",
+ "nature": "REGISTERED probe-set design for the rewording-robustness method tracks (plan, registered 2026-11-18: a third rewrite probe R3 of the official MultiTQ test split (reuse of the official test split), DEV paraphrases of dev_sel2000 for method selection, TRAINING paraphrases of the 5% list for the normalizer track, and the secondary-analysis and audit plan that every method track applies to R3. R1 and R2 are SECONDARY: nothing is tuned on them and their registered results are never changed.",
+ "question": "Probe-set construction (no hypothesis is tested by this track). The R3 secondary analysis below is the registered plan each method track applies in its own single scoring pass: does a method lose less Hits@1 under R3 rewording than its baseline, and does it score higher on R3 rewrites, at each fitting level?",
+ "parent_documents": {
+  "kpct_rule": "(frozen file of the reported run)",
+  "kpct_subsets": "(dev_sel2000 sha256 b5b8a28d...; k01_s0 sha256 9cc6eb40...; k05_s0 sha256 0a840365...)",
+  "evaluator": "(multitq_eval.py sha256 1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69)",
+  "R1_rule": "(frozen file of the reported run)",
+  "R1_set": "(sample quid-list sha256 5b4ae6a8b35d93521f30b89fc6eb3c2ee5ef05ef3350726e295f900565e26d0d)",
+  "R1_code": "(frozen file of the reported run)",
+  "R2_rule": "(frozen file of the reported run)",
+  "R2_A1": "(frozen file of the reported run)",
+  "R2_A2": "(frozen file of the reported run)",
+  "R2_set": "(sample quid-list sha256 76139c3d9c4d151ad72fa45343670aea8651fe83fd8acff2aba395b29c5e98da)",
+  "R2_freeze": "(frozen file of the reported run)",
+  "R2_code": "(frozen file of the reported run)",
+  "LLM_controls_code": "(frozen file of the reported run)",
+  "GPLAIN_1_freeze": "(frozen file of the reported run)",
+  "GU_5_freeze": "(frozen file of the reported run)"
+ },
+ "status_at_registration": {
+  "outputs": "None. The R3 sample and pool have not been drawn; no R3 rewrite, dev paraphrase, training paraphrase, judge verdict, bundle, retrieval or prediction exists; no R3-track GPU job has run.",
+  "work_before_registration": "Read the R1/R2 rules, amendments, code, sets and freezes; extracted quid / qtype / question TEXT (no answers) of test.json and of the dev_sel2000 questions on the GPU host; listed the Gemini models available to the API key (one models.list call, no generation); sha256-snapshotted the frozen dev/test prediction files, adapters and code to be used (no content read); wrote the code listed under code_sha256.",
+  "existing_test_exposure": "All R1/R2 numbers and the full-test k% results (aggregate) are known to the designers. R3 questions are official test questions disjoint from the R1 and R2 samples; every arm's full-test predictions on them were scored in aggregate in the k% experiment."
+ },
+ "test_reuse": "Official MultiTQ test split (questions/test.json sha256 d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee), reused. All arms frozen (sha256 verified against expected_sha_r3.json); nothing is trained or selected on R3.",
+ "R3_sample": {
+  "candidate_set": "test minus (R1 2,000-question sample union R2 2,000-question sample); the two samples are disjoint (asserted)",
+  "n": 2000,
+  "seed": 20261118,
+  "recipe": "r3_common.draw_sample_r3: largest-remainder allocation proportional to the candidate set's qtype counts; within each qtype (sorted order) quids sorted ascending; ONE numpy default_rng(20261118) generator, choice(n_qtype, alloc, replace=False) -- the R1/R2 procedure",
+  "pool": {
+   "n": 600,
+   "recipe": "R1/R2 pool procedure: largest remainder over the R3 sample's qtype counts; default_rng([20261118, 3]).choice within each qtype"
+  },
+  "records": "quid lists + sha256 (rob_common.list_sha) in multitq_robustness_R3_perturbed_set.json; disjointness from R1 and R2 asserted",
+  "fields_read_for_sampling": [
+   "quid",
+   "qtype"
+  ]
+ },
+ "R3_generator": {
+  "family": "Google Gemini (third family: R1 = an API LLM, R2 = Qwen2.5-72B-Instruct-AWQ, arms = Llama-3.1-8B)",
+  "model_id": "gemini-2.5-flash (Gemini API v1beta generateContent; stable GA model, version 001); the modelVersion string of every response is recorded",
+  "access": "Gemini API key from the environment variable GEMINI_API_KEY (robustness/llm_client.py); never printed or written",
+  "decoding": "temperature 0.0, candidateCount 1, maxOutputTokens 300, seed 0, thinkingConfig.thinkingBudget 0 (thinking off); safetySettings BLOCK_NONE for HARASSMENT, HATE_SPEECH, SEXUALLY_EXPLICIT, DANGEROUS_CONTENT (benchmark text about dated political events); no system instruction",
+  "prompt": "one user turn = R1/R2 rob_common.GEN_PROMPT (sha256 f69b6053645b90116e4418f53babafbd7e40f9e59f0b801bfaae16054353ea0d) with the question (names and dates protected); attempt 2 = GEN_PROMPT + GEN_RETRY_SUFFIX (sha256 d80d677031892fa7f2f153259836914eb126f90154096570af600490290d03ba) showing the rejected attempt-1 text",
+  "retry_policy": "R1/R2 policy: at most 2 attempts; attempt 2 only for pool questions whose attempt-1 rewrite failed a mechanical check or the judge; first accepted attempt kept. HTTP 408/429/5xx/timeouts: the same request is re-sent up to 6 times with backoff (transport retries, not rewrite attempts, counted); a blocked or empty response = a failed attempt (mechanical reason no_json)",
+  "smoke_test": "allowed before the first R3 generation: the 5 smallest train quids with GEN_PROMPT, same configuration; outputs discarded; checks only that the model and configuration (thinkingBudget 0, seed) are accepted",
+  "fallback": "If gemini-2.5-flash rejects the configuration or is unavailable at the smoke test, an amendment naming another Gemini model (gemini-2.5-pro, minimum thinking GPU-hour cap) is registered BEFORE any R3 generation. No R3 generation with any other model family; the R3 generator is never used for dev or training paraphrases."
+ },
+ "mechanical_checks": "R1 rob_common.mechanical_check unchanged (rob_common.py sha256 de4e76ee32cb741ac1d405501ffd8aa1b810a6b5deabe9c91dc218ed37d2cf7c) with the frozen mtq_lib.parse_time (sha256 471da9d3fd6efbe16590f143352398d0816b4877bd07b71ded258e6a4e44e29f)",
+ "judge_prefilter": "R1/R2 judge prompt (rob_common.JUDGE_PROMPT sha256 da40535e53be1f24a5c23e7dcc81ff2aa90580e7f0c3a8adc4b0921da4c7405a) and role (API LLM judge JUDGE_MODEL_ID as in R1/R2, max_tokens 200; the model id returned is recorded); only on mechanically valid rewrites; accepted iff all five booleans true and no call error. Pre-filter only. Order of judge calls: all R3 attempts first, then dev.",
+ "R3_analysis_sets": {
+  "PRIMARY": "all judge-accepted R3 rewrites (as R2 amendment A1); LOW_N flag if fewer than 200",
+  "ORIG": "the same questions' original text"
+ },
+ "DEV_paraphrases": {
+  "questions": "the registered dev_sel2000 selection set (2,000 dev quids, sha256 b5b8a28d843bc6120b580a2e13505dfd56185a43e5ef28adc3d1ece78d9403b1)",
+  "generator": "Qwen/Qwen2.5-72B-Instruct-AWQ (R2 generator; snapshot 698703eae6604af048a3d2f509995dc302088217), vLLM 0.10.2 (tkgqa-vllm:latest), ONE RTX PRO 6000 card, dtype float16, max_model_len 2048, max_num_batched_tokens 2048, gpu_memory_utilization = floor(100*(free MiB at launch - 1536)/97887)/100 (other processes held ~48 GB of the card), engine: CUDA graphs (vLLM default) with automatic fallback to enforce_eager (= R2) if the graph engine fails to start; the model's default chat template; greedy (temperature 0, seed 0), max 300 new tokens; r3_qwen_gen.py",
+  "prompt_and_checks": "R2 instruction (GEN_PROMPT) and the same mechanical checks",
+  "attempts": "attempt 1 for all 2,000; attempt 2 (GEN_PROMPT + GEN_RETRY_SUFFIX) in the same session for questions whose attempt 1 failed a mechanical check; judge-triggered retries are NOT run for dev (difference from R2/R3, to avoid a second 72B session)",
+  "judge": "APPLIED (the optional pre-filter is used): the first mechanically valid attempt is judged with the R1/R2 judge; DEV_ACCEPTED = mechanically valid AND judge-accepted. Rows whose judge verdict is unavailable (e.g. API token limit) are flagged judge_missing, excluded from DEV_ACCEPTED and listed in DEV_MECH_OK (secondary set)",
+  "synthetic_quid": "10 * quid + 5 (ORIG 10 * quid + 0)"
+ },
+ "TRAINING_paraphrases": {
+  "questions": "the 5% training list (nested subset k05_s0, n = 19,339, sha256 0a84036566f348be78dbf8e37b95477aa4ffa23f6fa1ed58b8c031faf2ff1a5b), question text from questions/train.json (sha256 89ce10b4...)",
+  "generator": "the DEV configuration above, same session (after the dev stages)",
+  "attempts": "ONE rewrite per question (attempt 1 only); mechanical checks applied; failed rows are kept and flagged (mech_ok = false, reasons); no judge",
+  "order_and_budget_cut": "registered order r3_common.training_order: k01_s0 (3,868) ascending first, then the other 15,471 k05_s0 quids in default_rng([20261118, 5]).permutation order; generated in chunks of 1,000; before each chunk the script stops if elapsed + projected chunk time > deadline, where deadline = (1.2 - robustness_r3 GPU-h already spent - 0.50 arms reserve - 0.03 margin) h - 90 s. Any shortfall is a prefix of the registered order (complete 1% list first, then a uniform random subset of the rest) and is declared. If after the arms at least 0.10 GPU-h of the allotment remain, one completion session continues the order under the same deadline rule."
+ },
+ "arms": {
+  "list": [
+   "RULE_1, RULE_5, RULE_100",
+   "S_1, S_5, S_100 (Ranker, LightGBM seeds 0-2)",
+   "G_1, G_5, G_100 (Reader)",
+   "P_1, P_5, P_100 (Parser; tau off; fallback = the variant's S_k lists; 3 S seeds)",
+   "GU_1, GU_5, GU_100 (Dense-RAG)",
+   "GPLAIN_1 (LLM-controls plain-evidence reader)"
+  ],
+  "frozen": "kpct / R1 frozen adapters and code (R2 expected_sha.json) plus GU_5 and GPLAIN_1 from the LLM-controls freezes (adapter sha256 893ef368... / efa223b2...); verified by rob_collect_frozen.py against expected_sha_r3.json and expected_sha_dev.json (exit 3 = STOP_TEST_INTEGRITY); no retraining",
+  "pipeline": "R2 pipeline: rob_build.py (R1/R2 code unchanged) rebuilds bundles / RULE / S on every R3 and dev variant at k01_s0, k05_s0, k100; r3_combine.py collects the REWRITE rows of both sets into one LLM-arm root; frozen gk_infer.py (G, GU), gu_retrieve.py, pk_infer.py + pk_execute.py, and the LLM-controls gplain_infer.py run once per arm on that root (vLLM gpu_mem 0.40, as llm_controls amendment LC1-A1)",
+  "orig_reference": "ORIG predictions of every arm = its FROZEN predictions on the original questions (official full-test files for R3; the dev_sel2000 selection-time files for dev), extracted by rob_collect_frozen.py; LLM arms are NOT re-run on ORIG (difference from R2, which re-ran ORIG: R2 identity I2 showed 99.05-100% top-1 agreement between re-run and frozen; the frozen full-test files are also what the method tracks use for their own 'original test' numbers, so method and baseline drops share one reference). The structural rebuild of the ORIG rows is the I1 identity check (top-1 >= 99.5% required for RULE and S at every k on both sets, else STOP_PIPELINE_DRIFT with one logged bug-fix)",
+  "per_question_hits": "S and P: mean over their 3 S-seed files; RULE, G, GU, GPLAIN: single file",
+  "synthetic_quids": "R3 rewrite 10 * quid + 4; dev paraphrase 10 * quid + 5; ORIG 10 * quid + 0"
+ },
+ "freeze_and_blinding": "After all arms: sha256 of every prediction / bundle / check file (jobD3.sh) and of the frozen ORIG rows is written into multitq_robustness_R3_freeze.json and saved as a file BEFORE any scoring. DEV parts are then scored once by this track (dev is allowed). R3: this track computes NO Hits/accuracy on R3 originals or rewrites (gold-free checks only: acceptance counts, invalid/fallback rates, top-1-changed rates, template novelty). The method tracks score R3 together with their methods in one registered pass.",
+ "dev_scoring_by_this_track": {
+  "table": "for every arm: Hits@1 on dev ORIG (2,000; frozen), Hits@1 on DEV_ACCEPTED ORIG and DEV_ACCEPTED paraphrases, drop = ORIG - PARA per question; Hits@10 alongside",
+  "statistic": "Poisson(1) bootstrap 95% percentile CIs (r2_common.summarise, B = 10,000, seed 20261118) for Hits@1 and drop; R1/R2 drop label (r2_common.drop_label: B = 2000, seed 0; BRITTLE / ROBUST / INCONCLUSIVE); descriptive; also on DEV_MECH_OK (descriptive)",
+  "evaluator": "official multitq_eval.hit_at_k (sha256 1f85bbdc...), dev.json answers of the dev_sel2000 quids"
+ },
+ "method_selection_rules": {
+  "data": "method tracks select (hyper-parameters, checkpoints, thresholds, prompt variants, normalizer settings) on dev_sel2000 ORIG and the DEV_ACCEPTED paraphrases ONLY; never on R1, R2, R3 or test",
+  "default_objective": "unless a method track registers its own objective before reading any dev number of its method: maximise 0.5 * Hits@1(dev ORIG, 2,000) + 0.5 * Hits@1(DEV_ACCEPTED paraphrases); ties (|diff| < 0.0005) -> the configuration closer to its baseline / with fewer components",
+  "training_data_for_normalizer": "training paraphrases of the k% list the model trains at (k01_s0 = the first 3,868 rows of the registered order; k05_s0 = all generated rows); only mech_ok rows unless the track registers otherwise; dev and test questions are never used for training",
+  "dev_vs_R3": "dev paraphrases come from the R2 generator (Qwen2.5-72B); R3 uses a different family (Gemini), so dev selection cannot fit R3's generator style"
+ },
+ "R3_secondary_analysis_for_method_tracks": {
+  "set": "R3 PRIMARY (all judge-accepted R3 rewrites) and their original questions",
+  "per_method_and_level": "for each method m vs its baseline b (named in the method track's own rule before scoring) at each level k in {1, 5, 100} (where both exist): Hits@1 on the original FULL test (the method track's own primary numbers), Hits@1 on R3 ORIG and R3 rewrites, drop = Hits@1(ORIG) - Hits@1(R3 rewrite) per question",
+  "contrasts": "c_drop(q) = drop_b(q) - drop_m(q) (H_drop: mean > 0, 'm loses less'), c_rw(q) = Hits@1_RW,m(q) - Hits@1_RW,b(q) (H_rw: mean > 0, 'm scores higher on R3'); r3_common.contrasts / method_tests",
+  "statistic": "paired Poisson(1) bootstrap of the mean contrast (multitq_eval stream via r2_common.poisson_boot), B = 10,000, seed 20261118; one-sided p = share of bootstrap means <= 0; two-sided 95% percentile CI and one-sided 95% lower bound reported",
+  "multiplicity": "Holm within each method over all its R3 tests (levels x {H_drop, H_rw}) at alpha = 0.05; label SUPPORTED iff Holm-adjusted p < 0.05, else NOT_SUPPORTED. R3 results are SECONDARY (robustness evidence), never the paper's primary test result",
+  "seeds": "per-question hits of seeded arms = mean over seeds (S, P: 3 S seeds; methods: their registered seeds)",
+  "descriptive": "per-arm drops with the R1/R2 labels; R1+R2+R3 pooled estimates optional and labelled descriptive"
+ },
+ "R3_audit": {
+  "when": "after every method track's R3 predictions are frozen (sha256) and the registered R3 pass has computed the per-question contrasts",
+  "selection": "T = every R3 PRIMARY rewrite where ANY method beats its baseline at ANY level on either contrast (c_drop > 0 or c_rw > 0); R = a simple random sample of 100 PRIMARY rewrites: sorted(quids)[i] for i in default_rng([20261118, 7]).choice(n, min(100, n), replace=False); audit set = T union R, presented in default_rng([20261118, 8]).permutation order over the ascending audit set; ids A001, ... (r3_common.audit_selection)",
+  "annotator": "single annotator (one author), blind to model outputs, hits, contrasts, judge output, generator identity and selection flags; reviews every audit row; sheet columns as the R2 kit (original_question, rewrite, qtype, gold_answers, same_answer_set, same_constraint_time, notes, reviewer_initials)",
+  "accept_rule": "same_answer_set == Y and same_constraint_time == Y; N, unsure or blank = not accepted",
+  "analyses": "random100 acceptance and rejection rates with Wilson 95% CIs (z = 1.959964); targeted acceptance with Wilson CI; BOUND (as R2 amendment A2): every R3 test recomputed on PRIMARY minus the human-rejected rows (same bootstrap, Holm within method); BOUND_HOLDS iff Holm-adjusted p < 0.05 else BOUND_FAILS; the scorer asserts every unreviewed row has every contrast <= 0 (r3_common.bound_analysis)",
+  "paper_wording": "'human-audited by one author: all R3 rewrites on which a method outperformed its baseline plus a random 100'; never 'human-verified'"
+ },
+ "stop_rules": {
+  "STOP_GPU_CAP": "see cut_order (GPU-hour cap of the track 1.2 GPU-h); unrun items NOT_RUN and declared",
+  "STOP_GPU_SHARING": "one container per card; any other compute process on the card -> wait (run_card_r3.sh)",
+  "STOP_TEST_INTEGRITY": "adapter / frozen-code / frozen-prediction sha256 mismatch stops the run",
+  "STOP_PIPELINE_DRIFT": "I1 top-1 < 99.5% for RULE or S at any k on either set -> one logged bug-fix, else stop",
+  "STOP_GENERATOR": "R3 generator change only via a pre-generation amendment (R3_generator.fallback)",
+  "DEADLINE": "all R3-track compute finished by Fri 21 Nov 2026; unfinished items NOT_RUN"
+ },
+ "scoring_discipline": "No result of this rule is changed after it is computed; anything not listed here is POST_HOC; R3 Hits are first computed by the method tracks' registered pass.",
+ "code_sha256": {
+  "local/r3_pipeline.py": "7a5ce89ca9e4901b559f5d35d474b3f7b8464b3ea0996dc49379ffacf2fd75af",
+  "r2_common.py": "5622ea2cb19853e4ddcc7e64dfb9872f35e920cdf33d67c583b8ca2359b2be5c",
+  "r3_common.py": "d80d811e3031ebd8f470010d801df9d424793b5185922d9f471d32e6f3a147bc",
+  "remote/expected_sha_dev.json": "7bc16e8709045e84a5c664f1c202381d2c57e283d531f50cc4786d88ced87de8",
+  "remote/expected_sha_r3.json": "9ad0b4bfe074e2dc40be9547529f3b159582d2aa58c0680f4be93243528879f2",
+  "remote/gen_job_r3.sh": "69295ec09f62ebcf6e854bbec9d6fb926e5fb355e255962b239547b9b853e97f",
+  "remote/jobA3.sh": "c3a8869a4f56d71d707a146a77ed71c6122a0b693620225a6dffa95bd51aaea8",
+  "remote/jobBC3.sh": "dc73d2d398d13596742cfdf2e33d3edfad7baec71b91e0b3f23f1f58515ad213",
+  "remote/jobD3.sh": "64e3e626839129600468ee4e441d85a58d1c1dd893802c41cb90a3c332ee9020",
+  "remote/r2_common.py": "5622ea2cb19853e4ddcc7e64dfb9872f35e920cdf33d67c583b8ca2359b2be5c",
+  "remote/r3_combine.py": "a712b3720c55ae4677464bccc6b08313d629733cbc7cdc1869e7cd0709950a64",
+  "remote/r3_common.py": "d80d811e3031ebd8f470010d801df9d424793b5185922d9f471d32e6f3a147bc",
+  "remote/r3_qwen_gen.py": "e5c13c72908ec3dd0ebf0c97d1c26e8ff1fe6d1515fb9b28c628f1f5e85d7c6e",
+  "remote/rob_build.py": "0400d972eb1f33ee0c5501e6ee05c58eab3d83e6c0b81a245bbb23b211a19edf",
+  "remote/rob_collect_frozen.py": "2953b1192e5b3ae136b82c6ff96a8e1d7e313b0fb69ea4470104ee1ee6887a0f",
+  "remote/rob_common.py": "de4e76ee32cb741ac1d405501ffd8aa1b810a6b5deabe9c91dc218ed37d2cf7c",
+  "remote/rob_templates.py": "09fffa011e4a689f828ec5d2fd8520624e12de9d6bfbc88fb79a70045bde7b99",
+  "remote/run_card_r3.sh": "0040a3d80cd98ca60d73aaa6a09f8e0548702b0c178f9ac54747fb0af46f7f9e",
+  "remote/run_cpu_r3.sh": "46f9baf0bac0a72fc6d88e8cc094fec31b09a86879e41ba30d46b13b092c8958",
+  "rob_common.py": "de4e76ee32cb741ac1d405501ffd8aa1b810a6b5deabe9c91dc218ed37d2cf7c"
+ },
+ "amendment_log": [],
+ "registered_utc": "2026-11-18T15:53:55Z",
+ "sha256": "c5f799380c70c78ffba2a4ad865425389f83d3bb8918c312ae036c46cd328ce8",
+ "cut_order": "(1) generation: dev attempt 1 -> dev attempt 2 -> training (deadline rule); (2) arms: G_1, G_5, G_100 -> P -> GU retrieval -> GU_1, GU_100, GU_5 -> GPLAIN_1; before each GPU item spent + projection <= 1.2 else NOT_RUN; (3) optional training completion session"
+}

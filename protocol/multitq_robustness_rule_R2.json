@@ -1,0 +1,127 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_R2",
+ "rule_version": "v1.0",
+ "nature": "REGISTERED AMENDMENT to the robustness track: a confirmatory replication probe (R2) of a contrast first seen post hoc on R1. It reuses the official MultiTQ test split; the original registered R1 results are never changed.",
+ "plan": "PAKDD 2027 strengthening item A (registered 2026-10-29): confirmatory role-robustness probe. Device: the GPU host GPU 0 only.",
+ "question": "On a fresh, disjoint sample of rewritten MultiTQ test questions, produced by a different generator family and confirmed by the authors' blinded human review, does the guided reader G_k lose more Hits@1 under rewriting than the LLM parser P_k (drop(G_k) - drop(P_k) > 0) at k = 1, 5 and 100?",
+ "motivation_post_hoc": {
+  "source": "robustness_posthoc_parser_vs_reader.csv; analysts' post-hoc analysis of R1 frozen predictions 427b2b3d on the 569 R1 LLM-judge-accepted rewrites; paired Poisson bootstrap B = 2000, seed 0",
+  "drop(G_k)-drop(P_k)_points": {
+   "k1": "+7.73 [3.61, 11.82]",
+   "k5": "+7.21 [3.27, 11.40]",
+   "k100": "+8.61 [5.21, 12.14]"
+  },
+  "status": "POST HOC on R1 (not registered there); it motivates H1-H3 and is not evidence for them"
+ },
+ "parent_documents": {
+  "R1_rule": {
+   "filename": "multitq_robustness_rule.json",
+   "sha256": "e518eac86c8503d4b43c7c694cdd868f7484c44402501a0c375a18fe5a11f34e"
+  },
+  "R1_results": {
+   "filename": "multitq_robustness_results.json"
+  },
+  "R1_freeze": {
+   "filename": "multitq_robustness_freeze.json"
+  },
+  "R1_perturbed_set": {
+   "filename": "multitq_robustness_perturbed_set.json"
+  },
+  "R1_report": {
+   "filename": "multitq_robustness_report.md"
+  },
+  "R1_code": {
+   "filename": "multitq_robustness_code.tgz"
+  },
+  "R1_review_kit": "drafts/manuscripts/pakdd2027/dossier_2026-10-28/review_kit/ (build_review_kit.py, rescore_after_review.py; format template for the R2 kit)"
+ },
+ "status_at_registration": {
+  "R2_outputs": "None. The R2 sample and pool have not been drawn; no R2 rewrite, judge verdict, bundle, retrieval, generation or prediction exists; no R2 GPU job has run.",
+  "work_before_registration": "[internal note removed in the anonymised copy]",
+  "existing_test_exposure": "All R1 numbers (registered, post-hoc and internal sensitivities) and the full-test k% results are known to the designers. R2 questions are disjoint from the R1 2,000-question sample, but they are official test questions whose full-test predictions by every arm were scored in the k% experiment (aggregate only)."
+ },
+ "test_reuse": "Official MultiTQ test split, reused. Every arm is frozen by sha256 (R1 freeze lists); nothing is trained or selected; R2 adds descriptive and confirmatory information on rewritten inputs only.",
+ "sample": {
+  "split": "MultiTQ official test (questions/test.json, sha256 d9bf3bf2...)",
+  "candidate_set": "test minus the R1 2,000-question sample (R1 quid-list sha256 5b4ae6a8b35d93521f30b89fc6eb3c2ee5ef05ef3350726e295f900565e26d0d)",
+  "n": 2000,
+  "seed": 20261029,
+  "recipe": "r2_common.draw_sample_r2: largest-remainder allocation proportional to the candidate set's qtype counts; within each qtype (sorted order) quids sorted ascending; ONE numpy default_rng(20261029) generator, choice(n_qtype, alloc, replace=False) (same procedure as R1 rob_common.draw_sample)",
+  "pool": {
+   "n": 600,
+   "recipe": "R1 pool procedure: largest remainder over the R2 sample's qtype counts; default_rng([20261029, 3]).choice within each qtype"
+  },
+  "records": "quid lists and sha256 (json.dumps(sorted int quids)) written to multitq_robustness_R2_perturbed_set.json; disjointness from R1 asserted",
+  "fields_read_for_sampling": [
+   "quid",
+   "qtype"
+  ]
+ },
+ "generator": {
+  "model": "Qwen/Qwen2.5-72B-Instruct-AWQ (official Qwen open-weights 4-bit AWQ build of Qwen2.5-72B-Instruct): a model family different from the R1 generator (API LLM, API LLM) and from the Llama-3.1-8B backbone of the arms",
+  "engine": "vLLM 0.10.2 (tkgqa-vllm:latest), ONE RTX PRO 6000 (the GPU host GPU 0, pinned), dtype float16, max_model_len 2048, gpu_memory_utilization 0.90, enforce_eager; r2_gen.py",
+  "prompt": "one user turn = R1 rob_common.GEN_PROMPT (sha256 f69b6053645b90116e4418f53babafbd7e40f9e59f0b801bfaae16054353ea0d) with the question; the model's own default chat template (rendered prefix and template sha256 recorded)",
+  "decoding": "greedy (temperature 0), seed 0, max 300 new tokens",
+  "retry_policy": "R1 policy: at most 2 attempts; attempt 2 only for pool questions whose attempt-1 rewrite failed a mechanical check or the judge; attempt 2 = GEN_PROMPT + GEN_RETRY_SUFFIX (sha256 d80d677031892fa7f2f153259836914eb126f90154096570af600490290d03ba) showing the rejected attempt-1 text; first accepted attempt kept",
+  "engine_smoke_test": "allowed before the first R2 generation: the 5 smallest train quids (questions/train.json), GEN_PROMPT, same engine; outputs discarded and never used; only checks that the engine loads and returns text on sm_120",
+  "fallback": "If the AWQ build cannot be downloaded, cannot load or fails the smoke test on GPU 0, the generator falls back to meta-llama/Llama-3.1-70B-Instruct (already cached on the GPU host) in a single-card configuration, recorded as an amendment (with the failure evidence) BEFORE any R2 generation is run. No R2 generation may be run with any other model."
+ },
+ "mechanical_checks": "R1 rob_common.mechanical_check unchanged (rob_common.py sha256 de4e76ee32cb741ac1d405501ffd8aa1b810a6b5deabe9c91dc218ed37d2cf7c)",
+ "judge_prefilter": "R1 judge prompt (rob_common.JUDGE_PROMPT, sha256 da40535e53be1f24a5c23e7dcc81ff2aa90580e7f0c3a8adc4b0921da4c7405a) and judge role (API LLM judge, JUDGE_MODEL_ID, max_tokens 200); called only on mechanically valid rewrites; judge-accepted iff all five booleans true. Used only as a pre-filter.",
+ "analysis_sets": {
+  "PRIMARY": "judge-accepted rewrites that the authors' blinded human review confirms: a row is kept iff same_answer_set = Y AND same_constraint_time = Y on EVERY returned reviewer sheet ('unsure', N or blank = not kept)",
+  "SENSITIVITY": "all judge-accepted rewrites (descriptive)",
+  "LOW_N_flag": "if the PRIMARY set has fewer than 200 questions, H1-H3 are still computed and labelled, and the result is flagged LOW_N"
+ },
+ "review_kit_R2": "same format as the R1 kit: sheet (review_id, original_question, rewrite, qtype, gold_answers, same_answer_set, same_constraint_time, notes, reviewer_initials) with no predictions, judge output or generator identity; fixed random order numpy default_rng(20261029).permutation over the judge-accepted quids in ascending order; separate key; gold json; adapted instructions; rescoring script implementing H1-H3 and the secondaries; tests on R1 data and synthetic data only",
+ "arms": {
+  "list": [
+   "S_1, S_5, S_100 (3 S seeds each)",
+   "G_1, G_5, G_100",
+   "P_1, P_5, P_100 (3 S seeds each)",
+   "GU_1, GU_100"
+  ],
+  "frozen": "the R1 frozen adapters/models only (sha256 as in the R1 freeze and expected_sha.json); no retraining; RULE_k comes out of the structural rebuild and is descriptive only",
+  "pipeline": "identical to R1: rob_build.py (structural rebuild + bundles), frozen gk_infer.py (G, GU), frozen gu_retrieve.py, frozen pk_infer.py + pk_execute.py (tau off, fallback = the variant's S_k lists); R1 remote script sha256 recorded in the R2 freeze",
+  "inputs": "ORIG = all 2,000 sample questions (original text, re-run); RW = every judge-accepted rewrite (synthetic quid 10*quid + 3)",
+  "drop_reference": "drop = Hits@1(ORIG re-run) - Hits@1(RW) per question; S and P per-question hits are means over their 3 S seed files; G and GU seed 0"
+ },
+ "blinding": "All arms run on ORIG and RW; a sha256 freeze of every prediction file is written and saved as an artifact BEFORE any review sheet comes back. No Hits/accuracy on R2 originals or rewrites is computed by anyone on this track until the analysts sends the returned sheets. Gold-free checks (identity, invalid/fallback rates, acceptance counts, template novelty) are allowed.",
+ "hypotheses": {
+  "H1": "drop(G_1) - drop(P_1) > 0",
+  "H2": "drop(G_5) - drop(P_5) > 0",
+  "H3": "drop(G_100) - drop(P_100) > 0",
+  "set": "PRIMARY",
+  "statistic": "per-question d_i = drop(G_k)_i - drop(P_k)_i; paired Poisson(1) bootstrap of mean(d), B = 10,000, seed 20261029 (r2_common.primary_tests; multitq_eval stream; the same weights for the three k because n and seed are shared); one-sided p = share of bootstrap means <= 0; also two-sided 95% percentile CI and one-sided 95% lower bound",
+  "multiplicity": "Holm over H1-H3 at alpha = 0.05",
+  "labels": "CONFIRMED iff Holm-adjusted one-sided p < 0.05; else NOT_CONFIRMED (per k). No effect-size margin."
+ },
+ "secondary_descriptive": [
+  "rewrite Hits@1 P_k - G_k (k = 1, 5, 100)",
+  "drop(S_k) - drop(P_k) (k = 1, 5, 100) (= R1 contrast C_R2)",
+  "P_k - GU_k at k = 1, 100: rewrite Hits@1 gap and drop difference",
+  "per-arm drops with the R1 labels BRITTLE / ROBUST / INCONCLUSIVE (r2_common.drop_label: B = 2000, seed 0, two-sided 95% CI)",
+  "R1+R2 pooled estimates of drop(G_k) - drop(P_k): concatenation of the R1 set (R1 human-confirmed rows if the R1 review sheets are available at R2 scoring, else the 569 R1 judge-accepted rewrites; stated) and the R2 PRIMARY set; B = 10,000, seed 20261029",
+  "all of the above and H1-H3 also on the SENSITIVITY set",
+  "secondary results use the same bootstrap (B = 10,000, seed 20261029) unless stated; two-sided CIs; no multiplicity correction"
+ ],
+ "identity_checks_gold_free": "as R1: I1 ORIG structural rebuild vs frozen test files (top-1 >= 99.5% required, else STOP_PIPELINE_DRIFT with one logged bug-fix), I2 ORIG LLM re-run top-1 agreement vs frozen test predictions (flag < 98%), I3 GU retrieval identity",
+ "stop_rules": {
+  "STOP_BUDGET": "see cut_points; unrun items NOT_RUN",
+  "STOP_GPU_SHARING": "use the GPU host GPU 0 only; before each dispatch check nvidia-smi and docker ps; wait while GPU 0 has a foreign compute process; never use GPU 1 and never stop another process; if GPU 0 cannot do the job, message the parent",
+  "STOP_HOST": "resume from on-disk stage outputs; no partial scoring",
+  "STOP_TEST_INTEGRITY": "adapter / frozen-code / prediction sha256 mismatch stops the run or the scoring",
+  "STOP_GENERATOR": "generator fallback only through a pre-generation amendment (generator.fallback)",
+  "DEADLINE": "all R2 compute finished by Fri 6 Nov 2026; unfinished items NOT_RUN"
+ },
+ "scoring_discipline": "Scoring happens once, after the analysts returns the review sheets, with the R2 rescoring script on the frozen predictions; the original registered R1 results are never changed; every R2 analysis is labelled REGISTERED_AMENDMENT_R2 (primary, secondary) or POST_HOC (anything not listed here).",
+ "code": {
+  "r2_common.py": "5622ea2cb19853e4ddcc7e64dfb9872f35e920cdf33d67c583b8ca2359b2be5c",
+  "r2_gen.py": "250c1348cc1f9836dcf06663f56ea7502d8d519fd7d3f725e0f9eb7e8bcac0a7",
+  "rob_common.py (R1, unchanged)": "de4e76ee32cb741ac1d405501ffd8aa1b810a6b5deabe9c91dc218ed37d2cf7c"
+ },
+ "amendment_log": [],
+ "registered_utc": "2026-10-29T07:16:55Z",
+ "sha256": "c69d8f072e1c00268adf18231e1d22d24c93748f88224366e3775b640ddc516f"
+}

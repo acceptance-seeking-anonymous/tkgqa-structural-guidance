@@ -1,0 +1,39 @@
+{
+ "name": "p0_prompts",
+ "exemplars_sha256": "c17aed241160030f3292b6dd0a8948849179f18f0f32f167f8b8f1b9576b9b3b",
+ "exemplar_quids": [
+  1000004,
+  1000000,
+  1000002,
+  1000048,
+  1000009,
+  1000034,
+  1000017,
+  1000001
+ ],
+ "relations_sha256": "4b655249097806633197ce996460c67cda688f560b460fc31a07028c954b8671",
+ "chat_date": "26 Jul 2024",
+ "user_suffix": "Question: {question}\\nJSON:",
+ "decoding": "greedy, max 160 new tokens",
+ "designs": {
+  "d1": {
+   "file": "p0_prompt_d1.txt",
+   "sha256": "c96c8261b70c72dfb9b6b8deb92d5656c6dacb064a7cc36aeddbfdd00c1dc369",
+   "chars": 12118,
+   "prompt_tokens_example": 3141
+  },
+  "d2": {
+   "file": "p0_prompt_d2.txt",
+   "sha256": "4fb0284db3616a760f620ad1fcfc298c379eff9a2afbd53035fb3949184f9328",
+   "chars": 13272,
+   "prompt_tokens_example": 3407
+  },
+  "d3": {
+   "file": "p0_prompt_d3.txt",
+   "sha256": "2b1c2bb65087d221bd95db807546d5fe40b2f5d6488109c3acb348848a237c54",
+   "chars": 13675,
+   "prompt_tokens_example": 3515
+  }
+ },
+ "sha256": "b5080b862690a376af23cf21f88f3840ffbee546b4240a5cddddef9592a195e9"
+}

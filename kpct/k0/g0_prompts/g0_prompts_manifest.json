@@ -1,0 +1,55 @@
+{
+ "name": "g0_prompts",
+ "arm": "G_0",
+ "model": "meta-llama/Llama-3.1-70B-Instruct",
+ "zero_shot": true,
+ "chat_date": "26 Jul 2024",
+ "decoding": "greedy, max 48 new tokens",
+ "max_len": 2048,
+ "k_cands": 20,
+ "n_facts": 20,
+ "candidate_order": "RULE (k0 bundles: s_rank holds the RULE rank; no S scores)",
+ "gk_common_sha256": "3bbb684f484da4e9ccff5d7ed8ca644ccb5e8b6a918d50bd4b4ab04378e36b44",
+ "gk_renderers_sha256": "4d9a0078f65c5d5f4b2bbaa0d5868bed87b7dc86d37f89ebee90402f8e8eaceb",
+ "g0_renderer_source_sha256": "b00978c7786d9e64fb9358152ff0aaa18255e5d1cd61383d3670c1520e24a1e1",
+ "fixed_texts": {
+  "HEAD": "67d0802834a076d4feb3b660a803f7831eb27420fde78afb4931ea92b269603e",
+  "GLOSS": "77d37bdd1587c1da54587ed5ea30c815b495ae4812d2a1ca3eca9ae65aa477bc",
+  "TAIL": "6e55d8298f86afd15fe005f580088dabbf91869e3c343a258ed3286dcb130b31",
+  "NO_PARSE": "1dffedbebce63781f192ca16aedeed5efb58c15ec0ead8247343b0534e6e20b1"
+ },
+ "tie_break": "equal dev_sel2000 hit count -> shortest prompt (fixed-text chars: g1 < g2 < g3)",
+ "designs": {
+  "g1": {
+   "fixed_text_sha256": "2cd1719d2820e5ea42027ccc764dd7301cbcc3b06c25202d270acc6b27c96cca",
+   "fixed_chars": 385,
+   "example_render_sha256": "102fc909900a14e36876a1aa498f4d529943b9a371e2506b480863c446277176",
+   "example_render_chars": 1191,
+   "parts": [
+    "HEAD"
+   ]
+  },
+  "g2": {
+   "fixed_text_sha256": "c2f2ad5708b9bb4a2045c523ade6671faef6fa18d1f461fa11e0e6445b7bd186",
+   "fixed_chars": 1228,
+   "example_render_sha256": "80b7eb07322a182ce5285dc4bbafc3a28c656310921e3afb71c1ccceebbda37c",
+   "example_render_chars": 2034,
+   "parts": [
+    "HEAD",
+    "GLOSS"
+   ]
+  },
+  "g3": {
+   "fixed_text_sha256": "83bb867ddf5adb0c8c84bc36d65767f28b0eb01f9fea66c3b77b9e7aa98ea0eb",
+   "fixed_chars": 1633,
+   "example_render_sha256": "b8f4a64b38b7e931894d94ccbcba84594c87e565835a8e55bbd2e6c92eeb1cbc",
+   "example_render_chars": 2439,
+   "parts": [
+    "HEAD",
+    "GLOSS",
+    "TAIL"
+   ]
+  }
+ },
+ "sha256": "7f5c7c46d6e0b5e05e509ec9fc0cb0fcf0b601ba3ce27376d8ab74f1c8544717"
+}

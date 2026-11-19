@@ -1,0 +1,188 @@
+{
+ "_note": "exported from the code by scripts/export_frozen_config.py; the code is authoritative",
+ "paired_bootstrap": "Poisson(1) weights shared by both arms; B = 2000, seed 0 (k% test pass, R1); B = 10,000, seed 20261029 (R2)",
+ "structural_ranker (kpct/structural/kpct_run.py)": {
+  "E_GRID": [
+   6,
+   24
+  ],
+  "S_GRID": [
+   [
+    31,
+    0.05
+   ],
+   [
+    31,
+    0.1
+   ],
+   [
+    63,
+    0.05
+   ],
+   [
+    63,
+    0.1
+   ],
+   [
+    127,
+    0.05
+   ],
+   [
+    127,
+    0.1
+   ]
+  ],
+  "S_BASE": {
+   "objective": "lambdarank",
+   "metric": "ndcg",
+   "ndcg_eval_at": [
+    1
+   ],
+   "min_data_in_leaf": 100,
+   "feature_fraction": 0.8,
+   "bagging_fraction": 0.8,
+   "bagging_freq": 1,
+   "lambdarank_truncation_level": 20,
+   "verbose": -1
+  },
+  "TRAIN_CAP": 200
+ },
+ "reader_dense_rag (kpct/reader/gk_common.py)": {
+  "MODEL_8B": "meta-llama/Llama-3.1-8B-Instruct",
+  "MODEL_70B": "meta-llama/Llama-3.1-70B-Instruct",
+  "CHAT_DATE": "26 Jul 2024",
+  "MAX_LEN": 2048,
+  "MAX_NEW_G": 48,
+  "LORA": {
+   "r": 16,
+   "lora_alpha": 32,
+   "lora_dropout": 0.05,
+   "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+   ]
+  },
+  "OPT": {
+   "lr": 0.0002,
+   "weight_decay": 0.0,
+   "warmup": 0.03,
+   "grad_clip": 1.0,
+   "eff_batch": 16
+  },
+  "E_MAX": {
+   "k01": 3,
+   "k05": 2,
+   "k10": 1,
+   "k100": 1,
+   "cap20k_k10": 1,
+   "cap20k_k100": 1
+  }
+ },
+ "parser (kpct/parser/pk_common.py)": {
+  "MODEL_8B": "meta-llama/Llama-3.1-8B-Instruct",
+  "MAX_LEN": 2048,
+  "MAX_NEW_P": 160,
+  "LORA": {
+   "r": 16,
+   "lora_alpha": 32,
+   "lora_dropout": 0.05,
+   "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+   ]
+  },
+  "OPT": {
+   "lr": 0.0002,
+   "weight_decay": 0.0,
+   "warmup": 0.03,
+   "grad_clip": 1.0,
+   "eff_batch": 16
+  },
+  "E_MAX": {
+   "k01": 3,
+   "k05": 2,
+   "k10": 1,
+   "k100": 1,
+   "cap20k_k10": 1,
+   "cap20k_k100": 1
+  },
+  "TAUS": [
+   null,
+   -0.3,
+   -0.1,
+   -0.03
+  ],
+  "QTYPES": [
+   "equal",
+   "before_after",
+   "first_last",
+   "equal_multi",
+   "after_first",
+   "before_last"
+  ],
+  "LEVELS": [
+   "day",
+   "month",
+   "year"
+  ],
+  "ATYPES": [
+   "entity",
+   "time"
+  ],
+  "ROLES": [
+   "subject",
+   "object"
+  ],
+  "ORDERS": [
+   "before",
+   "after",
+   "first",
+   "last"
+  ],
+  "KEYS": [
+   "mentions",
+   "relation",
+   "answer_role",
+   "qtype",
+   "answer_type",
+   "granularity",
+   "time",
+   "anchor",
+   "order"
+  ]
+ },
+ "robustness_R1 (robustness/r1/local/rob_common.py)": {
+  "SEED": 20261028,
+  "N_SAMPLE": 2000,
+  "N_P3": 600,
+  "PREFIX": "Please answer: ",
+  "GEN_MAX_TOKENS": 300,
+  "JUDGE_MAX_TOKENS": 200,
+  "MAX_ATTEMPTS": 2,
+  "JUDGE_KEYS": [
+   "same_answer_set",
+   "same_entities",
+   "same_time",
+   "same_relation",
+   "grammatical"
+  ]
+ },
+ "robustness_R2 (robustness/r2/local/r2_common.py)": {
+  "SEED_R2": 20261029,
+  "N_SAMPLE": 2000,
+  "N_POOL": 600,
+  "B_PRIMARY": 10000,
+  "BOOT_SEED_PRIMARY": 20261029,
+  "ALPHA": 0.05
+ }
+}

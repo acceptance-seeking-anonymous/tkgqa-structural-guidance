@@ -1,0 +1,106 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_grounded_reader",
+ "rule_version": "v1.0",
+ "nature": "REGISTERED method-track protocol. Frozen Reader adapters G_5 and G_100 (and G_1 if the GPU allotment allows) read a guidance bundle whose facts and candidates come from the frozen LLM Parser's parse instead of the structural parse. No training, no new adapter, no prompt change; only the bundle source changes. Reuse of the official MultiTQ test split; selection on dev only.",
+ "question": "Does building the Reader's bundle from the Parser's parse (the more rewording-robust front end) make the frozen Reader lose less Hits@1 under R3 rewording, and score higher on R3 rewrites, than the same frozen Reader on the structural bundle (G_k), at each fitting level, without more than 0.3 points of dev-original loss?",
+ "parent_documents": {
+  "R3_rule": "(sha256 c5f79938...; contains the R3 analysis plan applied here)",
+  "R3_amendments": [
+   "(frozen file of the reported run)",
+   "(frozen file of the reported run)",
+   "(frozen file of the reported run)"
+  ],
+  "R3_set": "(578 judge-accepted gemini-2.5-pro rewrites)",
+  "R3_frozen_predictions": "; freeze (R3 hits not scored yet)",
+  "dev_paraphrase_set": "(DEV_ACCEPTED 1,762)",
+  "dev_hits_frozen_arms": "; dev results",
+  "kpct_rule": "(frozen file of the reported run)",
+  "kpct_subsets": "(frozen file of the reported run)",
+  "evaluator": "(multitq_eval.py sha256 1f85bbdc...)",
+  "guided_code": "(gk_common.py 3bbb684f..., gk_infer.py d01270d9...)",
+  "G_seed_code": "(frozen file of the reported run)",
+  "structural_ablation": "rule, code (sa_parser_replay.py PALONE / PK definitions), results",
+  "R1": "rule, set, predictions",
+  "R2": "rule, amendments /, set, predictions"
+ },
+ "status_at_registration": {
+  "outputs": "None of this track: no Parser-grounded bundle for any split except the code pilot below, no generation, no prediction, no score.",
+  "work_before_registration": "Read the R1/R2/R3 rules, the frozen guided / parser / executor / structural-ablation code and the remote file layout; wrote the code listed under code_sha256; ran ONE gold-free CPU code pilot (gr_build.py on the first 100 dev_sel2000 quids for k05_s0 and k100; outputs = bundle/status counts and the I1a/I1b identity rates; no LLM, no answer read; pilot outputs are discarded and rebuilt by stage A).",
+  "known_to_designers": "Dev numbers of every FROZEN arm (probe-set report [id]: e.g. G_5 dev ORIG 0.9370 / DEV_ACCEPTED 0.7242, G_100 0.9585 / 0.7520, P_5 0.9475 / 0.7834, P_100 0.9557 / 0.8089); all R1/R2 results; full-test aggregates of the frozen arms; the R3 gold-free checks (top-1 changed rates). No dev, test or R3 number of any GR variant exists; R3 hits of the frozen arms have not been computed.",
+  "pilot_results_gold_free": {
+   "jobs": "[id] (first pilot), [id] (rerun after the empty-pool self-check fix: structural bundles exist for empty pools, so the I1b self-check now builds them; no effect on GR bundles, where an empty pool is a fallback as in P_k)",
+   "rows": "first 100 dev_sel2000 quids, k05_s0 and k100",
+   "I1a_top1_and_full": "1.0 / 1.0 for seeds 0-2 at both levels",
+   "I1b_same_prompt": "1.0 at both levels (rerun)",
+   "prompt_identical_share": "PK 70/100 (k05_s0), 73/100 (k100); PALONE 5/100, 4/100 -> projection basis for the GPU-hour cap only",
+   "note": "gold-free; no LLM run; these counts are not outcomes and are not used for selection"
+  }
+ },
+ "test_reuse": "Official MultiTQ test split (questions/test.json sha256 d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee), reused; R3/R1/R2 rewrites are rewordings of official test questions. Nothing is trained; the only choice (bundle source per level) is made on dev.",
+ "method": {
+  "name": "GR_k (Parser-grounded Reader) at level k in {k05_s0 (5%), k100 (100%)}; k01_s0 (1%) optional (GPU-hour cap)",
+  "reader": "FROZEN G_k adapter, unchanged: k05_s0 guided/adapters/G_k05_s0_ordS_s0/ep2 (sha256 5adfc273...), k100 G_k100_ordS_s0/ep1 (ee08faf1...), k01_s0 G_k01_s0_ordS_s0/ep2 (4d81d7a0...); Llama-3.1-8B-Instruct, vLLM 0.10.2 (tkgqa-vllm:latest), the frozen gk_infer LLM arguments (bf16, enable_lora, max_lora_rank 16, max_loras 1, max_model_len 2304, seed 0, CUDA graphs), gpu_memory_utilization 0.40 (llm_controls LC1-A1 / R3 arms), greedy temperature 0, max 48 new tokens, seed 0, frozen chat template and date_string; prompt = gk_common.g_user of the normalised bundle, order S, gk_common.fit_g_prompt 2,048-token cap; answer validity gk_common.canon_answer; ranked list = gk_common.g_ranked(answer, Parser-pool S seed-0 top-50) (G_k: answer + S_k seed-0 list)",
+  "parser": "FROZEN P_k generations, cached (no Parser inference is re-run): checkpoint k01_s0 ep3, k05_s0 ep1, k100 ep0.5 (the P_k selected checkpoints); files parser/raw/<k>/raw_P_{dev_sel2000,test}_<ckpt>.jsonl.gz, robustness_r3/llm/P/raw (R3 rewrites + dev paraphrases), robustness/P/raw (R1), robustness_r2/P/raw (R2)",
+  "bundle_sources": {
+   "PALONE (GR-A_k)": "kpct_executor.compact_to_parse(c, q, structural_parse=None): the Parser hypothesis only (one relation, one entity per mention, the Parser's qtype / answer type / granularity / time / order / anchor) = structural-ablation mode PALONE",
+   "PK (GR-K_k)": "kpct_executor.compact_to_parse(c, q, structural_parse=the row's frozen structural bundle parse): the frozen P_k parse = Parser hypothesis first, then the deduplicated structural alternatives (<= 5 relations; <= 5 alternatives per mention)"
+  },
+  "bundle_construction": "gr_build.py: validation exactly as frozen pk_execute.work (pk_common.extract_json + validate_compact; check_names); execution exactly as kpct_executor.Executor.execute(probs='classifier') of the level's executor (rec_info_from_parse, the k% classifier probabilities of the parse's choices, anchor_mention override, build_info with the frozen operators / retrieval / RULE ordering, pool cap 1,000, the 3 S_k LightGBM seeds); bundle = kpct_core.parse_json(rec, info) + kpct_core.bundle_core(o, rec, S seed-0 scores), i.e. the frozen code that built every G_k bundle. Field by field: candidates = top-20 distinct pool candidates in S seed-0 order (Ranker seed 0 over the Parser candidates); 'RULE rank' = the candidate's position in the RULE-ordered pool of the Parser parse (the Rules pipeline's procedure applied to the Parser hypothesis); 'S score' = Ranker seed-0 score; 'satisfies operator' = the pool's sat_any flag; supporting facts = kpct_core.cand_support (<= 3) mapped to the 20 provenance facts of mtq_export.provenance_facts (S seed-0 order); operator trace = kpct_core.operator_trace on the Parser pool; parse block = the Parser parse rendered by the frozen render_parse (probabilities are not rendered). No field is missing; template_unseen is set to null (not rendered, as rob_build for rewrites).",
+  "fallback": "As P_k (tau off): invalid_json / unknown_name (both sources), execution error / invalid execution / empty pool (source-specific) -> the row keeps the frozen G_k output (Reader on the structural bundle), mirroring P_k's fallback to S_k. Fallback rates are reported per split.",
+  "prompt_identity_reuse": "If the rendered G user turn of the Parser-grounded bundle equals that of the row's frozen structural bundle (string equality of gk_common.g_user; identical text => identical token ids and truncation), the frozen G_k answer of that row is reused instead of regenerating (exact up to vLLM batch numerics; the frozen output IS the frozen adapter's greedy output on that prompt); the ranked-list tail is the Parser-pool S seed-0 list. Only prompt-different rows are generated. I2 (gold-free, descriptive): at most 150 dev ORIG + 150 DEV_ACCEPTED prompt-identical rows per level (default_rng([20261118, 11]) / ([20261118, 12])) are regenerated from the frozen structural bundles and their top-1 agreement with the frozen G_k outputs is reported."
+ },
+ "identity_checks_gold_free": {
+  "I1a": "PK-source S seed-b top-50 lists (fallback rows: S_k's own list) vs the frozen P_k prediction files, every level x split: top-1 identity >= 0.995 required for seed 0-2 (validates validation + compact_to_parse + execution)",
+  "I1b": "dev_sel2000 at every level: the frozen structural bundle parse re-executed through the SAME builder (probs='given') must reproduce the frozen structural bundle's rendered G prompt for >= 0.995 of rows (validates the bundle code path)",
+  "STOP_PIPELINE_DRIFT": "I1a or I1b below threshold -> one logged bug-fix (amendment, before any generation), else STOP"
+ },
+ "selection_on_dev": {
+  "data": "dev_sel2000 ORIG (2,000; frozen G_k = its selection-time dev file; Parser = cached dev_sel2000 generation of the selected P_k checkpoint) and DEV_ACCEPTED paraphrases (1,762; synthetic quid 10q+5 of the R3-track llm root; frozen G_k = its frozen variants file). Never R1, R2, R3 or test.",
+  "candidates": "per level: frozen G_k (baseline), GR-A_k (PALONE), GR-K_k (PK)",
+  "criterion": "admissible iff Hits@1(dev ORIG, c) - Hits@1(dev ORIG, G_k) >= -0.003 (= at most 6 of 2,000; G_k always admissible); select the admissible candidate with the highest Hits@1 on DEV_ACCEPTED; ties (|difference| < 0.0005) -> G_k, then GR-K_k, then GR-A_k (closest to the baseline first). Selecting G_k = NOT_SELECTED: no final pass and no test result at that level (reported as such). Registered before any dev number of a GR variant exists.",
+  "record": "selection json (all candidate numbers with Poisson CIs, B = 10,000, seed 20261118, descriptive; I2) saved as a file BEFORE the final pass; never changed afterwards"
+ },
+ "final_pass": {
+  "rows": "for each level with a selected GR source: official test (54,584; GR's original-test predictions), R3 PRIMARY rewrites (578; 10q+4), R1 P3 paraphrases (569 judge-accepted; 10q+3), R2 rewrites (570 judge-accepted; 10q+3). R1 P1 (prefix) and P2 (question mark) perturbations are NOT run (mechanical, non-LLM rewordings; declared scope reduction).",
+  "cut_order": "one vLLM session, items in order: [R3 rewrites, test rows of the 578 R3 quids] for each selected level (5% first) -> [R1 P3, R2 rewrites, test rows of the R1/R2 quids] per level -> [remaining test rows] per level. Before each item: elapsed + n_generate x 0.075 s + 20 s <= budget_s else NOT_RUN (declared; a missing full-test remainder makes the full-test number unavailable and the R3/R1/R2 analyses use the probe-question test rows only)",
+  "freeze": "after the final pass every assembled prediction file (test, r3rw, r1p3, r2rw per level) and every generated file is sha256-listed in grounded_reader_freeze.json, saved as a file BEFORE the single scoring pass; the scorer verifies every hash (mismatch -> STOP_TEST_INTEGRITY)"
+ },
+ "analysis_single_pass": {
+  "evaluator": "official multitq_eval.hit_at_k (sha256 1f85bbdc...), test.json answers",
+  "original_test": "per selected level: Hits@1 and Hits@10 of GR_k and of frozen G_k on the full test (n = 54,584), Poisson(1) bootstrap 95% percentile CIs (r2_common.summarise, B = 10,000, seed 20261118) and the paired difference GR_k - G_k (two-sided 95% CI). Descriptive original-wording cost; reported next to the rewrite numbers; also vs the 0.3-point dev constraint (descriptive)",
+  "R3_primary": "R3 rule R3_secondary_analysis_for_method_tracks, unchanged: set = R3 PRIMARY (578) and the same questions' original text; ORIG predictions = GR_k's full-test predictions (method) and frozen G_k's full-test predictions (baseline); drop = Hits@1(ORIG) - Hits@1(R3 rewrite) per question; c_drop = drop(G_k) - drop(GR_k) (H_drop: mean > 0), c_rw = Hits@1_RW(GR_k) - Hits@1_RW(G_k) (H_rw: mean > 0); r3_common.method_tests: paired Poisson(1) bootstrap of the mean contrast, B = 10,000, seed 20261118, one-sided p = share of bootstrap means <= 0, two-sided 95% CI and one-sided 95% lower bound; Holm within this method over (selected levels) x {H_drop, H_rw} at alpha 0.05; SUPPORTED iff Holm-adjusted p < 0.05. NOT_SELECTED levels are not part of the family. SECONDARY robustness evidence, never the paper's primary test result.",
+  "R1_R2": "the same contrasts and statistic on R1 P3 (569) and R2 rewrites (570), ORIG = the same questions' full-test predictions; Holm within the method per probe; labelled SECONDARY (R1/R2 were analysed many times; nothing is selected on them)",
+  "descriptive": "GR_k vs P_k (Parser arm, mean over its 3 S seeds) on R3 / R1 / R2: rewrite Hits@1 difference and drop difference (summarise; not tests); assembly counts (fallback / reused / generated) per split; I1a, I1b, I2",
+  "audit_feed": "per-question R3 contrasts (c_drop, c_rw per level) written for the later single-annotator R3 audit (r3_common.audit_selection over all method tracks); this track does not run the audit"
+ },
+ "stop_rules": {
+  "STOP_TEST_INTEGRITY": "sha256 mismatch of a frozen input listed in expected_gr.json (exit 3) or of a frozen GR prediction at scoring",
+  "STOP_PIPELINE_DRIFT": "see identity_checks_gold_free",
+  "STOP_GPU_SHARING": "one container per card; any other compute process on the card -> wait (run_card_gr.sh)",
+  "STOP_GPU_CAP": "cut order; NOT_RUN items declared",
+  "DEADLINE": "all compute by Fri 21 Nov 2026"
+ },
+ "scoring_discipline": "No result of this rule is changed after it is computed; anything not listed here is POST_HOC and labelled so. Test, R3, R1 and R2 hits of GR are computed once, in the registered pass, together with the frozen baseline's.",
+ "deliverables": "registration rule; selection record; freeze; results json; per-question hits csv.gz; R3 per-question contrasts; report md; GPU usage log rows; code tgz",
+ "code_sha256": {
+  "expected_gr.json": "0791e3b0b7491a15cba923ebd9be20bc41937a8604fd0197915126aeb44fc15f",
+  "gr_assemble.py": "eecbc75b324dc48e811106be6566434a6fc8b465387d3f966c698f613f98727f",
+  "gr_build.py": "851b79b7e80d5a0831f74648384b1d740c4e85bae92950ce297e75c573c7b62c",
+  "gr_dev_score.py": "b23cd7a1ad576075388756c29041ac30652578ca604e5b0f42830a2f1431001c",
+  "gr_infer.py": "23a482a7d684b44af02e6987ce0cd9534542e01b88c0a9167b0e24e17b3f5918",
+  "gr_prep.py": "30f6b72b54c992763ee1a445942d009d0f8024f98d6dd5b079cc546d92e02281",
+  "gr_score.py": "dd314ee4d5dd3a88852d82578087601118013e240f646c860214632959e86f5b",
+  "gr_verify.py": "95b9ebb7af9bd942541f3df808c13a0631d4dc1003730ca6f9da7b6caacb061c",
+  "jobA_gr.sh": "ed3753eb23379de4582e085ee0560afdd1b00cb93e682348b165d49dc6a2d444",
+  "jobB_gr.sh": "0a80c8f0c7842e47ddd789c2fc3d6de4ffd13ffa629c40af1f9e0cf40bfb5e1e",
+  "jobC_gr.sh": "d57c44fa66dc0b988a850f76d1fab783b74ead9f8e25f05567b6792cb024598e",
+  "jobD_gr.sh": "226cae8062226ede0dad55cd235b103ed933426fbacc064f690996eab1702887",
+  "run_card_gr.sh": "6b543134ac71303658c0b04b0faac6c569d9a1c4e8bc17445bb18ae4f80cc710",
+  "run_cpu_gr.sh": "03aca640dc8c70ac601dfe0abf860a95735591cdd760647da38ffb833585177f",
+  "pilot_gr.sh (pre-registration code pilot only)": "2d61fc868e1f6c3e2bae78d2153cd67d64cb577ec0c8fa697db5c249d7f141d5"
+ },
+ "amendment_log": [],
+ "registered_utc": "2026-11-18T17:46:53Z",
+ "sha256": "05a7b8b861b1ccc06c613bf7abe5556489a78b9ba95c52044205bde66100da1c"
+}

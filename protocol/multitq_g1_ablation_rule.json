@@ -1,0 +1,154 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "name": "multitq_g1_ablation_rule",
+ "version": "1.0",
+ "track": "guided reasoner (ablation_g1)",
+ "status": "POST-HOC and DESCRIPTIVE. Registered after every k% test number exists (KP1-KP4 already decided). No pass/fail threshold is registered: the analysis reports estimates with CIs only. It cannot change any k% decision, label or primary-arm declaration.",
+ "question": "How much does the frozen G_1 reasoner (Llama-3.1-8B-Instruct LoRA, k = 1%, subset seed 0, ordS ep2) rely, at inference time, on each component of its structural guidance bundle (provenance facts, candidate list, ranker outputs, parse/trace), and how much on the quality of the facts (structural provenance vs GU dense-retrieved), on MultiTQ dev?",
+ "limitation_registered": [
+  "The adapter was trained on full bundles only. Inference-time ablation measures how much the frozen model relies on each component, not the value of training without that component.",
+  "Every variant except A_full is out of the training format (sections are missing or reformatted). A drop therefore mixes information loss with format shift; the two cannot be separated with a frozen adapter.",
+  "G_HEAD is unchanged in every variant and still says that a pipeline parsed the question and ranked candidates.",
+  "The structural facts are SELECTED from S seed-0 provenance (support facts of the top candidates), so 'facts only' still carries the structural pipeline's retrieval and ranking through which facts are shown. A_facts / A_facts_cand remove the ORDER channel (seeded shuffle); A_facts_ord keeps the frozen order to measure it.",
+  "A_GUfacts changes the facts and, necessarily, the candidate-to-fact links (recomputed by string match); it measures the joint effect of the fact source and link definition with everything else held fixed.",
+  "Design knowledge: the structural pipeline, prompts and operators were designed with full-data development knowledge . The D_main pool excludes the two dev subsets on record as used (dev_sel2000, dev_sel10k), but earlier unrecorded use of dev cannot be excluded."
+ ],
+ "frozen_inputs": {
+  "base_model": "meta-llama/Llama-3.1-8B-Instruct (bf16, HF cache on the GPU host, HF_HUB_OFFLINE=1)",
+  "adapter": {
+   "adapter_model.safetensors_sha256": "4d81d7a017e391af0c8118e55c9e707b53ca9b607cc397572832c7da54a3440a",
+   "adapter_config.json_sha256": "738f4aba51d5a3de627963e02b6e8197e6671d159ddbc4aadef6135ef58dedc4",
+   "freeze_record": "multitq_kpct_guided_freeze.json"
+  },
+  "prompt": {
+   "G_HEAD_sha256": "67d0802834a076d4feb3b660a803f7831eb27420fde78afb4931ea92b269603e",
+   "renderers_sha256 (gk_common.prompt_texts_sha256)": "4d9a0078f65c5d5f4b2bbaa0d5868bed87b7dc86d37f89ebee90402f8e8eaceb",
+   "chat_date": "26 Jul 2024",
+   "gk_common.py_sha256": "3bbb684f484da4e9ccff5d7ed8ca644ccb5e8b6a918d50bd4b4ab04378e36b44",
+   "variant_renderer gk_ablation.py_sha256": "7f7a82c62433865bd8473e9e953debe436fbe206da3f2c2364ff22a2514e5ee5"
+  },
+  "decoding": "vLLM 0.10.2 (image tkgqa-vllm:latest), greedy (temperature 0, seed 0), max 48 new tokens, max_model_len 2304, gpu_memory_utilization 0.85, enable_lora max_lora_rank 16; 2,048-token prompt+answer cap with trailing displayed fact groups dropped (gk_common.fit_g_prompt rule); validity = gk_common.canon_answer (KG entity after normalisation, or a time string 2005-2015)",
+  "dev_sel2000_bundles": {
+   "file": "WORK_DIR/bundles/k01_s0/dev_sel2000.jsonl",
+   "sha256": "2cdddcffff523e462c27e02106baf5a7c2361387b1bf1a608a80843b99110a0c"
+  },
+  "dev_sel2000_S_seed0": {
+   "file": "WORK_DIR/preds/k01_s0/dev_sel2000_S_seed0.jsonl",
+   "sha256": "4ce5d60f5e4df237f95dd7dc0493e3d1747726c337056518abe7f50f430f5d25"
+  },
+  "dev_sel2000_GU_facts": {
+   "file": "WORK_DIR/gu_retrieval/gu_dev_sel2000.jsonl.gz",
+   "sha256": "4cba14589172d40053f0bf4a56f14e3c40f037ed47b95fe1249a7a91ac2adaf9",
+   "retriever": "gu_retrieve.py sha256 816cea9d84826e65c11a556855c1345e2be0965e67276e00815ec3650250ccb8, fact_emb_f16.npy sha256 fd749ec77422c5aefd6c89748b043641533da99c08030a37b5ce621f383b1f6e (manifest )"
+  },
+  "structural_executor": "WORK_DIR/executor (kpct_core.py, models/k01_s0/{S_seed0-2.txt, parser.pt, linker.json, FB.json}); bundle recipe = robustness/code/rob_build.py (= kpct_run.stage_infer for kind 'test'), applied to dev question text only",
+  "scorer": "multitq_eval.py sha256 1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69 (official Hits@k, year/month truncation)",
+  "frozen_G1_dev_predictions": "guided/preds/G_k01_s0/pred_G_dev_sel2000_ordS_ep2.jsonl (dev_sel2000 Hits@1 0.7990)"
+ },
+ "dev_sets": {
+  "why_not_full_dev": "Frozen k01_s0 bundles exist only for dev_sel2000. Full dev (57,979) x 6 variants is projected at ~3.9 GPU-h before overhead (prompt-token estimate below), which leaves no margin under the 4 GPU-h cap; and dev_sel2000 / dev_sel10k were used for selection. So the main set is a GPU-hour cap-limited stratified prefix of the unused dev questions.",
+  "dev_sel2000": {
+   "n": 2000,
+   "list_sha256": "b5b8a28d843bc6120b580a2e13505dfd56185a43e5ef28adc3d1ece78d9403b1",
+   "bundles": "FROZEN files above",
+   "role": "secondary set and A_full sanity check (same quids as the frozen 0.7990). It selected G_1's checkpoint and the structural S early stopping, so levels on it are optimistic; contrasts are reported but D_main is the main set."
+  },
+  "D_main": {
+   "pool": "dev quids not in dev_sel2000 and not in dev_sel10k",
+   "pool_n": 46327,
+   "pool_list_sha256": "55938121a9a50e2fef2eb38dec765e7e8aaef42333a1129e00d4da7fd4c42d4e",
+   "qtype_counts": {
+    "equal": 15162,
+    "before_after": 9309,
+    "first_last": 8884,
+    "after_first": 5185,
+    "before_last": 5218,
+    "equal_multi": 2569
+   },
+   "registered_order": "qtype-stratified interleaved permutation: for each qtype (sorted), members in ascending quid, p = default_rng(20261028).permutation(n_s), u = rng.random(n_s) (same rng, strata in sorted order); member p[pos] gets key (pos + u[pos]) / n_s; global order by (key, quid). Every prefix is proportionally stratified (max share deviation 0.0001 at 5,000).",
+   "registered_order_sha256 (json.dumps(order, separators=(',', ':')))": "8093394ab8391936d50c11c0fd51349c9081755f221c67f1e035a1c79744ea18",
+   "blocks": "consecutive blocks of 2,000 quids in the registered order (23 full blocks + 1 of 327)",
+   "evaluated_set": "the longest prefix of whole blocks completed within the GPU-hour cap stop rule; its list sha256 is recorded in the results",
+   "bundles": "rebuilt with the frozen k01_s0 executor from question text only (no answer read), identity-gated on dev_sel2000 (stop rule S2)",
+   "GU_facts": "recomputed with the frozen GU retriever (gu_retrieve.py --mode queries), identity-gated on dev_sel2000 (stop rule S3)",
+   "S_seed0_tail": "the executor's S seed-0 top-50 list for each rebuilt question"
+  }
+ },
+ "variants": {
+  "A_full": "frozen bundle, frozen rendering (gk_common.g_user(b, 'S')); prompt token ids asserted identical to gk_common.fit_g_prompt",
+  "A_no_trace": "A_full minus the 'Parse:' section and the 'Operator trace:' line. Candidate table (S order, RULE rank, S score, satisfies-operator flag, fact links) and facts (frozen order) unchanged. The per-candidate satisfies-operator flag is kept as a candidate-table column.",
+  "A_facts_cand": "structural facts (fact groups in the seeded random order default_rng([20261028, int(quid)]).permutation(n_groups), renumbered F1..) + 'Candidates:' list of candidate strings only (no RULE rank, S score, operator flag or fact links), in the k% rule's registered random order default_rng(int(quid)).permutation(n_cands) (the order G_1 ordrandom was trained with); no parse, no trace",
+  "A_facts": "structural facts only, fact groups in the same seeded random order as A_facts_cand; no candidates, parse or trace",
+  "A_GUfacts": "IN (GPU-hour cap allows). A_full format with the structural facts replaced by the first n GU dense-retrieved facts (n = the bundle's number of structural facts, 'same count'), grouped by (subject, relation, object) as in g_user in retrieval order; candidate fact links recomputed by string match (entity candidate = subject or object of the group; time candidate = a group date starting with it), at most 3 groups, ascending; parse, candidates (S order, ranks, scores, operator flag) and trace kept",
+  "A_facts_ord": "SUPPLEMENTARY (added by this rule, not in the analysts' list): structural facts only in the frozen order (S seed-0 provenance order). Justification: the frozen fact order follows the S seed-0 ranking, so A_facts_ord - A_facts measures the rank information carried by fact order alone.",
+  "section_removal": "removed components are omitted together with their section heading; remaining sections keep frozen wording and order; G_HEAD unchanged",
+  "processing": "all variants of a block are generated in one vLLM call (one session, one card, one adapter)"
+ },
+ "metrics": {
+  "Hits@1, Hits@10": "official scorer; ranked list for every variant = [answer] + S_k seed-0 list, deduplicated (the registered G construction). Hits@10 therefore differs between variants only through rank 1 (disclosed).",
+  "invalid_rate": "share of outputs that are not a KG entity or valid time string after canonicalisation",
+  "answer_outside_candidates": "share of rank-1 answers not among the bundle's top-20 structural candidates (exact string), for every variant including those that do not show candidates",
+  "answer_outside_shown_facts": "share of rank-1 answers not found in the displayed facts (entity = subject/object; time = a displayed date with the answer as prefix)",
+  "gold_coverage_shown_facts": "share of questions whose displayed facts (after truncation) contain an accepted gold string (gu_target semantics: entity = subject/object; time = a fact date truncated to the gold granularity)",
+  "gold_coverage_candidates": "share of questions with a gold hit among the bundle's top-20 candidates (same for every variant; reported once)",
+  "truncation_rate": "share of prompts with at least one fact group dropped by the 2,048-token cap",
+  "copy_S0": "share of rank-1 answers equal to S seed-0's rank-1 answer; fixes (S0 miss, variant hit), losses (S0 hit, variant miss), net",
+  "strata": "Hits@1 per qtype and per answer type (descriptive)"
+ },
+ "contrasts": {
+  "primary_descriptive": "each variant minus A_full, Hits@1, per set",
+  "chain_descriptive": [
+   "A_facts_cand - A_facts (candidate strings)",
+   "A_no_trace - A_facts_cand (ranker outputs: S order, ranks, scores, operator flags, links; and fact order)",
+   "A_full - A_no_trace (parse + trace)",
+   "A_facts_ord - A_facts (fact order)",
+   "A_full - A_GUfacts (structural vs GU facts within the full format)"
+  ],
+  "statistic": "paired Poisson(1) bootstrap over questions, B = 2000, seed 0, two-sided 95% percentile CI (tkg-claims-protocol paired_poisson_bootstrap; the weights depend only on n and the seed, as in the k% rule); strata B = 1000. No multiplicity correction and no p-value-based claim: every number is descriptive.",
+  "thresholds": "none registered"
+ },
+ "existing_prediction_analysis": {
+  "inputs": "frozen G_1 predictions pred_G_{dev_sel2000,test}_ordS_ep2.jsonl (test sha256 f5a132e4f5683371505ef316019e0d2a09229a411d6035f0f701a2c70af047ad), S_1 seed-0 lists preds/k01_s0/{dev_sel2000,test}_S_seed0.jsonl (test sha256 e3f7ec49cf37273115c311fbc233eb4a4675c2f80a2bc4bbf215d9389bc4c208), frozen k01_s0 bundles (test sha256 c9f18dc2ab090d8eb04c841592ea93befd3c1bf2e6a86279683851940ad57ca6), gu_test.jsonl.gz, official answers",
+  "no_new_inference": true,
+  "test_status": "descriptive analysis of test predictions already scored once in the analysts' single k% pass; no new test prediction, no new variant on test",
+  "definitions": {
+   "copy_rate": "G_1 rank-1 == S0 rank-1 (exact string)",
+   "fixes": "S0 Hits@1 miss and G_1 hit",
+   "losses": "S0 hit and G_1 miss",
+   "net": "fixes - losses",
+   "fix_in_top20": "fixes whose G_1 answer is in S0's top-20 (two readings reported: the S0 ranked list's first 20 entries incl. padding, and the bundle's 20 candidates)"
+  },
+  "reference_test": {
+   "copy_rate": 0.7443,
+   "fixes": 5457,
+   "losses": 1383,
+   "net": 4074,
+   "fixes_in_top20": 5348,
+   "gold_coverage_structural_facts": 0.8989,
+   "gold_coverage_GU_facts": 0.7368
+  },
+  "reconciliation": "reproduce each reference numbers; any difference is explained by definition (string vs hit equality, top-20 reading, coverage semantics)"
+ },
+ "stop_rules": {
+  "S1": "adapter sha256 mismatch -> STOP, no output",
+  "S2": "rebuilt dev_sel2000 bundles (executor, question text only) must render byte-identical user turns to the frozen bundles for >= 0.999 of questions in every non-GU variant, and identical S seed-0 lists for >= 0.999; else D_main is NOT_RUN (dev_sel2000 results only)",
+  "S3": "recomputed GU top-20 for dev_sel2000 must equal the frozen gu_dev_sel2000 fact_ids (ordered) for >= 0.99 of questions; else A_GUfacts is NOT_RUN on D_main (dev_sel2000 keeps the frozen GU facts)",
+  "S4": "A_full on dev_sel2000 must reproduce the frozen G_1: rank-1 agreement with pred_G_dev_sel2000_ordS_ep2 >= 0.99 and |Hits@1 - 0.7990| <= 0.005; else STOP before D_main (batch-composition nondeterminism of vLLM greedy decoding is the only accepted source of difference)",
+  "S5": "A_full invalid rate on the first D_main block > 0.02 -> STOP",
+  "S6": "before each D_main block: continue only if usage log GPU-h of track ablation_g1 so far + elapsed GPU-h of the running container + projected cost of the next block (mean of completed blocks; first block from the dev_sel2000 rate) + 0.10 <= 4.0",
+  "S7": "yield: if the file WORK_DIR/ablation_g1/YIELD exists (the robustness track or the analysts may create it), stop after the current block; a later session resumes with the next block of the registered order (blocks are deterministic and the analysis uses whole completed blocks)",
+  "S8": "no free card -> no dispatch; wait and re-check every 10 minutes"
+ },
+ "outputs": [
+  "multitq_g1_ablation_rule.json (this file)",
+  "multitq_g1_ablation_bundles_manifest.json (sha256 of every rebuilt bundle / S list / GU file, identity checks)",
+  "multitq_g1_ablation_predictions.tgz + multitq_g1_ablation_freeze.json",
+  "multitq_g1_ablation_results.json",
+  "multitq_g1_ablation_report.md",
+  "multitq_g1_ablation_code.tgz",
+  "multitq_g1_ablation_table.csv"
+ ],
+ "chronology": "Registered before any ablation bundle, retrieval or generation exists. Inputs seen before registration: the frozen dev_sel2000 bundles and GU facts (variant renderers tested on them, prompt lengths measured; gold coverage of structural vs GU facts on dev_sel2000 computed as a renderer check: 0.8955 vs 0.733), the reference test numbers, and no ablation output.",
+ "registered_utc": "2026-10-28T07:39:06Z",
+ "sha256": "e32304a1c1ed95098d3376d3aecb4183a6032d251714db4a704ae6367bebd0a8"
+}

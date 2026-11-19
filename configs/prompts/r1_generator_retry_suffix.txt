@@ -1,0 +1,3 @@
+
+
+An earlier rewrite was rejected because it did not keep the names, dates or meaning exactly, or was too close to the original: "{previous}". Write a new rewrite that follows every rule.

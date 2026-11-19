@@ -1,0 +1,90 @@
+{
+ "parallel": 6,
+ "prep_levels": "k01_s0,k05_s0",
+ "runs": [
+  {
+   "k": "k01_s0",
+   "emb": "off",
+   "seed": 0,
+   "max_epochs": 200,
+   "patience": 50
+  },
+  {
+   "k": "k01_s0",
+   "emb": "off",
+   "seed": 1,
+   "max_epochs": 200,
+   "patience": 50
+  },
+  {
+   "k": "k01_s0",
+   "emb": "off",
+   "seed": 2,
+   "max_epochs": 200,
+   "patience": 50
+  },
+  {
+   "k": "k01_s0",
+   "emb": "full",
+   "seed": 0,
+   "max_epochs": 200,
+   "patience": 50
+  },
+  {
+   "k": "k01_s0",
+   "emb": "full",
+   "seed": 1,
+   "max_epochs": 200,
+   "patience": 50
+  },
+  {
+   "k": "k01_s0",
+   "emb": "full",
+   "seed": 2,
+   "max_epochs": 200,
+   "patience": 50
+  },
+  {
+   "k": "k05_s0",
+   "emb": "off",
+   "seed": 0,
+   "max_epochs": 40,
+   "patience": 10
+  },
+  {
+   "k": "k05_s0",
+   "emb": "off",
+   "seed": 1,
+   "max_epochs": 40,
+   "patience": 10
+  },
+  {
+   "k": "k05_s0",
+   "emb": "off",
+   "seed": 2,
+   "max_epochs": 40,
+   "patience": 10
+  },
+  {
+   "k": "k05_s0",
+   "emb": "full",
+   "seed": 0,
+   "max_epochs": 40,
+   "patience": 10
+  },
+  {
+   "k": "k05_s0",
+   "emb": "full",
+   "seed": 1,
+   "max_epochs": 40,
+   "patience": 10
+  },
+  {
+   "k": "k05_s0",
+   "emb": "full",
+   "seed": 2,
+   "max_epochs": 40,
+   "patience": 10
+  }
+ ]
+}

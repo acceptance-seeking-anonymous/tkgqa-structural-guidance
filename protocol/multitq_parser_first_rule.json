@@ -1,0 +1,116 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_parser_first",
+ "rule_version": "v1.0",
+ "nature": "REGISTERED selection rule and single scoring pass for gated variants of the Parser arm P_k that re-use the CACHED Parser LLM generations (no new LLM inference, CPU only). Official MultiTQ test split REUSED (test.json sha256 d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee). R3 analysis follows the R3 rule's registered plan (R3_secondary_analysis_for_method_tracks); R1/R2 are SECONDARY and descriptive; nothing is tuned on test, R1, R2 or R3.",
+ "question": "Does executing the Parser hypothesis first, and adding the structural alternatives only when the hypothesis fails or is low-confidence, make the Parser arm lose less Hits@1 under LLM rewording (R3) than the frozen P_k, at k = 1/5/100%, and at what cost on original wording (full test, and k = 10% test-only)?",
+ "parent_documents": {
+  "R3_rule": "(sha256 c5f79938...), amendments A1, A2, A3",
+  "R3_set": "(578 judge-accepted Gemini-2.5-Pro rewrites = R3 PRIMARY)",
+  "R3_predictions": ", freeze",
+  "dev_paraphrase_set": "(DEV_ACCEPTED 1,762 of dev_sel2000)",
+  "dev_hits_frozen_arms": "(frozen file of the reported run)",
+  "dev_results_frozen_arms": "(frozen file of the reported run)",
+  "kpct_rule": "(frozen file of the reported run)",
+  "kpct_subsets": "(frozen file of the reported run)",
+  "kpct_test_hits": "(frozen file of the reported run)",
+  "evaluator": "(multitq_eval.py sha256 1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69)",
+  "structural_ablation": {
+   "rule": "(frozen file of the reported run)",
+   "code": "(frozen file of the reported run)",
+   "predictions_A": "(frozen file of the reported run)",
+   "freeze_A": "(frozen file of the reported run)",
+   "results": "(frozen file of the reported run)"
+  },
+  "R1": {
+   "rule": "(frozen file of the reported run)",
+   "set": "(frozen file of the reported run)",
+   "predictions": "(frozen file of the reported run)"
+  },
+  "R2": {
+   "rule": "(frozen file of the reported run)",
+   "A1": "(frozen file of the reported run)",
+   "A2": "(frozen file of the reported run)",
+   "set": "(frozen file of the reported run)",
+   "predictions": "(frozen file of the reported run)",
+   "freeze": "(frozen file of the reported run)"
+  }
+ },
+ "status_at_registration": {
+  "new_outputs": "None. No V2 or V3 prediction exists for any split; no PALONE/PK replay exists for dev_sel2000 or for the R3 / dev-paraphrase rewrite rows; this track has computed no Hits for any question.",
+  "work_before_registration": [
+   "Read the R3 rule + A1-A3, the structural-ablation code (sa_parser_replay.py, sa_score_A.py), r3_common.py / r2_common.py, r3_dev_score.py, jobA3.sh / jobBC3.sh, kpct_executor.compact_to_parse, and the kpct rule's tau definition (mean token log-prob of the JSON).",
+   "Listed files on the GPU host (WORK_DIR: parser/raw, parser/exec, bundles, preds, robustness_r3/llm) and checked by sha256 that the dev_sel2000 S_k fallback lists and the rewrite-root S_k lists equal the fallback_source recorded in the frozen exec_stats files (seed0 checked at every k).",
+   "Read the field names of the cached raw Parser files (quid, text, n_out, mean_logprob, min_logprob, finish_reason) on 2 dev_sel2000 rows and 2 test rows (generated text only, no gold), and counted the rewrite-root raw rows by variant index (R3 vidx 4: 578, DEV_ACCEPTED vidx 5: 1,762, DEVPARA_JREJ vidx 6: 192 at each of k01_s0 / k05_s0 / k100). Listed the member names of the R1 / R2 / R3 / structural-ablation archives."
+  ],
+  "known_numbers": "Known to the designers: the frozen P_k / S_k full-test Hits@1 (kpct), and the structural-ablation results on test, R1 and R2 for PK (= frozen P_k) vs PALONE (= V1 below), i.e. V1's original-test and R1/R2 numbers already exist (registered elsewhere; they are reported again here as reuse, not re-decided). The R3 track's dev table for the frozen arms (V0 dev numbers) exists as a file; this track has not opened it. No R3 Hits exist for any arm (R3 freeze [id]; first scored in the method tracks' passes). V2 and V3 have no numbers on any split."
+ },
+ "variants": {
+  "common": "All variants use the cached greedy Parser generation of the frozen adapter (k01_s0 ep3, k05_s0 ep1, k10_s0 ep0.5, k100 ep0.5), the frozen executor (probs='classifier', top 50) and the 3 S_k LightGBM seeds; per-question hits = mean over the 3 seeds. Execution modes as in sa_parser_replay.py (unchanged, sha256 e54870232cb85099587ed5a4038a89bad896e2e6a77e77d6a8af97351ffdd4fd): PK = hypothesis + deduplicated structural alternatives (= frozen P_k), PALONE = hypothesis only. Each mode falls back to S_k's own list (same seed) on invalid JSON / unknown name (mode-independent) and on execution error / invalid execution / empty pool (mode-specific): files pred_<mode>_<k>_<split>_fb_seed<b>.jsonl. Every variant therefore routes each question to either the PALONE_fb list or the PK_fb list.",
+  "V0": "frozen P_k (registered baseline): the frozen pred_P_<k>_<split>_..._tauoff_seed<b> files (= PK_fb; replay identity checked).",
+  "V1": "PALONE: route = PALONE_fb for every question (hypothesis only, registered S_k fallback).",
+  "V2": "alternatives only as fallback: route = PALONE_fb if the PALONE execution is ok (valid, non-empty pool); otherwise PK_fb (hypothesis + alternatives; if that also fails, S_k). When the cached JSON is invalid or names an unknown entity/relation there is no executable hypothesis and every variant uses S_k (the structural parse alone).",
+  "V3(t)": "confidence-gated alternatives: route = PK_fb if the Parser's mean token log-prob of the generated JSON (raw field mean_logprob, the kpct tau signal) < t; otherwise the V2 route. A missing mean_logprob counts as below every t. Threshold grid t in {-0.30, -0.10, -0.03, -0.01, -0.003} (kpct tau grid plus two finer steps), chosen on dev per level.",
+  "confidence_signal_available": "YES: mean_logprob and min_logprob are cached in every raw Parser file (test, dev_sel2000, R1, R2, R3/dev rewrite roots). Only mean_logprob is used (registered); min_logprob is not used."
+ },
+ "selection_rule": {
+  "data": "dev only: dev_sel2000 ORIG (2,000 questions; Parser raw = parser/raw/<k>/raw_P_dev_sel2000_<ckpt>.jsonl.gz) and the DEV_ACCEPTED paraphrases (1,762; vidx 5 of the R3-track rewrite root robustness_r3/llm). Gold = official dev.json answers; official multitq_eval.hit_at_k.",
+  "candidates_per_level": [
+   "V0",
+   "V1",
+   "V2",
+   "V3(-0.30)",
+   "V3(-0.10)",
+   "V3(-0.03)",
+   "V3(-0.01)",
+   "V3(-0.003)"
+  ],
+  "constraint": "feasible iff Hits@1(dev ORIG 2,000; seed mean) >= Hits@1(V0, dev ORIG) - 0.003 (a loss of at most 0.3 points vs V0 at the same level). V0 is always feasible.",
+  "objective": "among feasible candidates maximise Hits@1(DEV_ACCEPTED paraphrases, 1,762; seed mean)",
+  "ties": "candidates within 0.0005 of the feasible maximum are tied; choose the first in the order V0 < V1 < V2 < V3(-0.30) < V3(-0.10) < V3(-0.03) < V3(-0.01) < V3(-0.003) (status quo first, then fewer components / fewer appended questions)",
+  "levels_with_dev_paraphrases": "k = 1, 5, 100 (selected separately per level)",
+  "k10_transfer": "No Parser generation exists for any rewrite at k10 (P_10 was not run on rewrites; no new inference). k10 variant = the variant family chosen by majority over k = 1/5/100 (V3 thresholds count as one family; if all three differ, the first of the three in the tie order); a V3 family choice uses the median of the selected thresholds (the lower when two). The k10 choice must satisfy the same dev ORIG constraint at k10 (dev_sel2000, k10 raw ep0.5); if it fails, k10 = V0. k10 results are original-test only.",
+  "record": "the full dev table (every candidate x level: dev ORIG Hits@1, DEV_ACCEPTED ORIG / PARA Hits@1, drop, Hits@10, routing shares) and the selected variant per level are written to multitq_parser_first_selection.json and saved as a file BEFORE the freeze and before any test / R1 / R2 / R3 score.",
+  "descriptive_dev": "DEV_MECH_OK (vidx 5 union 6) Hits@1 of every candidate is reported (descriptive, not used for selection)."
+ },
+ "pipeline": {
+  "replay": "the GPU host CPU-only container (tkgqa-gpu:latest, no --gpus, kpct tree mounted read-only): sa_parser_replay.py (unchanged) for split dev_sel2000 at k01_s0 / k05_s0 / k10_s0 / k100 and for the rewrite root robustness_r3/llm (split variants: R3 vidx 4 + DEV_ACCEPTED vidx 5 + DEVPARA_JREJ vidx 6) at k01_s0 / k05_s0 / k100; fallback lists = the S_k files whose sha256 the frozen exec_stats record.",
+  "reuse": "test (54,584; k01_s0 / k05_s0 / k10_s0 / k100), R1 and R2 (k01_s0 / k05_s0 / k100): the frozen PK_fb / PALONE_fb files and per-question mode status of the structural-ablation predictions_A (frozen by freeze_A [id] before its scoring); the raw mean_logprob from the frozen raw files (test: parser/raw; R1 / R2 / R3 roots: the frozen archives).",
+  "routing": "a gold-free routing table (per split, level, question: PALONE status, PK status, mean_logprob, route of every candidate) built from the files above; prediction files of the SELECTED variant at each level are materialised by copying the routed lists (top 50, 3 seeds) for test, R3 rewrites, R1 and R2.",
+  "R3_ORIG_reference": "as the R3 rule: ORIG predictions = each arm's predictions on the original FULL-test question (V0: frozen P_k test files; V1-V3: their routed test lists), so method and baseline drops share the same original-question reference.",
+  "R1_R2_ORIG_reference": "as the structural-ablation scoring of R1/R2: the ORIG rows (vidx 0) of the R1 / R2 rewrite roots."
+ },
+ "identity_checks": {
+  "I_P1": "replayed PK_fb vs the frozen P_k files on dev_sel2000 (4 levels) and on the rewrite root (3 levels): top-1 identity >= 99.5% for every seed and level (full-list identity reported); else STOP_PIPELINE_DRIFT (one logged bug-fix allowed).",
+  "I_P2": "V0 lists used for R3 / test = the frozen P_k files verified by sha256 against the R3 freeze / kpct hash records."
+ },
+ "freeze": "After selection: sha256 of every source prediction / pool / raw file used, of the routing table, of the materialised selected-variant files and of the selection JSON, written to multitq_parser_first_freeze.json and saved as a file BEFORE the single scoring pass.",
+ "scoring_pass": {
+  "once": "one registered pass (score_pf.py) after the freeze record exists; no rescoring with changed inputs; results never changed after they are computed.",
+  "test": "for each level k in {1, 5, 10, 100}: Hits@1 (and Hits@10) on the full official test split (54,584) of the selected variant m_k and of V0_k, seed mean; 95% percentile CI by Poisson(1) bootstrap (r2_common.summarise, B = 10,000, seed 20261118); paired contrast m_k - V0_k with two-sided 95% CI (same bootstrap). Original-wording cost label (descriptive guard): ORIG_COST iff the CI lies entirely below 0; ORIG_WITHIN_0.3 iff the CI lower bound >= -0.003; else ORIG_INCONCLUSIVE. If m_k = V0 the contrast is identically 0 and labelled METHOD_EQUALS_BASELINE.",
+  "R3": "R3 PRIMARY (578 rewrites) and their original questions, k in {1, 5, 100}: Hits@1 on R3 ORIG, R3 rewrites, drop; contrasts c_drop = drop(V0) - drop(m), c_rw = RW(m) - RW(V0) (r3_common.contrasts / method_tests): paired Poisson(1) bootstrap B = 10,000, seed 20261118, one-sided p = share of bootstrap means <= 0, two-sided 95% CI and one-sided 95% lower bound; Holm within this method over all its R3 tests = {levels with m_k != V0} x {c_drop, c_rw}; SUPPORTED iff Holm-adjusted p < 0.05. Levels where m_k = V0 are reported as METHOD_EQUALS_BASELINE and are not tests. R3 results are SECONDARY robustness evidence.",
+  "R1_R2": "SECONDARY, descriptive: the same contrasts on R1 (per variant P1_prefix, P2_qmark, P3_paraphrase; root rows) and R2 (RW rewrites, root rows) at k in {1, 5, 100}, same bootstrap; Holm reported separately per probe, descriptive labels only.",
+  "all_candidates_descriptive": "Hits@1 of every candidate (V0, V1, V2, V3 at each t) on full test, R3 ORIG / RW / drop, R1, R2: DESCRIPTIVE ONLY (trade-off curve), not tests, never used to change the selection, and not part of the R3 audit's targeted set.",
+  "audit_feed": "per-question c_drop and c_rw of the selected variant vs V0 at each level on the R3 PRIMARY quids (for r3_common.audit_selection after every method track is frozen)."
+ },
+ "outputs": [
+  "multitq_parser_first_selection.json",
+  "multitq_parser_first_freeze.json",
+  "multitq_parser_first_results.json",
+  "multitq_parser_first_test_hits.csv.gz",
+  "multitq_parser_first_rewrite_hits.csv.gz (R3 / R1 / R2 / dev rows)",
+  "multitq_parser_first_dev_hits.csv.gz",
+  "multitq_parser_first_r3_contrasts.csv",
+  "multitq_parser_first_report.md",
+  "multitq_parser_first_code.tgz"
+ ],
+ "stop_rules": {
+  "STOP_PIPELINE_DRIFT": "I_P1 failure after one logged bug-fix",
+  "STOP_TEST_INTEGRITY": "any sha256 mismatch of a frozen source file",
+  "NO_INFERENCE": "a variant that would need new Parser generations is NOT_RUN"
+ },
+ "selection_discipline": "Variant, threshold and k10 transfer chosen on dev only by the rule above; no change after any test / R1 / R2 / R3 number is read; anything not listed here is POST_HOC and not decision-relevant.",
+ "amendment_log": [],
+ "registered_utc": "2026-11-18T17:34:09Z",
+ "sha256": "41a4f38cdebd768b298109c00b9038eb16763a6ff08286bd13fd6c12eaa1e191"
+}

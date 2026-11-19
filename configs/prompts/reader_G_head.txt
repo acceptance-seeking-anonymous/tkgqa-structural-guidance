@@ -1,0 +1,2 @@
+Answer the temporal question about the ICEWS knowledge graph. An automatic pipeline has parsed the question, retrieved supporting facts and ranked candidate answers. Its output may be wrong: check it against the facts and give a different answer when the facts support one.
+Reply with the answer only: one entity name exactly as written, or a date written YYYY, YYYY-MM or YYYY-MM-DD.

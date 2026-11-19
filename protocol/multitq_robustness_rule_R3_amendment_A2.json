@@ -1,0 +1,25 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_R3_probe_sets",
+ "amendment_id": "A2",
+ "amends": {
+  "rule": {
+   "sha256": "c5f799380c70c78ffba2a4ad865425389f83d3bb8918c312ae036c46cd328ce8"
+  },
+  "A1": {
+   "sha256": "081c00a490b7aa80f4dbbe80e199e0eb262bfccaaaf671f806c8703658a749b2"
+  }
+ },
+ "status_at_amendment": {
+  "done": "R3 set (578 judge-accepted rewrites) and dev set (1,762 DEV_ACCEPTED, 192 judge-rejected, 46 mechanically invalid) frozen; the stage-A CPU job was running (frozen-file verification passed; structural rebuilds in progress)",
+  "not_done": "no LLM arm run on any variant; no Hits on R3 or dev"
+ },
+ "problem": "dev_scoring_by_this_track registers a descriptive analysis 'also on DEV_MECH_OK', but the dev variant file contains only the DEV_ACCEPTED paraphrases, so the 192 mechanically valid, judge-rejected paraphrases would have no predictions",
+ "change": "the 192 judge-rejected (mechanically valid) dev paraphrases are added as a separate variant class DEVPARA_JREJ, synthetic quid 10 * quid + 6, in a third structural root devj/ (with their ORIG rows for the I1 identity check; jobA3b.sh), and r3_combine.py is re-run with --vidx 4,5,6 so all frozen arms are run on them too. DEV_ACCEPTED (vidx 5) remains the selection set; DEVPARA_JREJ rows are used only for the descriptive DEV_MECH_OK analysis (vidx 5 union 6). GPU cost about 0.02 GPU-h, inside the allotment; no other change",
+ "code": {
+  "jobA3b.sh": "79ffba191fee6bb461be7556f9609bc8ae9e95bc7662f9bd40371509a32cd274",
+  "variants_devjrej.jsonl": "a9efe3bb6aa88da053aeec2a4cfb6226cb8257fd9d3b35367a7f07d823a65fac"
+ },
+ "registered_utc": "2026-11-18T16:45:20Z",
+ "sha256": "fa003481e7f5994850befde9d6633b06d5b5b6048e074076959218c4b07fbdd2"
+}

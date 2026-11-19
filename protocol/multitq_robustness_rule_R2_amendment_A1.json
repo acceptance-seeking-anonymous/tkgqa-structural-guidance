@@ -1,0 +1,28 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_R2",
+ "amendment_id": "A1",
+ "amends": {
+  "filename": "multitq_robustness_rule_R2.json",
+  "registered_utc": "2026-10-29T07:16:55Z",
+  "sha256": "c69d8f072e1c00268adf18231e1d22d24c93748f88224366e3775b640ddc516f"
+ },
+ "status_at_amendment": {
+  "done": "R2 sample (n = 2,000, sha256 76139c3d9c4d151ad72fa45343670aea8651fe83fd8acff2aba395b29c5e98da) and rewrite pool (n = 600, sha256 a8cfd6a011f4bf63720b21552f13537ea1a6de280d94855f9f237ebf10f168ff) drawn from quid + qtype only, per the registered recipe; attempt-1 prompt file written; generator weights downloading (CPU job); review-kit builder and rescoring script drafted; rescoring script tested on R1 data and synthetic data only",
+  "not_done": "no R2 rewrite generated (no smoke test either), no judge call, no R2 bundle, retrieval, generation or prediction; no Hits on any R2 question"
+ },
+ "changes": {
+  "human_review": "SINGLE-ANNOTATOR RANDOM AUDIT, not full verification. One annotator (an author) reviews only rows 1-100 of the R2 review sheet (review ids S001-S100). The sheet's fixed random order (numpy default_rng(20261029).permutation over the judge-accepted quids in ascending order) makes these 100 rows a simple random sample of the judge-accepted rewrites. If fewer than 100 rewrites are judge-accepted, all rows are audited. Kit instructions say: review rows 1-100 only, single annotator.",
+  "PRIMARY_set": "all judge-accepted R2 rewrites (mechanical checks + judge). H1-H3, bootstrap (B = 10,000, seed 20261029, one-sided p = share of bootstrap means <= 0), Holm over the three and the CONFIRMED / NOT_CONFIRMED labels are unchanged. This replaces the rule's 'judge-accepted AND human-confirmed' PRIMARY set; the rule's SENSITIVITY set (all judge-accepted) becomes the PRIMARY set.",
+  "audit_analyses_registered": {
+   "a_acceptance": "human acceptance rate among the audited rows: accepted iff same_answer_set = Y AND same_constraint_time = Y; 'unsure', N or blank = not accepted; Wilson 95% interval (z = 1.959964) for the acceptance rate and for the rejection rate (1 - acceptance)",
+   "b_tipping_point": "for each k separately: order the PRIMARY questions by d_i = drop(G_k)_i - drop(P_k)_i descending (ties by quid ascending), i.e. those where G drops while P does not first; remove the top m questions from the k-th test only (the other two tests keep the full PRIMARY set), recompute the one-sided bootstrap p of H_k (same B and seed) and the Holm adjustment over the three; m* = the smallest m (scanning m = 0, 1, 2, ...) at which the Holm-adjusted p of H_k is >= 0.05. Report m* and m*/n. Label AUDIT_ROBUST iff m*/n > the upper Wilson 95% bound of the audit rejection rate, else AUDIT_SENSITIVE. If H_k is NOT_CONFIRMED on the full PRIMARY set, m* = 0 and the label is NOT_APPLICABLE.",
+   "c_audited_subset": "H1-H3 statistics re-estimated on the audited rows minus the rows not accepted (descriptive only; same bootstrap; no labels used for any claim)"
+  },
+  "secondary_descriptive": "unchanged, computed on the PRIMARY set; the R1+R2 pooled estimate uses the 569 R1 judge-accepted rewrites unless R1 human-review sheets are supplied (stated in the output)",
+  "paper_wording": "'human-audited (one author, random 100)'; the R2 rewrites are never described as human-verified",
+  "blinding": "unchanged: no Hits/accuracy on R2 originals or rewrites until the analysts sends the returned audit sheet; all R2 prediction files are frozen by sha256 before that"
+ },
+ "registered_utc": "2026-10-29T07:23:25Z",
+ "sha256": "1b473db99f591a1c495f0f900390047d1b06d1023854c75827df14ad9958c352"
+}

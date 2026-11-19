@@ -1,0 +1,19 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "file": "multitq_rule_amendment_A1.json",
+ "amends": {
+  "rule": "multitq_decision_rule.json v1.1",
+  "sha256": "8ccf9352b13f7200324b11d952b5124f0fdd96fc2bf6aa2bef6f9e0510284cef"
+ },
+ "reason": "the authors request (2026-10-26): see the test performance of the LLM-free arms before the reader stage finishes.",
+ "change": "The registered single test pass is split in two. Pass 1 (now): the frozen LLM-free arms only - PRIOR (shared parser), RULE, S seeds 0/1/2 (structural freeze b5d32f36, frozen 2026-10-26T05:31:05Z) and the supplementary Baselines-track shortcut arms TYPE_PRIOR, REL_PRIOR, ENT_REL_PRIOR and their own-parser PRIOR (baselines freeze 822a6167, frozen 05:03:47Z). M1 is decided in pass 1. Pass 2 (Phase 3): the reader, fused and control arms, scored once after their freeze; M2 and M3 decided then.",
+ "safeguards": [
+  "Every pass-1 prediction file is checked against its frozen sha256 before scoring; any mismatch aborts.",
+  "No pass-1 test number, per-question result or error analysis is passed to the LLM reader track before its freeze file exists; the reader track selects on dev only, as registered.",
+  "No LLM-free arm is retrained, re-tuned or re-frozen after pass 1.",
+  "The M3 'best arm' is still declared from cross-fitted dev Hits@1 before pass 2."
+ ],
+ "unchanged": "arms, criteria M1-M3, thresholds, statistics (paired Poisson bootstrap over questions, B = 2000), reporting layout, GPU-hour cap",
+ "registered_utc": "2026-10-26T05:48:29Z",
+ "sha256_of_body": "1138d96bdbb2776ba1c8574d80b04ae4bcf441a8d379f1619b0f1c17492d0d29"
+}

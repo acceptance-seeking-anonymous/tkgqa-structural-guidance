@@ -1,0 +1,21 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_normalizer",
+ "amendment_id": "A1",
+ "amends": {
+  "filename": "multitq_normalizer_rule.json",
+  "registered_utc": "2026-11-18T17:41:16Z",
+  "sha256": "b3fc91266165124b8174b7a049f748051284b647d48a6a784a6d9163f73f691b"
+ },
+ "status_at_amendment": {
+  "done": "normalizer trained (adapters ep0.5 d6068584..., ep1 ef8f04c6..., ep2 f01adf08...); dev decoding of the 3 checkpoints (gold-free: change / fallback rates seen); dev root built (variants_dev.jsonl sha256 23feca5c..., 1,681 rows incl. 200 controls); the GPU-host job stopped at the integrity step with exit 3 (STOP_TEST_INTEGRITY), before any structural rebuild or GPU container (no GPU time used)",
+  "not_done": "no structural or LLM arm on normalized text; no dev or test Hits of any normalizer configuration"
+ },
+ "problem": "nm_verify.py hard-coded the expected sha256 of the frozen R1 rob_build.py with a one-character transcription error (0400d972ee1f... instead of 0400d972eb1f...). The staged rob_build.py hashes to 0400d972eb1f33ee0c5501e6ee05c58eab3d83e6c0b81a245bbb23b211a19edf, which equals the value registered in the R3 rule (code_sha256 remote/rob_build.py); all 92 other frozen files matched.",
+ "change": "nm_verify.py constant corrected (new sha256 below); the stale staged copy on the GPU host (normalizer/code/nm_verify.py) is renamed to nm_verify.py.pre_A1 (not deleted) so the corrected file can be staged; the rule text 'rob_build.py sha256 0400d972...' is unchanged. No other change.",
+ "code": {
+  "remote/nm_verify.py": "42b56b349b74b738ca575d6236f0254d63d56135bf92af26cfdb6e98bc14305a"
+ },
+ "registered_utc": "2026-11-18T18:31:57Z",
+ "sha256": "ceff8702ba6a2451c4f769c4a38d43d5b78cec0c21f59ec0dfba59d41e71b00f"
+}

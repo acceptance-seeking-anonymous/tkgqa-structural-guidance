@@ -1,0 +1,27 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_R3_probe_sets",
+ "amendment_id": "A1",
+ "amends": {
+  "filename": "multitq_robustness_rule_R3.json",
+  "registered_utc": "2026-11-18T15:53:55Z",
+  "sha256": "c5f799380c70c78ffba2a4ad865425389f83d3bb8918c312ae036c46cd328ce8"
+ },
+ "status_at_amendment": {
+  "done": "R3 sample (n = 2,000, rob_common.list_sha 4dc86d828f4e6c087b27e7e69439162228f36c5285a7d82a33e948fa05c5d67a) and pool (n = 600, 5a8fb2c150310e0ab48a6e6bfa0127cece8584e42bd9b59eedc0d92543746b8f) drawn from quid + qtype only; dev and training Qwen paraphrases generated (the GPU job, 0.6264 GPU-h; not judged, not scored)",
+  "not_done": "no R3 rewrite generated, no judge call, no R3 bundle, retrieval or prediction; no Hits on any R3 or dev question"
+ },
+ "evidence": {
+  "smoke_2": "2026-11-18 16:33Z (just before this amendment), gemini-2.5-flash, same 5 prompts: all HTTP 404 'This model models/gemini-2.5-flash is no longer available to new users' (the API recommends gemini-3.8-flash)",
+  "check_fallback": "2026-11-18 16:33Z, one call, gemini-2.5-pro, train quid 1000000 prompt, thinkingBudget 128: HTTP 200, finishReason STOP, modelVersion gemini-2.5-pro, thoughtsTokenCount 92, candidatesTokenCount 70; output discarded"
+ },
+ "changes": {
+  "R3_generator.model_id": "gemini-2.5-pro (registered fallback; stable GA model) instead of gemini-2.5-flash",
+  "R3_generator.decoding": "temperature 0.0, candidateCount 1, seed 0, thinkingConfig.thinkingBudget 128 (the minimum for 2.5 Pro: thinking cannot be switched off), maxOutputTokens 428 = 300 visible tokens (R1/R2 cap) + 128 thinking tokens (thinking counts against maxOutputTokens); safetySettings and prompt unchanged; thought parts excluded from the rewrite text; finishReason MAX_TOKENS or a missing JSON = failed attempt",
+  "why_not_gemini-3.8-flash": "not the registered fallback; changing to it would be a choice made after seeing an error message, while gemini-2.5-pro was fixed in the rule before any generation",
+  "code": "r3_pipeline.py v2: gemini_call defaults to the A1 model/body; r3_common.py unchanged"
+ },
+ "unchanged": "sample, pool, prompt texts, two-attempt policy, mechanical checks, judge, analysis sets, arms, statistics, audit, GPU-hour cap",
+ "registered_utc": "2026-11-18T16:34:13Z",
+ "sha256": "081c00a490b7aa80f4dbbe80e199e0eb262bfccaaaf671f806c8703658a749b2"
+}

@@ -1,0 +1,33 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "amendment_id": "LC1-A1",
+ "name": "multitq_kpct_amendment_LC1_A1_llm_controls_gpu_sharing",
+ "amends": {
+  "amendment_id": "LC1",
+  "registered_utc": "2026-11-17T16:50:43Z",
+  "sha256": "fbc5ed562023016bb77d0b62fa6e0c4118b0ca2df843f11fd5a5a7a43ee46bda"
+ },
+ "status_at_registration": "No GU_5 or GPLAIN_1 training output, checkpoint, dev or test prediction exists (no GPU job of this track has been submitted).",
+ "trigger": "About 48 GB of the memory of the GPU card used by this track is held by other long-running processes. The frozen recipe peaks at ~84 GB in training (train_stats peak_mem_gb of G_1 / GU_1 / GU_10: 84.1 / 83.8 / 84.1) and reserves 85% of the card in vLLM, so it does not fit next to them.",
+ "implementation_changes": [
+  "Training (GPLAIN_1 and GU_5): the frozen gk_train.py option --grad_ckpt (gradient checkpointing, non-reentrant) because other processes hold ~48 GB of the card's memory. The optimisation is unchanged: same LoRA config, optimizer, LR schedule, effective batch 16, micro-batch token limit 8,192, data order, epochs and seed; checkpointing recomputes activations (RNG state preserved, so LoRA dropout masks are the same) and changes only memory and speed.",
+  "vLLM sessions and robustness passes: gpu_memory_utilization 0.40 (frozen default 0.85) via the frozen --gpu_mem option of gk_run_arm.py / gk_infer.py; this changes only the KV-cache size (scheduling/batching), not decoding (greedy, 48 tokens, max_model_len 2,304). GPU decoding is not bitwise batch-invariant, so this is declared."
+ ],
+ "unchanged": "Everything else in LC1: arms, inputs, targets, renderer, selection on dev_sel2000, freeze-before-score discipline, analyses, robustness design, human-audit removal lists, stop rules, outputs.",
+ "deviations_added": [
+  "gradient checkpointing in training (memory only)",
+  "vLLM gpu_memory_utilization 0.40 instead of 0.85"
+ ],
+ "code_sha256": {
+  "gk_plain.py": "579d49c9c88841f06366ead0c0c186782c485bc06bccfa317ba489770a871589",
+  "gplain_infer.py": "9f089b92a1f4af0aa88188ae48137dd4af67cafe1ed8d2dae5a2d3e381d08674",
+  "gplain_run_arm.py": "0e30565731f7fff825553ba593c2153bca5e3b815e6f50fb5c5de0dde6d34204",
+  "gplain_train.py": "404d694611a7467e1acc070fed9224ff63696e2777d0d1213374bf16e76e5e82",
+  "lc_analyze.py": "89728d4cfe1172f1917f6ab3a49b8d32ec334258cb0c6242e0a153123f1ebbc1",
+  "lc_job.sh": "3263ecbb6b2846304dda0b6396f0a2632e96fc2f3d2e78103d4c72a0b333dad2",
+  "lc_tokens.py": "72fac6940fe68129f4051c529a5e4a3de523df8abfeccf43233f9f5860794c35",
+  "run_card_lc.sh": "f73de8fe1c727db83fe98a8834c7b504ce4381aa642117dccea00dc66bea2363"
+ },
+ "registered_utc": "2026-11-18T02:42:45Z",
+ "sha256": "0ea0ca6cad8e42069b088cf036459062a2b1f5236968cc466689c98505d406b2"
+}

@@ -1,0 +1,9 @@
+# Inference image (tkgqa-vllm) = training image + the packages below (versions as recorded).
+vllm==0.10.2
+transformers==4.56.2
+xformers==0.0.32.post1
+numpy==2.2.6
+huggingface_hub==0.36.2
+sentencepiece==0.2.2
+torchaudio==2.8.0
+torchvision==0.23.0

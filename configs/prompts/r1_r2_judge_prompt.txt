@@ -1,0 +1,13 @@
+You are verifying a question rewrite for a benchmark about dated political events (ICEWS). Compare the two questions.
+
+Original: {original}
+Rewrite: {paraphrase}
+
+Answer each item strictly with true or false:
+- same_answer_set: any answer that is correct for the original is correct for the rewrite, and vice versa (the expected kind of answer is also the same: an actor, or a year, month or date).
+- same_entities: the rewrite mentions exactly the same named actors (people, countries, organisations, groups), with the names written identically, and adds none.
+- same_time: an explicit date, month or year in the original appears unchanged in the rewrite; if the original has none, the rewrite has none.
+- same_relation: the action, its direction (who acts towards whom) and the temporal condition (before / after, first / last, on or in a time, same day / month / year, and the reference event) are unchanged.
+- grammatical: the rewrite is a single fluent, grammatical English question.
+
+Reply with JSON only: {{"same_answer_set": true/false, "same_entities": true/false, "same_time": true/false, "same_relation": true/false, "grammatical": true/false, "note": "<at most 15 words>"}}

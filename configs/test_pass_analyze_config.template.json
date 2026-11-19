@@ -1,0 +1,326 @@
+{
+ "_comment": "Template. Fill every null from your own dev-selection / freeze outputs before running `multitq_kpct_test_pass.py analyze/summarize`. train_sizes and published_rows are design constants.",
+ "profile": "<path to multitq_kpct_subset_profile.json written by kpct/subsets/kpct_manifest.py>",
+ "local_copies_checked": {
+  "n": null,
+  "all_ok": null,
+  "what": "optional: re-verification of local copies of the frozen prediction files"
+ },
+ "qualifier_inputs": {
+  "DEV_NO_GAIN": {
+   "k0": {
+    "primary": "G_0",
+    "qualifier": "NOT_TESTED (no S_0 exists)"
+   },
+   "k1": {
+    "primary": "G_1",
+    "primary_dev": null,
+    "S_dev_mean": null,
+    "DEV_NO_GAIN": null
+   },
+   "k5": {
+    "primary": "P_5",
+    "primary_dev": null,
+    "S_dev_mean": null,
+    "DEV_NO_GAIN": null
+   },
+   "k10": {
+    "primary": "P_10",
+    "primary_dev": null,
+    "S_dev_mean": null,
+    "DEV_NO_GAIN": null
+   },
+   "k100": {
+    "primary": "G_100",
+    "primary_dev": null,
+    "S_dev_mean": null,
+    "DEV_NO_GAIN": null
+   },
+   "k1_s1": {
+    "primary": "G_1_s1",
+    "primary_dev": null,
+    "S_dev_mean": null,
+    "DEV_NO_GAIN": null
+   },
+   "k1_s2": {
+    "primary": "G_1_s2",
+    "primary_dev": null,
+    "S_dev_mean": null,
+    "DEV_NO_GAIN": null
+   }
+  },
+  "LOW_SILVER": {
+   "P_1": {
+    "kept_fraction": null,
+    "LOW_SILVER": null
+   },
+   "P_100": {
+    "kept_fraction": null,
+    "LOW_SILVER": null
+   },
+   "P_10": {
+    "kept_fraction": null,
+    "LOW_SILVER": null
+   },
+   "P_5": {
+    "kept_fraction": null,
+    "LOW_SILVER": null
+   }
+  },
+  "DEV_FAILURE": {
+   "G_1": null,
+   "GU_1": null,
+   "G_100": null,
+   "GU_100": null,
+   "G_10": null,
+   "GU_10": null,
+   "G_5": null,
+   "G_1_s1": null,
+   "G_1_s2": null,
+   "P_0": null,
+   "G_0": null,
+   "P_1": null,
+   "P_100": null,
+   "P_10": null,
+   "P_5": null
+  },
+  "PROVISIONAL": [],
+  "NOT_RUN_NOT_TESTED": [
+   "KP2 at k = 5 (GU_5 NOT_RUN, fallback 2)",
+   "P subset spread and P SUBSET_ROBUST; KP4 at subset seeds 1-2 (P_1 s1/s2 NOT_RUN, fallback 1)"
+  ],
+  "previously_scored": "RULE_100 and S_100 are the full-data structural arms scored before this protocol; their rows are not new findings"
+ },
+ "dev_sel2000_hits1": {
+  "G_1": null,
+  "G_1_s1": null,
+  "G_1_s2": null,
+  "G_5": null,
+  "G_10": null,
+  "G_100": null,
+  "GU_1": null,
+  "GU_10": null,
+  "GU_100": null,
+  "P_1": null,
+  "P_5": null,
+  "P_10": null,
+  "P_100": null,
+  "S_1": null,
+  "RULE_1": null,
+  "S_5": null,
+  "RULE_5": null,
+  "S_10": null,
+  "RULE_10": null,
+  "S_1_s1": null,
+  "RULE_1_s1": null,
+  "S_1_s2": null,
+  "RULE_1_s2": null,
+  "S_100": null,
+  "RULE_100": null,
+  "P_0": null,
+  "G_0": null,
+  "SHUF_G1": null,
+  "QONLY_G1": null
+ },
+ "train_sizes": {
+  "RULE_1": {
+   "structural": 3868,
+   "llm": null
+  },
+  "S_1": {
+   "structural": 3868,
+   "llm": null
+  },
+  "G_1": {
+   "structural": 3868,
+   "llm": 3868
+  },
+  "GU_1": {
+   "structural": 0,
+   "llm": 3868
+  },
+  "P_1": {
+   "structural": 3868,
+   "llm": "2655 silver of 3868"
+  },
+  "RULE_1_s1": {
+   "structural": 3868,
+   "llm": null
+  },
+  "S_1_s1": {
+   "structural": 3868,
+   "llm": null
+  },
+  "G_1_s1": {
+   "structural": 3868,
+   "llm": 3868
+  },
+  "GU_1_s1": {
+   "structural": 0,
+   "llm": 3868
+  },
+  "P_1_s1": {
+   "structural": 3868,
+   "llm": null
+  },
+  "RULE_1_s2": {
+   "structural": 3868,
+   "llm": null
+  },
+  "S_1_s2": {
+   "structural": 3868,
+   "llm": null
+  },
+  "G_1_s2": {
+   "structural": 3868,
+   "llm": 3868
+  },
+  "GU_1_s2": {
+   "structural": 0,
+   "llm": 3868
+  },
+  "P_1_s2": {
+   "structural": 3868,
+   "llm": null
+  },
+  "RULE_5": {
+   "structural": 19339,
+   "llm": null
+  },
+  "S_5": {
+   "structural": 19339,
+   "llm": null
+  },
+  "G_5": {
+   "structural": 19339,
+   "llm": 19339
+  },
+  "GU_5": {
+   "structural": 0,
+   "llm": 19339
+  },
+  "P_5": {
+   "structural": 19339,
+   "llm": "17761 silver of 19339"
+  },
+  "RULE_10": {
+   "structural": 38679,
+   "llm": null
+  },
+  "S_10": {
+   "structural": 38679,
+   "llm": null
+  },
+  "G_10": {
+   "structural": 38679,
+   "llm": 38679
+  },
+  "GU_10": {
+   "structural": 0,
+   "llm": 38679
+  },
+  "P_10": {
+   "structural": 38679,
+   "llm": "35895 silver of 38679"
+  },
+  "RULE_100": {
+   "structural": "386,787 (parser/linker); 99,999 (S, s_train100k)",
+   "llm": null
+  },
+  "S_100": {
+   "structural": "386,787 (parser/linker); 99,999 (S, s_train100k)",
+   "llm": null
+  },
+  "G_100": {
+   "structural": "386,787 (parser/linker); 99,999 (S, s_train100k)",
+   "llm": 60001
+  },
+  "GU_100": {
+   "structural": 0,
+   "llm": 60001
+  },
+  "P_100": {
+   "structural": "386,787 (parser/linker); 99,999 (S, s_train100k)",
+   "llm": "55951 silver of 60001"
+  },
+  "P_0": {
+   "structural": 0,
+   "llm": "8 hand-written exemplars (train question texts)"
+  },
+  "G_0": {
+   "structural": 0,
+   "llm": "0 (zero-shot; bundle from P_0)"
+  }
+ },
+ "gpu": {
+  "per_arm": {
+   "G_1": null,
+   "GU_1": null,
+   "G_100": null,
+   "GU_100": null,
+   "G_10": null,
+   "GU_10": null,
+   "G_5": null,
+   "G_1_s1": null,
+   "G_1_s2": null,
+   "P_1": null,
+   "P_100": null,
+   "P_10": null,
+   "P_5": null,
+   "P_0": null,
+   "G_0": null
+  },
+  "by_track": {
+   "guided": null,
+   "parser": null,
+   "k0": null,
+   "structural": null
+  },
+  "total": null,
+  "accounting": "container wall-clock x cards held (gpu_usage_kpct.tsv); failed runs count"
+ },
+ "published_rows": {
+  "SCoP": {
+   "Overall": 0.825,
+   "Single": 0.895,
+   "Multiple": 0.653,
+   "Entity": 0.768,
+   "Time": 0.964,
+   "backbone": "Qwen2.5-14B-Instruct"
+  },
+  "TKG-Thinker": {
+   "Overall": 0.855,
+   "Single": 0.91,
+   "Multiple": 0.721,
+   "Entity": 0.814,
+   "Time": 0.955,
+   "backbone": "Qwen2.5-7B-Instruct"
+  },
+  "ORACLE-T": {
+   "Overall": 0.869,
+   "Single": 0.913,
+   "Multiple": 0.754,
+   "Entity": 0.847,
+   "Time": 0.921,
+   "backbone": "Qwen2.5-72B-Instruct (4-bit, zero-shot)"
+  },
+  "AT2QA": {
+   "Overall": 0.887,
+   "Single": 0.942,
+   "Multiple": 0.751,
+   "Entity": 0.864,
+   "Time": 0.945,
+   "backbone": "DeepSeek-V3.2"
+  },
+  "_source": "published papers (manuscript Table 1)",
+  "_supervision": {
+   "AT2QA": "training-free",
+   "ORACLE-T": "zero-shot (tau, J_max tuned on dev)",
+   "TKG-Thinker": "SFT + GRPO on MultiTQ",
+   "SCoP": "training-free"
+  }
+ },
+ "provenance": {
+  "note": "optional: metadata of your own test-pass job"
+ }
+}

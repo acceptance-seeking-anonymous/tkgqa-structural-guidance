@@ -1,0 +1,21 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_R3_probe_sets",
+ "amendment_id": "A3",
+ "amends": {
+  "rule": {
+   "sha256": "c5f799380c70c78ffba2a4ad865425389f83d3bb8918c312ae036c46cd328ce8"
+  }
+ },
+ "status": {
+  "training_generated": "18,000 of 19,339 (registered-order prefix; deadline stop in the GPU job)",
+  "arms": "all registered arms ran (the GPU job); robustness_r3 GPU-h spent 1.0730; remaining 0.1270 >= 0.10",
+  "scores": "none (no dev or R3 Hits computed)"
+ },
+ "change": "the completion session uses the same deadline mechanism with ARMS_RESERVE = 0 (the 0.50 reserve existed only for the arms, which are complete): deadline = (1.2 - spent - 0.03) h - 90 s; same engine, prompt, decoding and checks; resume continues the registered order after the 18,000-row prefix (gen_job_r3_completion.sh)",
+ "code": {
+  "gen_job_r3_completion.sh": "51c71bcb2aeb18a90ea94aa253e5f30517abca09f208f405998ed3d847c5e369"
+ },
+ "registered_utc": "2026-11-18T17:15:10Z",
+ "sha256": "23e3ea5cfc10c14dc8dea7713d8a91a05fe13a91fe2c170a610350eaec606a44"
+}

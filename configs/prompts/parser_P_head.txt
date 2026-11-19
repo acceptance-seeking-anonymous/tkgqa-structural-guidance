@@ -1,0 +1,1 @@
+Parse the temporal question about the ICEWS knowledge graph into JSON with the keys mentions (list of {text, entity}), relation, answer_role (subject|object), qtype, answer_type (entity|time), granularity (day|month|year), time, anchor, order. Use exact KG entity and relation names.

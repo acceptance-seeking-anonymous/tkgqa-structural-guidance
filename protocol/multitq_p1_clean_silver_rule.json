@@ -1,0 +1,147 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "name": "multitq_p1_clean_silver_rule",
+ "rule_version": "v1.0",
+ "track": "multitq_kpct follow-up: clean-silver P_1 retrain (usage log track 'clean_silver_p1'); DEV ONLY",
+ "question": "Does training P_1 only on silver parses whose operators return a nonempty candidate pool with a gold unpadded RULE top-1 change dev_sel2000 Hits@1 relative to the frozen P_1, beyond retraining noise?",
+ "origin": {
+  "parent_rule": "multitq_kpct_decision_rule.json v1.0 sha256 0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7",
+  "parent_amendments": [
+   "B1",
+   "B2"
+  ]
+ },
+ "status_at_registration": {
+  "outputs": "None. No clean-silver filter has been executed by this track, no clean or rerun adapter exists, no dev or test output of any variant exists, no GPU job of this follow-up has run.",
+  "known_to_designer": [
+   "frozen P_1 dev_sel2000 Hits@1 0.7682 (ep3 / tau off) and the full frozen P_1 selection grid",
+   "the reference zero-pool counts 26 / 26 / 53 / 73 (P_1 / P_5 / P_10 / P_100)",
+   "the P-track stage-A note: rows kept by execution but not by the bundle executes_to_gold flag: 26 / 26 / 53 / 74",
+   "the k% test pass has been scored by the analysts (frozen P_1 test result exists); this follow-up never touches test"
+  ],
+  "status": "POST_HOC relative to the k% test pass: descriptive, not decision-relevant; the frozen P_1 arm, its freeze and every KP label are unchanged by any outcome"
+ },
+ "clean_silver_filter": {
+  "input": "the frozen silver build: parser/silver/silver_<list>_all.jsonl (serialised compact targets of the k%-trained structural top-1 parse) and the frozen keep decision",
+  "execution": "re-execute each stored serialised target exactly as pk_silver.py: validate_compact -> kpct_executor.compact_to_parse(c, question, None) -> Executor(<subset>).execute(probs='given') (operators + retrieval + RULE ordering; no structural hypotheses appended)",
+  "conditions": {
+   "C0_frozen_keep": "valid AND official hit@1 of the padded RULE list (= the frozen keep; replay-checked against the stored row)",
+   "C1_nonempty_pool": "pool_size > 0, i.e. the operator / retrieval candidate pool BEFORE output padding is nonempty",
+   "C2_unpadded_top1_gold": "the first pool candidate in RULE order (execute()['candidates'][0]['answer'], before padding) is in the gold set under official MultiTQ matching (multitq_eval.hit_at_k on the one-element list: a time prediction is truncated to the gold granularity YYYY / YYYY-MM before set membership), the same matching as the registered P target rule and the dev metric"
+  },
+  "keep": "valid AND C1 AND C2; otherwise the target is dropped",
+  "counts_reported": [
+   "frozen kept (C0)",
+   "dropped by C1 (zero pool)",
+   "additionally dropped by C2 among C1 rows",
+   "clean kept",
+   "clean rows not in the frozen set (expected 0)"
+  ],
+  "lists": {
+   "k01_s0": "filter applied; the clean training file is written (P_1clean)",
+   "k05_s0": "counts only",
+   "k10_s0": "counts only",
+   "k100": "counts only (reader_train60k, frozen v3 parser)"
+  },
+  "diagnostics_not_used_for_filtering": [
+   "strict exact-string membership of the unpadded top-1 in the gold list (no granularity truncation)",
+   "target qtype vs released qtype; target granularity vs released time_level (all rows and time-answer rows)",
+   "released qtype of the zero-pool rows"
+  ],
+  "train_data_rule": "only k01_s0 train answers enter the clean P_1 training set (k05/k10/k100 answers are read for the counts only, each within its own registered list)"
+ },
+ "variants": {
+  "P_1frozen": "the frozen arm, not retrained: adapter parser/adapters/P_k01_s0_s0/ep3 (sha256 93ea44bcb35a66b47dc7cd0310525e3d94f362a46584c692b33878f5422a231b), dev predictions parser/exec/k01_s0/pred_P_k01_s0_dev_sel2000_ep3_tauoff_seed{0,1,2}.jsonl, hash-verified against parser/freeze/freeze_P_k01_s0.json (sha256 292dc4d1cb5676944281a584477e62dbb9b2c687ed1134573b70cfc5e2e914a4)",
+  "P_1clean": "IN (primary). Clean silver of k01_s0; training identical to frozen P_1",
+  "P_1rerun": "IN (noise reference, as requested). The ORIGINAL frozen silver (silver_k01_s0_train.jsonl), seed 0, identical recipe; its data order must equal the frozen data_order_sha256 (STOP_RERUN_DRIFT). Measures GPU-training plus vLLM-decoding nondeterminism",
+  "P_1order": "IN (secondary noise reference, added by this track). ORIGINAL silver, LoRA init seed 0, data-order seed 1 (pk_train --order_seed 1; default unchanged). Reason: dropping rows changes n and therefore the seed-0 permutation, so P_1clean differs from frozen in data order as well as labels; P_1rerun alone does not measure data-order variance"
+ },
+ "training_recipe": {
+  "identical_to": "frozen P_1 (rule arms.P_k.lora_recipe = arms.G_k): Llama-3.1-8B-Instruct; LoRA r 16, alpha 32, dropout 0.05 on q,k,v,o,gate,up,down; AdamW lr 2e-4, wd 0, cosine, 3% warm-up, grad clip 1.0, effective batch 16, bf16; loss on JSON tokens; same prompt (P_HEAD sha256 5186ca8f...), chat template date '26 Jul 2024'; max length 2,048; E_max = 3 (k = 1); seed 0 (LoRA init and data order); micro-batch limit 8,192 padded tokens; checkpoints ep1, ep2, ep3",
+  "list": "k01_s0 (3,868 questions; registered sha256 9cc6eb403715...)",
+  "code": "pk_train.py of the frozen run plus an --order_seed option whose default reproduces the frozen data order exactly (used only by P_1order)",
+  "hardware": "one RTX PRO 6000 card per process, model.to('cuda:0'), no device_map, tkgqa-gpu:latest + peft 0.21.2 (as frozen)"
+ },
+ "dev_evaluation": {
+  "split": "dev_sel2000 (2,000 questions, registered sha256 b5b8a28d...); no other dev question; no test question",
+  "decoding": "vLLM (tkgqa-vllm:latest), greedy, max 160 new tokens, logprobs=0, one session for all 9 checkpoints",
+  "execution": "pk_execute.py with the frozen settings: compact_to_parse with the k01_s0 structural hypotheses appended, probs='classifier', the 3 S_k LightGBM seeds of k01_s0 (executor/models/k01_s0/S_seed{0,1,2}.txt), fallback to S_k's own dev prediction (preds/k01_s0/dev_sel2000_S_seed{b}.jsonl) for invalid JSON / unknown name / empty pool / mean log-prob < tau",
+  "primary_configuration": "ep3 and tau off for every variant (= the frozen P_1 configuration), fixed a priori; no selection is used for the primary contrast",
+  "secondary_configuration": "the registered P selection (checkpoint x tau in {off, -0.30, -0.10, -0.03}, best mean Hits@1, ties -> earlier checkpoint then off) applied to each variant; descriptive only"
+ },
+ "metric": {
+  "primary": "dev_sel2000 Hits@1, per-question hit = mean over the 3 S_k seeds of the official hit (multitq_eval.hit_at_k, sha256 1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69)",
+  "secondary": [
+   "Hits@10 (same averaging)",
+   "Hits@1 on dev templates unseen in k01_s0 (bundle template_unseen flag, n = 1,446) and on the seen complement",
+   "Hits@1 by released qtype (dev metadata used only to stratify the report)",
+   "invalid and fallback rates",
+   "number of dev questions whose 3-seed hit changes; number of identical ep3 generations vs frozen; adapter sha256 equality of P_1rerun vs frozen"
+  ]
+ },
+ "statistic": {
+  "contrasts": {
+   "primary": "D_clean = P_1clean - P_1frozen",
+   "noise_references": [
+    "D_rerun = P_1rerun - P_1frozen",
+    "D_order = P_1order - P_1frozen"
+   ],
+   "secondary": [
+    "P_1clean - P_1rerun",
+    "P_1clean - P_1order"
+   ]
+  },
+  "bootstrap": "paired Poisson(1) over the 2,000 dev_sel2000 questions, B = 2000, seed 0 (tkg-claims-protocol paired_poisson_bootstrap, copied verbatim); two-sided 95% percentile CI; one-sided p = share of bootstrap deltas <= 0 (and >= 0 for the opposite direction); single-arm CI = the same bootstrap of the mean; the same weights for every contrast (they depend only on n and the seed)",
+  "multiplicity": "one primary contrast; no correction; everything else descriptive"
+ },
+ "labels": {
+  "noise_band": "N = max(|D_rerun|, |D_order|) (point estimates, Hits@1)",
+  "CLEAN_HIGHER": "CI(D_clean) lower bound > 0 AND D_clean > N",
+  "CLEAN_LOWER": "CI(D_clean) upper bound < 0 AND -D_clean > N",
+  "NO_CLEAN_EFFECT_DETECTED": "otherwise",
+  "qualifiers": {
+   "WITHIN_RETRAIN_NOISE": "|D_clean| <= N",
+   "RETRAIN_REPRODUCED": "P_1rerun changes no dev question's 3-seed hit vs frozen",
+   "RETRAIN_NONDETERMINISTIC": "otherwise",
+   "DEV_FAILURE": "any variant's ep3/off Hits@1 < 0.30 or invalid rate > 0.20 (after the one allowed bug-fix iteration)",
+   "POST_HOC": "always"
+  },
+  "interpretation": "Dev only and post hoc. A label qualifies the F1 label-quality caveat; it does not replace frozen P_1, its test predictions or any KP label. No test number of any variant is produced."
+ },
+ "gpu_coordination": "the GPU host: the robustness probe and other users have priority. Before each GPU container: nvidia-smi and docker ps are logged; a card is used only if memory.used < 2000 MiB and utilization < 5% in two reads 30 s apart and no compute process is on it; one process per card; never stop or touch other processes; if no card is free wait 600 s and re-check (<= 48 checks, then NOT_RUN). Orphan check after each container (no cs_* container left).",
+ "stop_rules": {
+  "STOP_BUDGET": "no GPU container if track spend + its projection > 2.0 GPU-h or usage log total + projection > 52",
+  "STOP_NO_TEST": "no test question of any variant is decoded, executed or scored; the driver has no test phase; the freeze asserts that no test file exists",
+  "STOP_REPLAY": "if any re-executed frozen keep decision (C0) differs from the stored silver row, stop before writing the clean training file and report",
+  "STOP_RERUN_DRIFT": "if P_1rerun's data_order_sha256 or silver sha256 differs from frozen P_1's, stop before decoding and report (the rerun would not be a replicate)",
+  "STOP_INTEGRITY": "frozen P_1 adapter and dev prediction hashes are re-verified against freeze_P_k01_s0.json before the comparison; mismatch -> stop",
+  "STOP_LEAK": "clean silver quids must be a subset of the k01_s0 list (asserted in pk_train); dev answers are read only for the 2,000 dev_sel2000 quids and only in pk_select / cs_compare",
+  "STOP_DEV_FAILURE": "ep3/off Hits@1 < 0.30 or invalid rate > 0.20 for a variant -> one logged bug-fix iteration, then reported as is",
+  "failures": "an infrastructure failure may be retried once after a fix; a second failure -> that variant NOT_RUN"
+ },
+ "deliverables": [
+  "multitq_p1_clean_silver_rule.json (this file, registered before any output)",
+  "clean silver manifests (k01_s0, k05_s0, k10_s0, k100) with sha256",
+  "adapters on the GPU host (parser_clean/adapters/P_k01_s0{clean,rerun,order}_s0) with sha256 in the freeze",
+  "dev prediction files + multitq_p1_clean_silver_freeze.json",
+  "multitq_p1_clean_silver_results.json",
+  "multitq_p1_clean_silver_report.md",
+  "code tgz"
+ ],
+ "code_sha256_at_registration": {
+  "cs_compare.py": "e2f85828ff9512ce7df2c503ad0f1d4b43458429922aaf6f8578142f0b1d1afa",
+  "cs_driver.sh": "1a86aa92d00311b137cd0a98891784d5743c9b12c29fe25988083213e024ebaf",
+  "cs_freeze.py": "8113167563d3302e071d420e8282f313801715e47cc3d51bb7fc45f0dffcf2b1",
+  "pk_clean_silver.py": "d5ab85b1e7dc44579cdfab2a4e79118a0286ebc5f619404564d9582b50432e4c",
+  "pk_common.py": "0b2cc2faa72dc1f6a0171fdb4409c74ae4ff26d9cee1dd365af684f1e064371a",
+  "pk_execute.py": "70e86d7013476f34481bcd64ced190e57785b5fc2ad94aa108bcf2b714b9ee95",
+  "pk_infer.py": "6fc30ca57e56ae5c3a8ef45cc7351587f5f26bbdc45f9888ac0bd90fb1eb949f",
+  "pk_select.py": "0a6d22e9e091a89e1bc41420638538ae22fde241b0f4ef794a0e9f6f2a522e91",
+  "pk_train.py": "6d3e58745544f588df4b25f72227218843c3fd03524a157e70a53db50650b983",
+  "run_card_cs.sh": "87ab0b799a31ad50a6faab35d151755bb7a9b5592f359c8fb4835b6ffef75970",
+  "run_cpu_p.sh": "3bd869cc5a925d19b805595a232d9846c48310763275cfa5599ad10994901534"
+ },
+ "sha256_recipe": "sha256 = SHA-256 of json.dumps({all keys except sha256}, indent=1, sort_keys=True, default=str)",
+ "registered_utc": "2026-10-28T07:34:35Z",
+ "sha256": "004023a3d1cf3bd32ed25d5a46b8cfffc7c0f365bc04921d4a62786d6286b5bb"
+}

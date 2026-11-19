@@ -1,0 +1,246 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_structural_ablation",
+ "rule_version": "v1.0",
+ "plan": "Research-track plan (registered 2026-11-17), steps 'Register structural ablation design', 'Replay Parser-alone vs Parser-plus-alternatives', 'Retrain Ranker without each feature group'. PAKDD 2027 research-track paper 'Data-Efficient TKGQA via Structural Guidance and Symbolic Execution'. Protocol: tkg-claims-protocol.",
+ "question": {
+  "A": "On the MultiTQ test split, how much of the Parser arm's (P_k) Hits@1 comes from the deduplicated structural alternatives that follow the Parser hypothesis, i.e. how does executing ONLY the Parser hypothesis (PALONE_k) compare with P_k at k = 1/5/10/100%, under the same fallback handling, and without any fallback?",
+  "B": "At k = 1% and 5%, which of six disjoint groups of the Ranker's 34 features does the Ranker need: how much test Hits@1 is lost when the LightGBM lambdarank Ranker is retrained without each group, against a full-feature Ranker retrained by the same procedure in the same run?"
+ },
+ "nature": "POST-HOC structural analyses. Part A replays FROZEN cached parser generations through the FROZEN executor and Ranker models (no LLM inference, no training, no selection). Part B trains NEW Ranker versions (full and ablated) with the frozen recipe and dev_sel2000-only selection. Neither part changes any registered result (KP1-KP4 of multitq_kpct_decision_rule.json, robustness R1/R2 outcomes) or any frozen file.",
+ "test_split_label": "REUSE of the official MultiTQ test split (questions/test.json, 54,584 questions, sha256 d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee), already scored once in the k% single test pass (2026-10-28T01:11:37Z) and in the robustness probes R1/R2. Every number of this track is labelled 'test split reused'. Nothing is selected on test.",
+ "status_at_registration": {
+  "new_outputs": "None scored. No ablated or retrained Ranker exists; no PALONE / PREL / PENT prediction file exists for the full test split or the rewrites; no gold answer has been read for any output of this track.",
+  "work_before_registration": [
+   "Read the frozen code (pk_execute.py, pk_common.py, kpct_executor.py, kpct_core.py, mtq_cand.py, kpct_run.py, kpct_retrain_fixed_vocab.py, rob_build.py) and the reproduction notes REPRODUCE_kpct.md.",
+   "Built a local copy of the executor tree from the archived k% outputs (models/kpct/structural/<k>, structural bundles tar, S_k test lists) and verified the S_k fallback lists against the sha256 recorded in the frozen exec_stats files (12/12 match).",
+   "Identity pilot (predictions only, no gold): replayed PK on the first 500 test quids at k01_s0 with sa_parser_replay.py; PK lists equal the frozen pred_P_k01_s0_test_ep3_tauoff_seed{0,1,2} lists for 500/500 questions (full top-50 lists, all 3 seeds). The pilot also printed fallback rates on those 500 quids (PK 0.060, PALONE 0.062, PREL 0.060, PENT 0.062). No hit was computed.",
+   "Read the frozen k01_s0 / k05_s0 structural run logs and selection_S.json (dev_sel2000 numbers of the FROZEN S_k), and know the stage-2b reference numbers of the fixed-vocabulary k01_s0 retrain (dev_sel2000 Hits@1 0.7255 / 0.7175 / 0.7200 for S seeds 0/1/2; selected 127 leaves, lr 0.05, 96 iterations)."
+  ],
+  "known_registered_numbers": "The frozen S_k and P_k test Hits@1 (multitq_kpct_test_results.json) are known; they are the reason for this analysis, and they are not re-decided here."
+ },
+ "parent_documents": {
+  "kpct_decision_rule": {
+   "sha256": "e2db254d65b22c1a2a8be763c82bdbc881e5f3bcc8b13aee42f0180309e47d6d"
+  },
+  "kpct_subsets": {
+   "sha256": "de8a9c22d51f4182f88063c57d408530c351660ec23caea29b8559878ee88e5a"
+  },
+  "official_evaluator": {
+   "file": "multitq_eval.py",
+   "sha256": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69"
+  },
+  "parser_code": {
+   "file": "multitq_kpct_parser_code.tgz",
+   "note": "byte-identical to the archived multitq_kpct_parser_code.tgz"
+  }
+ },
+ "part_A_parser_replay": {
+  "inputs": {
+   "generations": "cached P_k test generations archived test_results/multitq/kpct/predictions/parser/test/<k>/raw_P_test_<ckpt>.jsonl.gz with the frozen checkpoints (k01_s0 ep3, k05_s0 ep1, k10_s0 ep0.5, k100 ep0.5; tau off), and the cached rewrite generations raw_P_variants_P_<k>.jsonl.gz in the R1 (6,569 variants) and R2 (2,570 variants) prediction archives (k01_s0, k05_s0, k100; k10 was never run on the rewrites -> rewrites reported at k = 1/5/100 only)",
+   "structural_parse": "test: the frozen bundle parse (inputs/kpct/multitq_kpct_structural_bundles.tar, bundles/<k>/test.jsonl, sha256 verified by its index). Rewrites: the variant bundle parse rebuilt locally with the frozen robustness builder rob_build.py (unchanged; frozen executor models) because the variant bundles stayed on the GPU host; identity of the rebuilt variant RULE/S lists with the archived preds/<k>/variants_* files is checked and reported (predictions only)",
+   "fallback_lists": "S_k's own test lists (preds/<k>/test_S_seed{0,1,2}.jsonl, sha256 = the frozen exec_stats fallback_source) and, for rewrites, the archived preds/<k>/variants_S_seed{0,1,2}.jsonl"
+  },
+  "validation": "identical to the frozen pk_execute.work: pk_common.extract_json + validate_compact (else invalid_json), then check_names (relation, every mention entity, a non-null anchor must be KG names; else unknown_name). Parse validity = share of generations passing both; identical for every mode because the generation is the same.",
+  "modes": {
+   "PK": "kpct_executor.compact_to_parse(c, question, structural_parse = bundle parse): Parser hypothesis = rank 0, then the deduplicated structural relation hypotheses (<= 5 relations) and, per Parser mention, the alternatives of the overlapping structural mention (<= 5). Identical to the frozen P_k execution.",
+   "PALONE": "kpct_executor.compact_to_parse(c, question, structural_parse = None): the Parser hypothesis only (one relation-direction, one entity per Parser mention; qtype / answer type / granularity / time / anchor / order from the Parser). The executor's internal role hypotheses (topic/anchor role swap, pair order for time answers) are part of the frozen operator code and are kept unchanged in every mode.",
+   "PREL (secondary)": "PK with each mention truncated to its first alternative (= Parser hypothesis + structural relation alternatives only)",
+   "PENT (secondary)": "PK with the relation list truncated to its first entry (= Parser hypothesis + structural entity alternatives only)"
+  },
+  "execution": "every mode: frozen executor Executor(k).execute(parse, question, probs='classifier') -> operators + RULE order + the 3 frozen S_k LightGBM seeds (k100: frozen full-data artefacts); per-question hit = mean over the 3 S seeds (as P_k)",
+  "fallback_variants": {
+   "fb (registered handling, primary)": "a question falls back to S_k's own output for that seed when the generation is invalid_json, has an unknown_name, its execution raises / is invalid, or its pool is empty (tau off, as frozen). Applied identically to every mode; only empty_pool / execution failures can differ between modes.",
+   "strict (separately labelled, secondary)": "no fallback: every question that would fall back gets an empty ranked list (scored as a miss)."
+  },
+  "metrics": {
+   "parse_validity": "share of questions whose generation passes validation and the KG-name check",
+   "executability": "share of questions whose mode executes to a non-empty pool (= 1 - fallback frequency)",
+   "fallback_frequency": "share of fallback questions, by reason (invalid_json, unknown_name, empty_pool, execution error), per mode",
+   "candidate_recall": "share of ALL questions whose gold answer (official matching, multitq_eval.hit_at_k over the full pool) is in the mode's own RULE-ordered candidate pool (cap 1,000); fallback questions count as 0 (strict recall). Also reported conditional on questions executable under BOTH PK and PALONE (paired), and recall@50 of the final ranked lists (descriptive).",
+   "hits": "Hits@1 primary (mean over 3 S seeds; per seed reported), Hits@10 descriptive; official evaluator multitq_eval.py",
+   "strata": "descriptive Hits@1 by qtype and by answer_type (B = 1000)"
+  },
+  "identity_checks": {
+   "I_A1": "replayed PK (fb) top-50 lists vs the frozen pred_P_<k>_test_*_tauoff_seed{b} lists: required full-list identity >= 99.9% per seed at every k; reported for every k and seed. Below that, the k is labelled REPLAY_NOT_IDENTICAL and its numbers provisional (the PK-vs-PALONE contrast is still within-replay).",
+   "I_A2": "replayed PK (fb) test Hits@1 vs the registered P_k Hits@1 (per-question hits CSV [id], P_k_seedN@1): difference reported; expected 0 when I_A1 = 100%.",
+   "I_A3": "rewrites: replayed PK (fb) vs the archived pred_P_<k>_variants_* lists; and the rebuilt variant S lists vs the archived variants_S lists (identity rates reported). Below 99.5% full-list identity the rewrite numbers of that k are provisional."
+  },
+  "contrasts": {
+   "primary": "D_A(k) = Hits@1(PK_fb) - Hits@1(PALONE_fb) on the full test split, k in {1, 5, 10, 100} (k = 1 is subset list k01_s0, the frozen P_1)",
+   "secondary_strict": "D_A_strict(k) = Hits@1(PK_strict) - Hits@1(PALONE_strict) (own Holm family of 4)",
+   "secondary_descriptive": [
+    "PK_fb - PK_strict and PALONE_fb - PALONE_strict (what the fallback contributes)",
+    "PALONE_fb - S_k (frozen S_k test lists; is the Parser hypothesis alone better than the structural Ranker?)",
+    "PREL_fb - PALONE_fb and PENT_fb - PALONE_fb (relation vs entity alternatives)",
+    "candidate recall PK - PALONE (paired bootstrap)"
+   ],
+   "rewrites": "for each rewrite set (R1: ORIG, P1 prefix, P2 trailing '?' removed, P3 judge-accepted paraphrase n = 569; R2: ORIG, RW judge-accepted rewrite n = 570) at k in {1, 5, 100}: Hits@1 of PK_fb, PALONE_fb, PK_strict, PALONE_strict; D_A on the variant; the drop = variant - ORIG on the same original quids for each mode, and the difference of drops PK - PALONE (paired bootstrap). Rewrite numbers are descriptive (no decision label)."
+  },
+  "decision_labels_per_k": {
+   "ALTERNATIVES_HELP": "D_A(k) 95% CI entirely > 0, D_A(k) >= 0.001 and Holm-adjusted two-sided p < 0.05 (family: the 4 primary contrasts)",
+   "ALTERNATIVES_HURT": "D_A(k) 95% CI entirely < 0, |D_A(k)| >= 0.001 and Holm-adjusted p < 0.05",
+   "NO_DETECTABLE_DIFFERENCE": "otherwise",
+   "summary": "SUPPORTED (the structural alternatives add Hits@1 to the Parser) if ALTERNATIVES_HELP at all 4 k; PARTIAL if at 1-3 k; NOT_SUPPORTED if at none. The strict variant gets the same labels, reported separately and never substituted for the primary."
+  }
+ },
+ "part_B_ranker_feature_group_ablation": {
+  "levels": "k = 1% (subset list k01_s0) and k = 5% (k05_s0); subset seeds 1/2 and k = 10/100 are not run",
+  "feature_groups": {
+   "G_OPSAT": {
+    "label": "temporal-operator satisfaction flags",
+    "features": [
+     "sat_top",
+     "sat_any",
+     "sat_anchor_last",
+     "anchor_found",
+     "q_ncand_sat"
+    ]
+   },
+   "G_TPOS": {
+    "label": "temporal position / distance under the operator",
+    "features": [
+     "pos",
+     "pos_rel",
+     "gap",
+     "dist",
+     "pos_anchor_last",
+     "first_day",
+     "last_day"
+    ]
+   },
+   "G_RELP": {
+    "label": "relation-hypothesis rank and structural-classifier confidences",
+    "features": [
+     "best_rank",
+     "best_relp",
+     "sum_relp_sat",
+     "relp_conn",
+     "rel1_p",
+     "rel_margin",
+     "dir_top",
+     "qt_p",
+     "atype_p",
+     "level_p"
+    ]
+   },
+   "G_LINK": {
+    "label": "entity linking / grounding (mention alternatives, roles)",
+    "features": [
+     "alt_rank",
+     "alt_eff_ratio",
+     "anchor_alt",
+     "role_swapped",
+     "is_qent",
+     "n_ment"
+    ]
+   },
+   "G_PROV": {
+    "label": "fact-provenance support counts",
+    "features": [
+     "n_sat",
+     "n_conn",
+     "n_pair_all"
+    ]
+   },
+   "G_PRIOR": {
+    "label": "answer-type and popularity priors",
+    "features": [
+     "is_time",
+     "log_deg",
+     "log_prior"
+    ]
+   }
+  },
+  "feature_groups_note": "the 34 features are mtq_cand.FEATS (frozen). The 6 groups are disjoint and exhaustive (34 features). The Ranker has no explicit RULE-rank or RULE-score feature (RULE order enters only through the pool order used to break score ties); the RULE-key components are covered by the secondary composite C_RULEKEY.",
+  "secondary_composites": {
+   "C_RULEKEY": {
+    "label": "composite (overlapping): Ranker features that are components of the RULE lexicographic key (operator satisfied, relation rank, alternative rank, role swap, operator position, connection count)",
+    "features": [
+     "sat_any",
+     "best_rank",
+     "alt_rank",
+     "role_swapped",
+     "pos",
+     "pos_rel",
+     "n_conn"
+    ]
+   },
+   "C_TEMPORAL": {
+    "label": "composite (overlapping): all temporal-operator features = G_OPSAT + G_TPOS",
+    "features": [
+     "sat_top",
+     "sat_any",
+     "sat_anchor_last",
+     "anchor_found",
+     "q_ncand_sat",
+     "pos",
+     "pos_rel",
+     "gap",
+     "dist",
+     "pos_anchor_last",
+     "first_day",
+     "last_day"
+    ]
+   }
+  },
+  "retraining_procedure": {
+   "stack": "kpct_retrain_fixed_vocab.py (unchanged kpct_run.py and kpct_core.py) stage fitA with PYTHONHASHSEED=0 and the preserved vocabulary orders of the frozen checkpoints (frozen_out/<k> from code/kpct/multitq_kpct_structural_code.tgz): sector aliases, block list, silver records, full-subset classifier (E in {6, 24} by dev_sel2000 RULE Hits@1), 2-fold OOF classifier probabilities for the S training rows (cap 200 candidates per question), dev_sel2000 pools. Environment: local conda env multitq (Python 3.12.15, numpy 2.5.4, lightgbm 4.6.0, torch 2.14.1) = the environment of the original structural runs; KPCT_NPROC = 8, OMP_NUM_THREADS = 1.",
+   "ranker": "frozen kpct_run.stage_trainS recipe, applied to the feature columns kept: LightGBM lambdarank (S_BASE: ndcg@1, min_data_in_leaf 100, feature_fraction 0.8, bagging 0.8/1, lambdarank_truncation_level 20), grid num_leaves {31, 63, 127} x learning_rate {0.05, 0.1} at seed 0 with early stopping (100 rounds, max 2000) on dev_sel2000 ndcg@1; selection = max dev_sel2000 Hits@1 (ties: higher ndcg@1, then grid order); seeds 0, 1, 2 retrained with the seed-0 best iteration. Run separately for the full feature set and for every ablation (each re-selected on dev_sel2000).",
+   "inference": "test pools from the fitA full-subset classifier and linker (= frozen ones by vocabulary-order imposition) via K.MC.parse_info + K.build_info (frozen stage_infer path); S order = descending score, ties by RULE order; padding with PRIOR then FB (K.make_ranked). Per-question hit = mean over the 3 Ranker seeds.",
+   "why_retrained_full": "free retraining is not bitwise reproducible (vocabulary order of the out-of-fold classifiers; earlier k01_s0 retrain -0.0053 [-0.0132, +0.0022] dev_sel2000, top-1 agreement 82.7-84.7%), so every ablation is compared with SA_<k>_full trained on the SAME S training rows, dev pools and test pools in the same run, never with the frozen S_k."
+  },
+  "arms": {
+   "SA_<k>_full": "retrained Ranker, all 34 features (3 seeds)",
+   "SA_<k>_minus_<G>": "retrained Ranker without group G (3 seeds), G in the 6 primary groups",
+   "SA_<k>_minus_<C> (secondary)": "without composite C_RULEKEY or C_TEMPORAL",
+   "SA_<k>_full_hs7 (secondary, noise floor)": "full-feature Ranker retrained after a second fitA with PYTHONHASHSEED=7 (other OOF classifiers, hence other S training rows; same test pools); SA_full(hs0) - SA_full(hs7) is the retrain-noise reference"
+  },
+  "identity_checks": {
+   "I_B1": "the fitA full-subset classifier checkpoints parser_full_E{6,24}.pt equal the frozen ones (all tensors) and the test RULE lists built from the run's pools equal the frozen test_RULE.jsonl of the subset (predictions only). If not, the test pools differ from the frozen ones; all contrasts stay within-run but this is reported as a deviation.",
+   "I_B2": "k01_s0: SA_1_full dev_sel2000 selection and Hits@1 vs the earlier fixed-vocabulary retraining check (stage 2b) (expected identical; reported)."
+  },
+  "contrasts": {
+   "primary": "Delta_G(k) = Hits@1(SA_k_full) - Hits@1(SA_k_minus_G) on the full test split, 6 groups x 2 k = 12 contrasts (Holm family)",
+   "secondary": [
+    "the same on dev_sel2000 (descriptive; dev_sel2000 is the early-stopping and selection set, so these are optimistic)",
+    "Delta for C_RULEKEY and C_TEMPORAL (not in the Holm family)",
+    "SA_k_full - frozen S_k on test (retrain shift; descriptive, the frozen result is not changed)",
+    "SA_k_full(hs0) - SA_k_full(hs7) (noise floor)",
+    "per-seed Hits@1 and Hits@10"
+   ]
+  },
+  "decision_labels_per_cell": {
+   "GROUP_NEEDED": "Delta_G(k) 95% CI entirely > 0, Delta_G(k) >= 0.001 and Holm-adjusted two-sided p < 0.05",
+   "GROUP_HARMFUL": "Delta_G(k) 95% CI entirely < 0, |Delta_G(k)| >= 0.001 and Holm-adjusted p < 0.05 (removing the group helps)",
+   "NO_DETECTABLE_EFFECT": "otherwise",
+   "interpretation_guard": "a GROUP_NEEDED or GROUP_HARMFUL cell whose |Delta| is below |SA_k_full(hs0) - SA_k_full(hs7)| is reported with that caveat (not relabelled)."
+  }
+ },
+ "statistic": {
+  "evaluator": "multitq_eval.py (official MultiQA semantics, sha256 1f85bbdc...): hit_at_k",
+  "bootstrap": "paired Poisson(1) bootstrap over questions, multitq_eval.paired_poisson_bootstrap, B = 2000, seed 0 (full test and rewrite sets), strata B = 1000; two-sided 95% percentile CI; two-sided p = min(1, 2 * min(P(boot <= 0), P(boot >= 0)))",
+  "single_arm_CI": "Poisson(1) bootstrap of the mean hit, B = 2000, seed 0",
+  "seeds": "Part A: the 3 frozen S_k seeds (per-question mean); Part B: Ranker seeds 0, 1, 2 (per-question mean); per-seed numbers reported",
+  "multiplicity": "Holm within each family: A primary (4), A strict (4), B primary (12). Secondary and descriptive numbers carry unadjusted CIs and no label."
+ },
+ "selection_discipline": "Part A has no free choice (frozen generations, executor, Ranker models, tau off, fallback rule). Part B: every Ranker hyper-parameter and iteration count is chosen on dev_sel2000 only, by the frozen rule, separately per arm; the feature groups and composites are fixed in this file before any ablation is trained. Nothing is changed after a test number is read; any later addition is labelled post hoc and is not decision-relevant.",
+ "scoring_discipline": "Gold answers are read only by the scoring pass, which runs after every new prediction file of the part (Part A: all modes x variants x k x splits; Part B: all arms x seeds x {dev_sel2000, test}) is listed with sha256 in a freeze file saved. Each new test file is scored once. Identity checks I_A1, I_A3, I_B1 use predictions only. dev_sel2000 gold is read during Part B training only (selection), as in the frozen recipe.",
+ "stop_rules": {
+  "STOP_IDENTITY_A": "if I_A1 < 99.0% at a k, Part A results for that k are reported as provisional and no label is given for that k",
+  "STOP_IDENTITY_B": "if I_B1 fails (test RULE lists differ from the frozen ones on > 0.5% of questions), Part B is still reported (within-run contrasts) with the deviation stated",
+  "STOP_DEADLINE": "unrun cells on 2026-11-24 are NOT_RUN"
+ },
+ "deliverables": [
+  "multitq_structural_ablation_rule.json (this file)",
+  "multitq_structural_ablation_freeze_A.json / _freeze_B.json (sha256 of every new prediction file, saved before scoring)",
+  "multitq_structural_ablation_predictions_A.tgz / _B.tgz",
+  "multitq_structural_ablation_test_hits.csv.gz (per-question hits keyed by quid; and rewrite hits keyed by synthetic quid)",
+  "multitq_structural_ablation_results.json",
+  "multitq_structural_ablation_report.md",
+  "code archive"
+ ],
+ "amendment_log": [],
+ "registered_utc": "2026-11-17T16:53:47Z",
+ "sha256": "594bd8ff95268d19fa164dc314ff486c3e05e5d1057ec5330d341760226cbb9b"
+}

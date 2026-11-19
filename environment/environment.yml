@@ -1,0 +1,20 @@
+# CPU environment of the structural pipeline, k% subsets / retraining, test-pass analysis and post-hoc analyses
+# (versions as recorded for the experiments). Create with: conda env create -f environment/environment.yml
+name: multitq
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.15
+  - lightgbm=4.6.0
+  - numpy=2.5.4
+  - scipy=1.18.1
+  - pandas=3.1.0
+  - scikit-learn=1.9.1
+  - pyarrow=25.0.0
+  - pytorch=2.14.1
+  - matplotlib=3.11.2
+  - pip
+  - pip:
+      - openpyxl        # annotation-kit .xlsx sheets only (version not recorded)
+      - pytest          # optional, for tests/
+      - requests        # R3 rewrite generation only (HTTP client; version not recorded)

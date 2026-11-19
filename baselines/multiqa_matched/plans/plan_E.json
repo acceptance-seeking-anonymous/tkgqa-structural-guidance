@@ -1,0 +1,20 @@
+{
+ "parallel": 2,
+ "prep_levels": "k100",
+ "runs": [
+  {
+   "k": "k100",
+   "emb": "off",
+   "seed": 0,
+   "max_epochs": 10,
+   "patience": 0
+  },
+  {
+   "k": "k100",
+   "emb": "full",
+   "seed": 0,
+   "max_epochs": 10,
+   "patience": 0
+  }
+ ]
+}

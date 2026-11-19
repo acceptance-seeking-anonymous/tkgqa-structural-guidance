@@ -1,0 +1,582 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "amendment_id": "B1",
+ "track": "multitq_kpct / guided reasoner (G_k, GU_k, SHUF_G1, QONLY_G1); stage A",
+ "rule": {
+  "file": "multitq_kpct_decision_rule.json",
+  "rule_version": "v1.0",
+  "sha256": "0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7",
+  "registered_utc": "2026-10-27T03:59:39Z",
+  "sha256_method": "rule sha256_recipe: SHA-256 of json.dumps({all keys except sha256}, indent=1, sort_keys=True, default=str); equals the rule's own sha256 field",
+  "file_bytes_sha256": "e2db254d65b22c1a2a8be763c82bdbc881e5f3bcc8b13aee42f0180309e47d6d"
+ },
+ "subsets_manifest_sha256": "de8a9c22d51f4182f88063c57d408530c351660ec23caea29b8559878ee88e5a",
+ "type": "amendment_log entry: stage-0 throughput benchmark, BINDING GPU-hour cap projection, fallbacks in force (rule GPU-hour cap.stage0_benchmark, fallbacks.procedure); implementation details of the guided-reasoner arms not fixed by the rule (selection_discipline, last bullet)",
+ "state_at_amendment": "No dev_sel2000, dev or test score of any arm of this experiment has been computed by this track. No G_k or GU_k adapter has been trained (only the registered 50-step benchmark adapters, deleted after the throughput runs). No test generation exists. The only use of answers: train answers of the 1,300 benchmark questions (outside every training list) as benchmark LoRA targets, and reader_train60k (the registered k = 100 LLM list) bundle targets for token counts only. A local plumbing test of the session script used a dev file whose answers had been replaced by a placeholder string (no real dev answer read; all its scores are 0 by construction).",
+ "stage0_benchmark": {
+  "spec": "rule GPU-hour cap.stage0_benchmark: <= 1 GPU-h; 50 LoRA steps each with G, GU and P prompts on train questions outside k10_s0 and reader_train60k (adapters discarded, outputs unscored); vLLM 8B and 70B (TP2) throughput on 500 such prompts (outputs discarded); bge embedding throughput",
+  "questions": {
+   "n": 1300,
+   "list_sha256": "4622da9f79e83e557ae0432a1c7cc092d20564b59155ce62adc64433b5379dce",
+   "sampling": "default_rng(20261027), uniform from the 200,031 train quids outside EVERY registered training list (k01_s0, k05_s0, k10_s0, k01_s1, k01_s2, reader_train60k, s_train100k, cap20k_k10, cap20k_k100; 186,756 excluded)",
+   "use": "800 LoRA (50 steps x 16 per style), 500 vLLM throughput prompts per style"
+  },
+  "prompts": {
+   "G": "G prompt (gk_common.g_user, S order). No structural bundle exists for outside-list questions, so the guidance is built from the question's own frozen k = 100 OOF parse (train_parser_outputs.jsonl.gz) plus KG facts of its linked entities under the top relation hypothesis (bench_prep.py). Length check: 2,560 characters mean vs 2,566 for the real k100 reader_train60k bundles; tokens 857 (benchmark seq.) vs 860 (real k100 seq., token counts only).",
+   "GU": "GU prompt with the real bge-large top-20 retrieval for the benchmark questions",
+   "P": "P-style prompt (instruction + key list + question) with the question's frozen OOF parse serialised in the registered P_k JSON schema as target; the LLM-parser track designs the real P prompt",
+   "P_0_70B": "instruction + 251 KG relation names + key list + 8 exemplars (benchmark questions with their frozen parse; not the hand-written P_0 exemplars) + question; 2,497 tokens; max 160 new tokens, logprobs on",
+   "G_0_70B": "zero-shot G prompt without S scores (RULE-ordered candidates); max 48 new tokens"
+  },
+  "hardware_software": "the GPU host, RTX PRO 6000 Blackwell Max-Q (sm_120); LoRA: tkgqa-gpu:latest torch 2.8.0+cu128, transformers 5.12.1, peft 0.21.2, model.to('cuda:0'), no device_map, bf16 autocast, sdpa; vLLM: tkgqa-vllm:latest vllm 0.10.2 (V1, CUDA graphs for 8B; 70B TP2 eager, spawn, NCCL_P2P_DISABLE=1, disable_custom_all_reduce=True); bge: sentence-transformers fp16",
+  "measurements": {
+   "lora_8b": {
+    "G": {
+     "n": 800,
+     "len_mean": 857.23,
+     "len_p95": 1106.1,
+     "answer_tokens_mean": 5.53125,
+     "load_s": 7.6,
+     "tokenize_s": 1.4,
+     "s_per_step": 3.331686601638794,
+     "s_per_step_after3": 3.2680714789857257,
+     "padded_tok_per_s": 4145.047734443906,
+     "real_tok_per_s": 4116.737748758696,
+     "peak_mem_gb": 83.7817211151123,
+     "train_tok": 8192,
+     "wall_s": 176.7,
+     "versions": {
+      "torch": "2.8.0+cu128",
+      "transformers": "5.12.1",
+      "peft": "0.21.2"
+     },
+     "prompt_ids_sha256_first100": "cb74b014edee673a1f262c39a11c7f10bfe9d34c5163bba9f91fa184eab81d65"
+    },
+    "GU": {
+     "n": 800,
+     "len_mean": 604.2525,
+     "len_p95": 709.0,
+     "answer_tokens_mean": 5.55,
+     "load_s": 2.6,
+     "tokenize_s": 0.8,
+     "s_per_step": 2.289827151298523,
+     "s_per_step_after3": 2.2596807378403683,
+     "padded_tok_per_s": 4238.905104472922,
+     "real_tok_per_s": 4222.170216873101,
+     "peak_mem_gb": 83.56195878982544,
+     "train_tok": 8192,
+     "wall_s": 118.9,
+     "versions": {
+      "torch": "2.8.0+cu128",
+      "transformers": "5.12.1",
+      "peft": "0.21.2"
+     },
+     "prompt_ids_sha256_first100": "7bab1df8c07551b54d360f3e742a81abaf306ff847c0114850a624f4f4424997"
+    },
+    "P": {
+     "n": 800,
+     "len_mean": 213.22,
+     "len_p95": 235.0,
+     "answer_tokens_mean": 94.13125,
+     "load_s": 2.7,
+     "tokenize_s": 0.3,
+     "s_per_step": 0.7536923027038575,
+     "s_per_step_after3": 0.7393899268292367,
+     "padded_tok_per_s": 4545.090864946773,
+     "real_tok_per_s": 4526.409501279546,
+     "peak_mem_gb": 52.60502052307129,
+     "train_tok": 8192,
+     "wall_s": 41.6,
+     "versions": {
+      "torch": "2.8.0+cu128",
+      "transformers": "5.12.1",
+      "peft": "0.21.2"
+     },
+     "prompt_ids_sha256_first100": "eb07787bbe6ef00e484a6311fea9ebfb03590e45943afe2d66de35fab8b5182a"
+    },
+    "G_replicate_part2": {
+     "s_per_step": 3.3764209032058714,
+     "real_tok_per_s": 4062.19496715505,
+     "peak_mem_gb": 83.7817211151123,
+     "wall_s": 173.3
+    }
+   },
+   "vllm_8b_lora": {
+    "warm (used)": {
+     "WARMUP_G": {
+      "n": 100,
+      "seconds": 42.32,
+      "prompts_per_s": 2.362733858983798,
+      "prompt_tok_mean": 863.53,
+      "out_tok_mean": 5.03,
+      "prompt_tok_per_s": 2040.2915692482788
+     },
+     "G": {
+      "n": 500,
+      "seconds": 26.02,
+      "prompts_per_s": 19.217476185641733,
+      "prompt_tok_mean": 853.93,
+      "out_tok_mean": 5.386,
+      "prompt_tok_per_s": 16410.379439205044
+     },
+     "GU": {
+      "n": 500,
+      "seconds": 18.62,
+      "prompts_per_s": 26.853179403677775,
+      "prompt_tok_mean": 595.684,
+      "out_tok_mean": 5.55,
+      "prompt_tok_per_s": 15996.009319900393
+     },
+     "PB": {
+      "n": 500,
+      "seconds": 8.83,
+      "prompts_per_s": 56.65379959515865,
+      "prompt_tok_mean": 118.852,
+      "out_tok_mean": 126.688,
+      "prompt_tok_per_s": 6733.417389483796
+     },
+     "G2": {
+      "n": 500,
+      "seconds": 26.95,
+      "prompts_per_s": 18.553604108144366,
+      "prompt_tok_mean": 853.93,
+      "out_tok_mean": 5.388,
+      "prompt_tok_per_s": 15843.479156067719
+     }
+    },
+    "init_s": 50.5,
+    "cold first pass (superseded)": {
+     "G": {
+      "n": 500,
+      "seconds": 63.43,
+      "prompts_per_s": 7.8828321217831165,
+      "prompt_tok_mean": 853.93,
+      "out_tok_mean": 5.422,
+      "prompt_tok_per_s": 6731.386833754257
+     },
+     "GU": {
+      "n": 500,
+      "seconds": 18.23,
+      "prompts_per_s": 27.421809703034302,
+      "prompt_tok_mean": 595.684,
+      "out_tok_mean": 5.396,
+      "prompt_tok_per_s": 16334.733291142285
+     },
+     "PB": {
+      "n": 500,
+      "seconds": 8.91,
+      "prompts_per_s": 56.10537693472606,
+      "prompt_tok_mean": 118.852,
+      "out_tok_mean": 129.954,
+      "prompt_tok_per_s": 6668.236259446062
+     }
+    },
+    "note": "The first pass charged the one-off LoRA kernel JIT to the first style (G 7.9 prompts/s); the warm re-measure (100-prompt warm-up, order G, GU, P, G) gives G 19.2 / G-repeat 18.6 prompts/s. The JIT cost is carried as per-session overhead in the projection."
+   },
+   "vllm_70b_tp2": {
+    "retry (used)": {
+     "model": "meta-llama/Llama-3.1-70B-Instruct",
+     "vllm": "0.10.2",
+     "tp": 2,
+     "init_s": 37.3,
+     "p0_head_chars": 11352,
+     "P0": {
+      "n": 250,
+      "seconds": 58.58,
+      "prompts_per_s": 4.267455145683819,
+      "prompt_tok_mean": 2496.592,
+      "out_tok_mean": 93.144
+     },
+     "G0": {
+      "n": 250,
+      "seconds": 65.41,
+      "prompts_per_s": 3.822303899420263,
+      "prompt_tok_mean": 831.368,
+      "out_tok_mean": 5.556
+     },
+     "wall_s": 162.0
+    },
+    "first attempt": "hung in a TP collective after ~6 min with vLLM custom all-reduce on (PCIe cards); TimeoutError, rc 1, 0.2233 GPU-h counted; the retry with disable_custom_all_reduce=True completed"
+   },
+   "bge_large": {
+    "facts": {
+     "model": "BAAI/bge-large-en-v1.5",
+     "mode": "facts",
+     "load_s": 4.6,
+     "n_passages": 461329,
+     "embed_s": 64.8,
+     "passages_per_s": 7122.2,
+     "dim": 1024,
+     "sha256": "fd749ec77422c5aefd6c89748b043641533da99c08030a37b5ce621f383b1f6e",
+     "passage_example": "Abdul Kalam Express intent to engage in diplomatic cooperation (such as policy support) Social Worker (India) on 2005-01-01",
+     "kg_sha256": "b94b31a86dc9f8dd40c8a95ec5c224f85a9a0793df0d40efad710cfda2f3944e",
+     "total_s": 70.4
+    },
+    "queries": {
+     "model": "BAAI/bge-large-en-v1.5",
+     "mode": "queries",
+     "load_s": 3.8,
+     "name": "gu_bench_facts",
+     "n_queries": 1300,
+     "query_embed_s": 0.5,
+     "queries_per_s": 2654.6,
+     "search_s": 0.2,
+     "file": "gu_bench_facts.jsonl.gz",
+     "sha256": "1f53d0b9b62d0b13409ec8c1f522997afffda1c7032321d821db12392ad6dc18",
+     "quid_list_sha256": "4622da9f79e83e557ae0432a1c7cc092d20564b59155ce62adc64433b5379dce",
+     "emb_sha256": "fd749ec77422c5aefd6c89748b043641533da99c08030a37b5ce621f383b1f6e",
+     "total_s": 5.5
+    }
+   },
+   "token_lengths_real_k100": {
+    "name": "k100_train",
+    "n": 60001,
+    "G_prompt_mean": 854.6069232179464,
+    "G_prompt_p50": 963.0,
+    "G_prompt_p95": 1144.0,
+    "G_prompt_max": 1484,
+    "G_answer_mean": 5.425326244562591,
+    "G_seq_mean": 860.032249462509,
+    "n_truncated": 0,
+    "QONLY_prompt_mean": 129.2237296045066,
+    "seconds": 114.0,
+    "prompt_sha256": {
+     "G_HEAD": "67d0802834a076d4feb3b660a803f7831eb27420fde78afb4931ea92b269603e",
+     "GU_HEAD": "433e4e5f89c488106cc5a5f59d26dc00b91bf996ccd1daf4d6fc6a8023a9e1c5",
+     "renderers": "0e8d347d8fbda27d344b6edfdf60c74e7897245e7b70ff5cd8dacb20fbcd24d7",
+     "chat_date": "26 Jul 2024"
+    }
+   },
+   "tokenizer_cross_check": "token ids of the first 100 G training prompts identical in transformers 5.12.1 (training) and the vLLM 0.10.2 tokenizer (sha256 cb74b014...)"
+  },
+  "gpu_usage": {
+   "path": "WORK_DIR/gpu_usage_kpct.tsv",
+   "rows": [
+    {
+     "track": "guided",
+     "cards": "1",
+     "n_cards": "1",
+     "start_utc": "2026-10-27T04:27:09Z",
+     "end_utc": "2026-10-27T04:28:29Z",
+     "seconds": "80",
+     "gpu_h": "0.0222",
+     "rc": "0",
+     "tag": "bench_bge",
+     "container": "gk_bench_bge_1793075229"
+    },
+    {
+     "track": "guided",
+     "cards": "1",
+     "n_cards": "1",
+     "start_utc": "2026-10-27T04:30:14Z",
+     "end_utc": "2026-10-27T04:32:45Z",
+     "seconds": "151",
+     "gpu_h": "0.0419",
+     "rc": "0",
+     "tag": "bench_vllm8b",
+     "container": "gk_bench_vllm8b_1793075414"
+    },
+    {
+     "track": "guided",
+     "cards": "0",
+     "n_cards": "1",
+     "start_utc": "2026-10-27T04:27:09Z",
+     "end_utc": "2026-10-27T04:33:00Z",
+     "seconds": "351",
+     "gpu_h": "0.0975",
+     "rc": "0",
+     "tag": "bench_lora",
+     "container": "gk_bench_lora_1793075229"
+    },
+    {
+     "track": "guided",
+     "cards": "0",
+     "n_cards": "1",
+     "start_utc": "2026-10-27T04:34:22Z",
+     "end_utc": "2026-10-27T04:37:21Z",
+     "seconds": "179",
+     "gpu_h": "0.0497",
+     "rc": "0",
+     "tag": "bench_lora_G_recreate",
+     "container": "gk_bench_lora_G_recreate_1793075662"
+    },
+    {
+     "track": "guided",
+     "cards": "0",
+     "n_cards": "1",
+     "start_utc": "2026-10-27T04:37:21Z",
+     "end_utc": "2026-10-27T04:40:22Z",
+     "seconds": "181",
+     "gpu_h": "0.0503",
+     "rc": "0",
+     "tag": "bench_vllm8b_warm",
+     "container": "gk_bench_vllm8b_warm_1793075841"
+    },
+    {
+     "track": "guided",
+     "cards": "0,1",
+     "n_cards": "2",
+     "start_utc": "2026-10-27T04:40:22Z",
+     "end_utc": "2026-10-27T04:47:04Z",
+     "seconds": "402",
+     "gpu_h": "0.2233",
+     "rc": "1",
+     "tag": "bench_vllm70b",
+     "container": "gk_bench_vllm70b_1793076022"
+    },
+    {
+     "track": "guided",
+     "cards": "0,1",
+     "n_cards": "2",
+     "start_utc": "2026-10-27T04:48:13Z",
+     "end_utc": "2026-10-27T04:51:04Z",
+     "seconds": "171",
+     "gpu_h": "0.0950",
+     "rc": "0",
+     "tag": "bench_vllm70b_retry",
+     "container": "gk_bench_vllm70b_retry_1793076493"
+    }
+   ],
+   "gpu_h_total": 0.5799,
+   "cap": 1.0
+  },
+  "adapters": "the 50-step benchmark adapters were deleted after the vLLM throughput runs; outputs were not scored"
+ },
+ "binding_projection": {
+  "assumptions": {
+   "P_silver_share": 0.9,
+   "dev_test_lengths": "= train lengths of the same style",
+   "n_ckpt": "E_max epoch ends; 2 (0.5, 1.0) when E_max = 1",
+   "sessions_8b": "one vLLM session per arm (all checkpoints on dev_sel2000, then test)",
+   "sessions_70b": "3 dev sessions (one per prompt design) + 1 test session, 2 cards",
+   "gu_queries": 155094,
+   "margin": "10% of the sum of all items",
+   "cap": 40.0
+  },
+  "full_design": {
+   "items": {
+    "G_1_s0": 1.625,
+    "G_1_s1": 1.625,
+    "G_1_s2": 1.625,
+    "GU_1_s0": 1.161,
+    "P_1_s0": 0.506,
+    "P_1_s1": 0.506,
+    "P_1_s2": 0.506,
+    "G_5_s0": 3.173,
+    "GU_5_s0": 2.22,
+    "P_5_s0": 0.815,
+    "G_10_s0": 3.183,
+    "GU_10_s0": 2.225,
+    "P_10_s0": 0.817,
+    "G_100_s0": 4.431,
+    "GU_100_s0": 3.079,
+    "P_100_s0": 1.07,
+    "G_1 order-variant grid (extra training, dev only)": 0.806,
+    "SHUF_G1 + QONLY_G1 (dev subset + test, inference only)": 1.043,
+    "GU retriever: bge-large over 461,329 facts + questions": 0.051,
+    "P_0 (70B TP2, 3 prompt designs on dev subset + test)": 8.103,
+    "G_0 (70B TP2, 3 prompt designs on dev subset + test)": 9.022,
+    "stage-0 throughput benchmark": 0.58,
+    "failure / re-run margin (10%)": 4.817
+   },
+   "total": 52.988
+  },
+  "procedure_trace": [
+   {
+    "step": "full design",
+    "fallbacks": []
+   },
+   {
+    "step": "apply 1",
+    "fallbacks": [
+     "1"
+    ]
+   },
+   {
+    "step": "apply 2",
+    "fallbacks": [
+     "1",
+     "2"
+    ]
+   },
+   {
+    "step": "apply 3",
+    "fallbacks": [
+     "1",
+     "2",
+     "3"
+    ]
+   },
+   {
+    "step": "apply 4",
+    "fallbacks": [
+     "1",
+     "2",
+     "3",
+     "4"
+    ]
+   },
+   {
+    "step": "undo 3",
+    "fallbacks": [
+     "1",
+     "2",
+     "4"
+    ],
+    "kept_undo": true
+   },
+   {
+    "step": "undo 2",
+    "fallbacks": [
+     "1",
+     "4"
+    ],
+    "kept_undo": false
+   },
+   {
+    "step": "undo 1",
+    "fallbacks": [
+     "2",
+     "4"
+    ],
+    "kept_undo": false
+   }
+  ],
+  "fallbacks_in_force": [
+   "1. drop subset seeds 1-2 for P",
+   "2. drop GU at k = 5%",
+   "4. drop G_0"
+  ],
+  "fallback_ids_in_force": [
+   "1",
+   "2",
+   "4"
+  ],
+  "binding": {
+   "items": {
+    "G_1_s0": 1.625,
+    "G_1_s1": 1.625,
+    "G_1_s2": 1.625,
+    "GU_1_s0": 1.161,
+    "P_1_s0": 0.506,
+    "P_1_s1": 0.0,
+    "P_1_s2": 0.0,
+    "G_5_s0": 3.173,
+    "GU_5_s0": 0.0,
+    "P_5_s0": 0.815,
+    "G_10_s0": 3.183,
+    "GU_10_s0": 2.225,
+    "P_10_s0": 0.817,
+    "G_100_s0": 4.431,
+    "GU_100_s0": 3.079,
+    "P_100_s0": 1.07,
+    "G_1 order-variant grid (extra training, dev only)": 0.806,
+    "SHUF_G1 + QONLY_G1 (dev subset + test, inference only)": 1.043,
+    "GU retriever: bge-large over 461,329 facts + questions": 0.051,
+    "P_0 (70B TP2, 3 prompt designs on dev subset + test)": 8.103,
+    "G_0 (70B TP2, 3 prompt designs on dev subset + test)": 0.0,
+    "stage-0 throughput benchmark": 0.58,
+    "failure / re-run margin (10%)": 3.592
+   },
+   "total": 39.509
+  },
+  "by_fallback_set": {
+   "none": 52.988,
+   "1": 51.875,
+   "1+2": 49.433,
+   "1+2+3": 42.306,
+   "1+2+3+4": 32.382,
+   "1+2+4": 39.509,
+   "1+4": 41.951,
+   "4": 43.064
+  },
+  "a_priori_for_reference": {
+   "total_full_design": 52.4,
+   "a_priori_outcome": "fallback 4 only"
+  },
+  "consequences": [
+   "fallback 1: P_1 subset seeds 1 and 2 NOT_RUN; P subset spread and P SUBSET_ROBUST NOT_TESTED",
+   "fallback 2: GU_5 NOT_RUN; KP2 at k = 5 NOT_RUN",
+   "fallback 4: G_0 NOT_RUN; the k = 0 primary LLM arm is P_0",
+   "fallback 3 NOT in force (undone): G, GU and P at k = 10 and 100 train on the full LLM lists (k10_s0 n = 38,679; reader_train60k n = 60,001)",
+   "fallbacks 5-7 not applied: SHUF_G1 / QONLY_G1 test passes, G subset seeds 1-2 at k = 1, G_5 and P_5 all in the design",
+   "affected numbers are PROVISIONAL where the rule says so; re-projection after the k = 1 core and after k = 100 (not-yet-started items only)"
+  ],
+  "projection_sha256": "af173e67974e2762c02172bc817aebb8c6a511d89b7ab5f1512e230338f7a563"
+ },
+ "implementation_details": {
+  "prompts": {
+   "sha256": {
+    "G_HEAD": "67d0802834a076d4feb3b660a803f7831eb27420fde78afb4931ea92b269603e",
+    "GU_HEAD": "433e4e5f89c488106cc5a5f59d26dc00b91bf996ccd1daf4d6fc6a8023a9e1c5",
+    "renderers": "0e8d347d8fbda27d344b6edfdf60c74e7897245e7b70ff5cd8dacb20fbcd24d7",
+    "chat_date": "26 Jul 2024"
+   },
+   "G_HEAD": "Answer the temporal question about the ICEWS knowledge graph. An automatic pipeline has parsed the question, retrieved supporting facts and ranked candidate answers. Its output may be wrong: check it against the facts and give a different answer when the facts support one.\nReply with the answer only: one entity name exactly as written, or a date written YYYY, YYYY-MM or YYYY-MM-DD.\n",
+   "GU_HEAD": "Answer the temporal question about the ICEWS knowledge graph using the retrieved facts below.\nReply with the answer only: one entity name exactly as written, or a date written YYYY, YYYY-MM or YYYY-MM-DD.\n",
+   "G_layout": "question; Parse (entities with up to 2 alternatives, top relation hypothesis + answer role, qtype/operator, answer type, granularity, time constraint, anchor); Candidates in the selected order, one line each: candidate | RULE rank | S score | satisfies operator | supporting fact groups; Facts F1.. grouped losslessly by (subject, relation, object), groups in first-appearance order, dates chronological; Operator trace. The parse is labelled as possibly wrong and the model is told it may answer differently (rule: may override the parse and the candidates)",
+   "GU_layout": "question; the 20 retrieved facts in retrieval order, one per line (subject | relation | object | date); no parse, candidates, scores, trace",
+   "QONLY": "G_HEAD + question (bundle removed)",
+   "SHUF": "own question + the whole bundle of the deranged donor question (default_rng(0) permutation over the split's sorted quids, fixed points swapped with the next index)"
+  },
+  "chat_template": "Llama-3.1 template, one user turn, date_string fixed to '26 Jul 2024' (the template otherwise inserts the run date), identical at training and inference",
+  "candidate_order_tie": "G_1 order selection: random order is chosen only if its selected-checkpoint dev_sel2000 Hits@1 exceeds the S-order one by >= 0.0005; otherwise S order",
+  "checkpoint_tie": "best dev_sel2000 Hits@1, tie (equal hit count) -> earlier checkpoint (rule)",
+  "answer_canonicalisation": "an output valid by the rule's normalisation (strip, whitespace collapse, case fold, _ -> space) is written as the KG entity name it matches (KG names in space form; 0 normalisation collisions among 10,488 entities); valid time strings are kept; invalid outputs stay at rank 1 unchanged",
+  "training": "micro-batches under an 8,192 padded-token limit inside each effective batch of 16 questions; per-epoch permutation default_rng(1000*seed + 7 + epoch), length-sorted within chunks of 64 batches, batch order shuffled within chunk; loss = summed answer-token cross-entropy / answer tokens of the effective batch; lm_head evaluated only at answer positions; adapter saved at every epoch end (and at 0.5 epoch when E_max = 1); resume checkpoint every 500 steps; all questions of the list trained (target fallback answers[0] as registered)",
+  "truncation": "if prompt + answer > 2,048 tokens, trailing fact groups are dropped (G/SHUF) or trailing facts (GU); 0 of 60,001 k100 train prompts needed it (max 1,484 tokens)",
+  "sessions": "one vLLM session per arm: all checkpoints on dev_sel2000 -> official-scorer selection (logged as computed) -> freeze file with adapter / prompt / code / bundle sha256 written BEFORE any test prompt -> test predictions written, sha256 added, not scored; G_1 session also runs SHUF_G1 and QONLY_G1 on dev_sel2000 and test",
+  "ranked_lists": "G family: [answer] + S_k seed-0 list (structural track prediction file); bundle candidates in S order if that file is absent. GU: [answer] + entities and dates of the retrieved facts (dates at the answer's granularity when it is a time string), deduplicated, padded to 20 with the 50 most frequent answers of the k% list",
+  "gu_retriever": "registered recipe; passages '<h> <r with _ -> space> <t> on <date>' in kg/full.txt order (CSV-unquoted), fp16 bge-large-en-v1.5 embeddings normalised; score = inner product; top-20, ties by fact index. The 461,329-fact index embedded during the stage-0 run (sha256 fd749ec7...) is the A2 index (same code and model)",
+  "gu_recall_diagnostic": "recall@20 of a gold-supporting fact on dev_sel2000 NOT computed: the rule's dev_rule allows dev_sel2000 answers for selection, early stopping and thresholds only",
+  "k100_bundles": {
+   "what": "gk_convert_k100.py converts the frozen k = 100 exports (parser outputs, S_seed0 top-20 blocks re-scored by the reader track, top-50 RULE rank and operator features, top-20 provenance facts) into the bundle schema; operator trace synthesised from the frozen parse and S features; dev/test carry no gold and no label column is read",
+   "use": "script development now; for G_100 these bundles are used unless the structural track stages its own k100 bundles before G_100 training (decision recorded before G_100 training)",
+   "files": {
+    "train": {
+     "n": 60001,
+     "sha256": "f68476d846d0e9277f85179f3802a87d8a3e665debb2c9ab6f378bc54d881a3f",
+     "mean_cands": 14.496275062082299,
+     "mean_facts": 16.093231779470344
+    },
+    "dev_sel2000": {
+     "n": 2000,
+     "sha256": "3799a5bf7d77c98b5ff50f90f1b7bccb2267b9426dff31dc8f8cc75989a4b569",
+     "mean_cands": 16.2965,
+     "mean_facts": 17.4555
+    },
+    "test": {
+     "n": 54584,
+     "sha256": "0a9bab34ef4057b335c9ebb7d9c7109f295c3899ce7be8efd465b068eadf41c3",
+     "mean_cands": 16.332203576139527,
+     "mean_facts": 17.522204308955004
+    }
+   },
+   "remote": "WORK_DIR/guided/k100_from_exports/"
+  },
+  "vllm_70b": "TP2 requires disable_custom_all_reduce=True on these PCIe cards (first attempt hung); relevant to P_0 (LLM-parser track)"
+ },
+ "code_sha256": {
+  "a2_driver.sh": "7cd88e3804baf53b43fddc71f19b0f94a8e31f62cf55e7fc39fc2f11df167283",
+  "bench_70b.py": "602085a502689d736794edf180e026b6399faf5a7b28ed32242ab48c3da895c4",
+  "bench_driver.sh": "2c1a4c7b3c54c680ae628e629877ab6252f4af4e68cdeb25b900c1341f3f936d",
+  "bench_driver2.sh": "84fdbbd2b02f330604569d9d91273ba295068cd88fae23a185cfa101427df63c",
+  "bench_driver3.sh": "c2aa9ce4e23dece476576e0e8a38a124f73b57b3e30e63322b40392a8101140d",
+  "bench_prep.py": "9dae12d523bfa0ea5dc40879cd7f986a819fc727982afc271289d0cf4aabbc9d",
+  "gk_check_bundles.py": "905d31e91caeecc45b5ec4159ca3ff6d489f5fc3cb3dbfd536b85bfcd30ef8e4",
+  "gk_common.py": "1b8e22dbc0c3a34203c91bb8e4ac832f9220ba08fe4dad1c32f6ca26d0f29bb4",
+  "gk_convert_k100.py": "90498dee9894902f25157ac08adbe379fd0ecd6b21362eba79332074cb92c6d5",
+  "gk_infer.py": "d01270d94ea0c9bab7943426237f24bd7720b855d2ca068d8bd58d4e9c32e6a7",
+  "gk_lenstats.py": "c0d1ed370d32ffe0d53e11dde5345977524ad929cc0b6e7920fc4296ea88057c",
+  "gk_projection.py": "c13413dbdaaa15cd0820f98ec0f5e81bd4875d1c2a0940c46adfb90a3778e949",
+  "gk_run_arm.py": "cd2219067f3276d7844134f2b6cf7eb196941e9af5a85a1d6139a1d88b6f0cb3",
+  "gk_select.py": "cd22f7b988ad7b16115d815a8971b1109c098960c351f9d7438c706014d6d32e",
+  "gk_train.py": "2cda8943d1cee8e174c8fb803bbf2bdb4865e3cca43db7ea1893b5bef81f62f0",
+  "gu_retrieve.py": "816cea9d84826e65c11a556855c1345e2be0965e67276e00815ec3650250ccb8",
+  "multitq_eval.py": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69",
+  "run_card.sh": "3fe4ecd4352ef904847a0f1f61b759149d47599e772f5ea9781b47a3b7b37665",
+  "stageB_plan.sh": "147c8aac24eaebc38104ffada9f284b0affece9c68cd46740761efbeca86b24c"
+ },
+ "amended_utc": "2026-10-27T04:52:49Z",
+ "sha256": "2d448b24f5c813c9bad5595cf1f8e6a78384702a5a04df3e0e1e403bc28df390"
+}

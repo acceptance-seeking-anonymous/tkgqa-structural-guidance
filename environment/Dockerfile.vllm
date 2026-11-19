@@ -1,0 +1,6 @@
+# Inference image (tag it tkgqa-vllm:latest or set VLLM_IMAGE): the training image plus vLLM 0.10.2.
+#   docker build -f environment/Dockerfile.vllm -t tkgqa-vllm:latest environment/
+ARG BASE=tkgqa-gpu:latest
+FROM ${BASE}
+COPY requirements-vllm.txt /tmp/requirements-vllm.txt
+RUN pip install --break-system-packages -r /tmp/requirements-vllm.txt

@@ -1,0 +1,31 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "name": "multitq_kpct_seed_amendment_P_A1",
+ "version": "1.0",
+ "type": "REGISTERED AMENDMENT to multitq_kpct_seed_amendment_P v1.0 (GPU-hour cap only): gate G1 lifted, allotment 3.0 -> 3.4 GPU-h",
+ "track": "LLM parser (parser_seeds)",
+ "parent": {
+  "amendment_P": "multitq_kpct_seed_amendment_P.json, registered 2026-10-29T07:30:02Z, sha256 (recipe) 4ea0af7a506f1cb78edf3266c4eeb0966bbfdc2f5907c04f95b21534c3c62062",
+  "rule": "multitq_kpct_decision_rule.json (sha256 0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7)"
+ },
+ "state_at_amendment": "P_5_lora1/2 trained, dev-selected (lora1 ep1/off 0.9430, lora2 ep2/off 0.9460) and pre-test frozen (artifacts, ); P_5 test decoding in progress (unscored, not executed). No P_1 seed trained; no P_1 or P_5 seed test result computed. GPU-h on the second GPU host usage log: 1.5197 (+ the running P_5 test session, projected 0.675).",
+ "reason": "Measured 4090 test decoding (about 1,190 s per adapter, 46 prompts/s) put the registered gate G1 projection at about 3.27 GPU-h (> 3.0), so G1 would have made P_1_lora1/2 NOT_RUN. The Robustness track used 0.445 of its 2.0 GPU-h allotment; the analysts raised this track's allotment to 3.4 GPU-h within the unchanged 52 GPU-h project cap (projected project total about 48.3).",
+ "changes": {
+  "allotment_gpu_h": "3.4 (was 3.0)",
+  "gate_G1": "lifted: P_1_lora1 and P_1_lora2 run (run order 3, 4), subject only to the hard stops below",
+  "hard_stop_1": "after P_1_lora1 training: if (usage log GPU-h spent) + (P_1_lora2 training at the measured lora1 container time) + (dev session for 6 checkpoints, 54 s + 41.3 s per checkpoint) + (test session for 2 adapters at the measured P_5 per-adapter test time + 50 s) > 3.4, P_1_lora2 is NOT trained; then P_1_lora1 runs alone (dev 3 checkpoints, test 1 adapter) and the stop is reported",
+  "hard_stop_2": "before the P_1 test session: if spent + test session for both adapters > 3.4, only P_1_lora1 is decoded on test and the stop is reported (P_1_lora2 dev results then dev only)",
+  "projection_now": {
+   "spent_usage log": 1.5197,
+   "P_5_test_session": 0.675,
+   "P_1_train_2_seeds": 0.3194,
+   "P_1_dev_session_6_ckpts": 0.0839,
+   "P_1_test_session_2_adapters": 0.675,
+   "total": 3.273
+  }
+ },
+ "unchanged": "everything else in multitq_kpct_seed_amendment_P v1.0: data, recipe, micro-batch 768, seeds, selection, freezes, registered analyses A1-A10 (incl. A7 KP4 per P_1 seed with Holm and the A8 SEED_STABLE / SEED_SENSITIVE and LABEL_STABLE / LABEL_SENSITIVE labels), device the second GPU host RTX 4090 only",
+ "sha256_recipe": "SHA-256 of json.dumps({all keys except sha256}, indent=1, sort_keys=True, default=str) (as the rule)",
+ "registered_utc": "2026-10-29T09:31:59Z",
+ "sha256": "5fea9f5e1c87409b4f19e3b296d3bd331b3493b76db636c3564abd210e5190d5"
+}

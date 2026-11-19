@@ -1,0 +1,57 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "amendment_id": "B3",
+ "track": "multitq_kpct / guided reasoner (G_k, GU_k, SHUF_G1, QONLY_G1); stage B",
+ "rule": {
+  "file": "multitq_kpct_decision_rule.json",
+  "sha256": "0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7",
+  "sha256_method": "rule sha256_recipe: SHA-256 of json.dumps({all keys except sha256}, indent=1, sort_keys=True, default=str); equals the rule's own sha256 field",
+  "file_bytes_sha256": "e2db254d65b22c1a2a8be763c82bdbc881e5f3bcc8b13aee42f0180309e47d6d"
+ },
+ "follows": {
+  "B1": "",
+  "B2": "4ee79238 (GPU-hour cap decision: cap 52 GPU-h, G_0 restored; fallbacks 1 and 2 in force)"
+ },
+ "type": "implementation details of the guided-reasoner arms (selection_discipline, last bullet); no criterion, threshold, arm, comparator, subset, stratum or statistic changed",
+ "state_at_amendment": "No G_k / GU_k adapter trained, no dev_sel2000 or test score of any guided arm. Structural bundles inspected for schema only (one train row, 300 train / test rows and the dev_sel2000 files of k01_s0 and k100, no answers of dev/test).",
+ "changes": {
+  "bundle_source": "Instruction (stage B): the structural track's bundles at WORK_DIR/bundles/<k>/ are used for EVERY k including k100, so operator trace and schema come from one code base. The guided-track conversion of the frozen k100 exports (B1) is used only as a cross-check (gk_crosscheck_k100.py).",
+  "schema_mapping": "normalize_bundle maps the structural kpct-parse-v1 schema: candidates {answer, rule_rank (1-based), s_score, s_rank (1-based), operator_satisfied, support_fact_idx (0-based into facts)}; facts {fid, head, relation, tail, date}; rule ranks converted to 0-based internally and rendered +1, so the prompt shows the same 1-based RULE rank as in B1. support_fids (KG line ids), gold_meta, in_sample_parse, template_unseen, pool_size and n_operator_satisfied are never shown to the model.",
+  "parse_rendering": "render_parse reads mentions[].alternatives[{entity}] (first = linked entity, up to 2 alternatives), relations[0] (highest-probability relation-direction hypothesis), qtype / answer_type / granularity labels (probabilities not shown), operator_keywords as 'keyword: ...', time.value. The structural parse has no anchor field, so no anchor line is printed (B1 printed 'anchor: none'). G_HEAD, GU_HEAD, candidate, fact and trace layout are unchanged.",
+  "prompt_sha256": {
+   "G_HEAD": "67d0802834a076d4feb3b660a803f7831eb27420fde78afb4931ea92b269603e",
+   "GU_HEAD": "433e4e5f89c488106cc5a5f59d26dc00b91bf996ccd1daf4d6fc6a8023a9e1c5",
+   "renderers": "4d9a0078f65c5d5f4b2bbaa0d5868bed87b7dc86d37f89ebee90402f8e8eaceb",
+   "chat_date": "26 Jul 2024"
+  },
+  "stop_oof_leak": "producers.json is not staged; the check uses each train row's oof field {outer_fold f, stack_trained_on '<k>/fold<1-f>'} and the registered outer folds of multitq_kpct_subsets.json (fold sha256 checked, folds partition the k% list): every train quid must lie in its own fold f and not in fold 1-f, the training fold of its producer. k100: reader_train60k disjoint from s_train100k (frozen exports: classifier OOF, S on s_train100k, linker in-sample, disclosed).",
+  "inference_shards": "gk_run_arm.py generates in shards of 5,000 prompts cached on disk with the adapter sha256 (STOP_HOST: 'inference in shards'); a restarted session reuses finished shards",
+  "train_resume": "gk_train.py exits without retraining when the final checkpoint and train_stats.json exist; otherwise resumes from ckpt.pt (every 500 steps)",
+  "selection_log": "every dev_sel2000 Hits@1 of a guided checkpoint is appended as computed to WORK_DIR/guided/multitq_kpct_guided_selection_log.jsonl (for the analysts' multitq_kpct_selection_log.json)",
+  "gpu": "card 0 only until the analysts releases card 1; one process per card; GPU usage log rows track 'guided'"
+ },
+ "code_sha256": {
+  "a2_driver.sh": "7cd88e3804baf53b43fddc71f19b0f94a8e31f62cf55e7fc39fc2f11df167283",
+  "bench_70b.py": "602085a502689d736794edf180e026b6399faf5a7b28ed32242ab48c3da895c4",
+  "bench_driver.sh": "2c1a4c7b3c54c680ae628e629877ab6252f4af4e68cdeb25b900c1341f3f936d",
+  "bench_driver2.sh": "84fdbbd2b02f330604569d9d91273ba295068cd88fae23a185cfa101427df63c",
+  "bench_driver3.sh": "c2aa9ce4e23dece476576e0e8a38a124f73b57b3e30e63322b40392a8101140d",
+  "bench_prep.py": "9dae12d523bfa0ea5dc40879cd7f986a819fc727982afc271289d0cf4aabbc9d",
+  "gk_check_bundles.py": "db4e7539e0731bf3bd421bccbb621c1d993dd852a39f195c67e93d68d1e033c3",
+  "gk_common.py": "3bbb684f484da4e9ccff5d7ed8ca644ccb5e8b6a918d50bd4b4ab04378e36b44",
+  "gk_convert_k100.py": "90498dee9894902f25157ac08adbe379fd0ecd6b21362eba79332074cb92c6d5",
+  "gk_crosscheck_k100.py": "a1403fcd9d4af3697588045f6e3eb0f844dcf32efa5c0c8f6f5b0c13a149d657",
+  "gk_infer.py": "d01270d94ea0c9bab7943426237f24bd7720b855d2ca068d8bd58d4e9c32e6a7",
+  "gk_lenstats.py": "c0d1ed370d32ffe0d53e11dde5345977524ad929cc0b6e7920fc4296ea88057c",
+  "gk_projection.py": "c13413dbdaaa15cd0820f98ec0f5e81bd4875d1c2a0940c46adfb90a3778e949",
+  "gk_run_arm.py": "691c9b08565bb8f2a01b72f84b85c78ee94b7312e007856f4b12fefd93c19a09",
+  "gk_select.py": "cd22f7b988ad7b16115d815a8971b1109c098960c351f9d7438c706014d6d32e",
+  "gk_train.py": "1f07a88168d241200e99b40c11160089f2f03b6f191663ffe85740775a248950",
+  "gu_retrieve.py": "816cea9d84826e65c11a556855c1345e2be0965e67276e00815ec3650250ccb8",
+  "multitq_eval.py": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69",
+  "run_card.sh": "3fe4ecd4352ef904847a0f1f61b759149d47599e772f5ea9781b47a3b7b37665",
+  "stageB_plan.sh": "34393022cb295fb7b516d8c91cc18c7f198a171daaea4d04a615dab6160d25a2"
+ },
+ "amended_utc": "2026-10-27T06:12:32Z",
+ "sha256": "e9049e69ffdd027391c801d939c8d930b13874f68de0bf9150358cc6e628aa0e"
+}

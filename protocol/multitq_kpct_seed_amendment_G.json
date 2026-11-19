@@ -1,0 +1,99 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "name": "multitq_kpct_seed_amendment_G",
+ "version": "1.0",
+ "type": "REGISTERED AMENDMENT (secondary analyses) to multitq_kpct_decision_rule.json v1.0 -- LoRA-seed replication of the guided answerer",
+ "track": "guided reasoner (guided_seeds)",
+ "parent": {
+  "rule": "multitq_kpct_decision_rule.json, sha256 (registered recipe) 0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7, file bytes e2db254d65b22c1a2a8be763c82bdbc881e5f3bcc8b13aee42f0180309e47d6d",
+  "amendments": {
+   "B1": "",
+   "B2": "",
+   "B3_guided": ""
+  },
+  "registered_test_results": "multitq_kpct_test_results.json (scored 2026-10-28T01:11:37Z); per-question hits multitq_kpct_test_hits.npz and multitq_kpct_test_per_question_hits.csv.gz",
+  "guided_freeze": "multitq_kpct_guided_freeze.json"
+ },
+ "status_and_test_reuse": "Registered BEFORE any training output, test inference or test scoring of the new seeds. The official MultiTQ test split (54,584) is REUSED: every seed-0 arm was scored once on it in the registered k% pass. These analyses are secondary; the original registered results, labels and primary-arm declarations are never changed. Every number derived here is labelled 'registered amendment (seed replication)'; anything not listed here is post hoc.",
+ "question": "Are the guided answerer's registered k = 1 (and k = 5) results stable across the LoRA training seed, with everything else identical to the frozen seed-0 adapters?",
+ "arms": {
+  "G_1_lora1": {
+   "setting": "G_k01_s0_ordS (k = 1 %, subset draw s0, candidate order S)",
+   "lora_seed": 1,
+   "adapter_dir": "WORK_DIR/guided/seeds/adapters/G_k01_s0_ordS_s1",
+   "run_order": 1
+  },
+  "G_1_lora2": {
+   "setting": "G_k01_s0_ordS",
+   "lora_seed": 2,
+   "adapter_dir": "WORK_DIR/guided/seeds/adapters/G_k01_s0_ordS_s2",
+   "run_order": 2
+  },
+  "G_5_lora1": {
+   "setting": "G_k05_s0_ordS (k = 5 %, subset s0, order S)",
+   "lora_seed": 1,
+   "run_order": 3,
+   "status": "NOT_RUN (GPU-hour cap cut point, see GPU-hour cap)"
+  },
+  "G_5_lora2": {
+   "setting": "G_k05_s0_ordS",
+   "lora_seed": 2,
+   "run_order": 4,
+   "status": "NOT_RUN (GPU-hour cap cut point, see GPU-hour cap)"
+  },
+  "reference_seed0": {
+   "G_1_lora0": "frozen G_k01_s0_ordS_s0 ep2 (adapter sha256 4d81d7a017e391af0c8118e55c9e707b53ca9b607cc397572832c7da54a3440a; test file pred_G_test_ordS_ep2.jsonl sha256 f5a132e4f5683371505ef316019e0d2a09229a411d6035f0f701a2c70af047ad)",
+   "G_5_lora0": "frozen G_k05_s0_ordS_s0 ep2 (test file pred_G_test_main_ep2.jsonl sha256 a944a367cb1aa5c125a8e247b6216c67041a3388b655b9b65e1586d6a363616f)"
+  }
+ },
+ "identical_to_seed0": {
+  "data": "k% LLM list k01_s0 (n = 3,868, list sha256 9cc6eb403715fd8591311e2e013b96d44e89cb2bcc961f6f21763139170e74e8) / k05_s0 (n = 19,339, list sha256 0a84036566f348be78dbf8e37b95477aa4ffa23f6fa1ed58b8c031faf2ff1a5b); the same structural train bundles WORK_DIR/bundles/<list>/train.jsonl (OOF) and targets (gold ranked highest in the bundle candidates, else answers[0]); check: train_stats prompt_ids_sha256_first100 must equal seed 0 (k01_s0 8d311a33c0e8a1e00694e6039ccda96d8850bb146099fe60da4bc24b12fe7dc0; k05_s0 2bbe7dd01a4f9ca483c68b2d94568973e26553f4a1575923dda5d323765fd37a) and n, target_in_source, len_mean identical",
+  "prompt": "G_HEAD sha256 67d0802834a076d4feb3b660a803f7831eb27420fde78afb4931ea92b269603e; renderers sha256 4d9a0078f65c5d5f4b2bbaa0d5868bed87b7dc86d37f89ebee90402f8e8eaceb; chat date 26 Jul 2024; candidate order S (fixed by the seed-0 order decision; not re-selected)",
+  "recipe": "Llama-3.1-8B-Instruct bf16; LoRA r 16, alpha 32, dropout 0.05 on q,k,v,o,gate,up,down; AdamW lr 2e-4, weight decay 0, cosine, 3% warm-up, grad clip 1.0, effective batch 16 questions, micro-batch token cap 8,192; loss on answer tokens; max length 2,048; E_max 3 (k = 1), 2 (k = 5); torch 2.8.0+cu128, transformers 5.12.1, peft 0.21.2; image tkgqa-gpu:latest; one card, model.to('cuda:0')",
+  "code_sha256": {
+   "gk_train.py": "0ee1d118d71e465ff09433a41db0a08e6150d2b23ef7a301df2e3aedc200e03f",
+   "gk_common.py": "3bbb684f484da4e9ccff5d7ed8ca644ccb5e8b6a918d50bd4b4ab04378e36b44",
+   "gk_infer.py": "d01270d94ea0c9bab7943426237f24bd7720b855d2ca068d8bd58d4e9c32e6a7",
+   "gk_select.py": "cd22f7b988ad7b16115d815a8971b1109c098960c351f9d7438c706014d6d32e",
+   "gk_run_arm.py": "992a6a99defedc4bd0aaa78c4b561c84c07acdaabae8bb1a4d42669c761b2115",
+   "multitq_eval.py": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69",
+   "note": "identical to the code_sha256 recorded in the frozen G_1 freeze record; verified on the host 2026-10-29T07:14Z"
+  },
+  "decoding": "vLLM 0.10.2 (tkgqa-vllm:latest), greedy, max 48 new tokens, max_model_len 2304, gpu_memory_utilization 0.85; ranked list = [answer] + S_k seed-0 list (deduplicated); validity = canon_answer",
+  "epoch_selection": "dev_sel2000 only: score every epoch-end checkpoint (ep1..E_max), select the best dev_sel2000 Hits@1, tie -> earlier; Poisson bootstrap CI B = 1000 reported; STOP_DEV_FAILURE as in the rule (best dev Hits@1 < 0.30 or invalid > 0.20 -> one logged fix, then DEV_FAILURE). Selection log: WORK_DIR/guided/seeds/multitq_kpct_seed_selection_log_G.jsonl (the frozen guided log is not touched)."
+ },
+ "what_the_seed_controls": {
+  "lora_init": "torch.manual_seed(seed) immediately before get_peft_model: LoRA A matrices (Kaiming-uniform) are drawn from it; B matrices are zero-initialised (seed-independent), so the initial adapter is the identity map for every seed",
+  "data_order": "per epoch e: permutation default_rng(1000 * seed + 7 + e) of the examples, length-sorted inside chunks of 64 batches, batch order inside each chunk permuted by the same generator",
+  "dropout": "LoRA dropout (p = 0.05) masks come from the torch CPU/CUDA generators seeded once at start (random.seed, np.random.seed, torch.manual_seed, torch.cuda.manual_seed_all)",
+  "not_controlled": "GPU kernel non-determinism (bf16 sdpa / matmul reductions) and vLLM batch composition at inference; a seed-0 rerun is not bit-identical, so seed-to-seed spread includes this numerical noise",
+  "unchanged": "the data set, targets, bundles, prompts, recipe, schedule, epochs, base weights, decoding and selection rule"
+ },
+ "freeze": "For each arm: adapter sha256 (selected checkpoint) written to freeze_G_<list>.json before its test inference; each test prediction file (official {quid, ranked} format) sha256 recorded in multitq_kpct_seed_freeze_G.json and saved as an artifact BEFORE any test scoring. Test scoring is a separate CPU step that reads the frozen files and verifies their sha256 first.",
+ "analyses_registered": {
+  "A1_per_seed": "test Hits@1 (and Hits@10) of G_1_lora0/1/2 with 95% Poisson(1) bootstrap percentile CI (B = 2000, seed 0; multitq_eval.paired_poisson_bootstrap weights, identical for every full-test comparison)",
+  "A2_seed_summary": "mean, sample SD (ddof = 1) and range of test Hits@1 over LoRA seeds 0, 1, 2; and the seed-mean arm G_1_loramean = per-question mean hit over the three seeds (values 0, 1/3, 2/3, 1), with its CI",
+  "A3_KP_recomputed": {
+   "KP2": "delta = G_1^seed - GU_1 on test Hits@1, paired over 54,584 questions; pass iff delta >= +0.020 AND Holm-adjusted one-sided bootstrap p < 0.05",
+   "KP3": "delta = G_1^seed - S_1 (per-question mean over the 3 LightGBM seeds); G_1 is the declared primary LLM arm at k = 1; pass iff delta >= +0.010 AND Holm-adjusted one-sided p < 0.05",
+   "KP4": "registered test delta = P_1 - S_1 on U_1 (n = 40,205) does not involve G and is reproduced unchanged; its registered descriptive companion G_1^seed - S_1 on U_1 is computed per seed (and for the seed-mean arm)",
+   "Holm": "per seed, Holm step-down over {KP2(seed), KP3(seed), KP4 (unchanged)}, family alpha 0.05, one-sided, exactly as the registered k = 1 family",
+   "seed_mean": "every KP above also for G_1_loramean (descriptive)",
+   "k5": "KP2 at k = 5 is NOT_RUN (GU_5, fallback 2); KP3 at k = 5 uses the declared primary P_5 and is unchanged; G_5^seed - S_5 is descriptive (only if G_5 seeds run)"
+  },
+  "A4_seed_label": "per KP contrast: SEED_STABLE iff every LoRA seed's 95% CI excludes 0 in the same direction as seed 0, else SEED_SENSITIVE (for KP4 applied to the G companion; the P-based test is seed-independent). Also reported: whether the pass/fail label (threshold + Holm) is identical across seeds (descriptive).",
+  "A5_KP1": "G_1^seed vs AT2QA 0.887: ABOVE (CI lower > 0.887) / BELOW (CI upper < 0.887) / TIE, per seed and seed-mean; the other comparators (ORACLE-T 0.869, TKG-Thinker 0.855, SCoP 0.825) descriptive",
+  "A6_G5_vs_P5": "descriptive per seed: G_5^seed - P_5 (P_5 = per-question mean over its 3 S seeds), paired bootstrap; NOT_RUN with the G_5 seeds",
+  "A7_strata": "G_1^seed test Hits@1 per qlabel (Single / Multiple) and answer_type (entity / time), per seed and seed-mean, Poisson bootstrap CI B = 1000 (descriptive)",
+  "A8_dev": "dev_sel2000 Hits@1 of every checkpoint per seed and the selected checkpoint (selection transparency)",
+  "outputs": "multitq_kpct_seed_freeze_G.json, multitq_kpct_seed_results_G.json, per-question CSV keyed by quid with G_1_lora0@1, G_1_lora1@1, G_1_lora2@1, G_1_loramean@1 and the @10 columns (G_5_* columns only if run), multitq_kpct_seed_report_G.md, code tarball"
+ },
+ "stop_rules": {
+  "STOP_RECIPE": "if a new seed's train_stats differ from seed 0 in n, list_sha256, prompt_ids_sha256_first100, target_in_source, lora, opt, max_len, epochs or versions -> no test inference for that seed; report",
+  "STOP_DEV_FAILURE": "as in the rule",
+  "STOP_BUDGET": "see GPU-hour cap.hard_stop and cut_point",
+  "card": "the GPU host GPU 1 only; dispatch only if it holds no compute process; never touch other processes"
+ },
+ "registered_utc": "2026-10-29T07:16:54Z",
+ "sha256": "2fea79fabffbec761059d5317fe1ecd36a0da99f221680da58807ee11d570972"
+}

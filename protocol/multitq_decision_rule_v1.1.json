@@ -1,0 +1,363 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq",
+ "plan": "3b27f8dc (version 9eb541e6), Phase 0 Setup",
+ "rule_version": "v1.1",
+ "question": "On MultiTQ (retrospective multi-granularity temporal KGQA over ICEWS05-15), does an HR-FQA-derived structural pipeline (S) beat its own rule-only operator baseline, and does fusing a LoRA LLM reader over retrieved facts (F3B/F7B) beat S, under the official MultiQA Hits@1 on the full test split?",
+ "status_at_registration": "No system has been built and no system output (dev or test) exists. Only dataset statistics (multitq_data_profile.json) and the scorer unit tests (synthetic predictions) have been computed.",
+ "data": {
+  "source": "github.com/czy1999/MultiTQ commit 94ad61c, data/Dataset.zip; HF mirror chenziyang/MultiTQ question files byte-identical",
+  "question_file_sha256": {
+   "train": "89ce10b4a1ca9b53b75a1a8d6935e70d8381457cfa36dfe92a51f483ebd3a044",
+   "dev": "ad0dfe7c94dfdd7c00b4df22896d8cb3df3b860f1e5e10cd1ae110ab9791bbb7",
+   "test": "d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee"
+  },
+  "kg_file_sha256": {
+   "full.txt": "b94b31a86dc9f8dd40c8a95ec5c224f85a9a0793df0d40efad710cfda2f3944e",
+   "train.txt": "54f82c6d8c71f100f1885129d724d414fe60693e6b51790d2d3e6e2eb6228bf2",
+   "valid.txt": "d8cd0e94747fbf737094991ebc76b3b38685ebc1c61fc5ae1dfcc171759ec5bd",
+   "test.txt": "70591a58f7c18e6c3cf62a60bf0c1da78ad555c2888b91f56ff620f6922f3837",
+   "entity2id.json": "50529c68e783dbc684eb2dfe249df6f5d49bf571cd24000e9aaad747b7f130bf",
+   "relation2id.json": "4b655249097806633197ce996460c67cda688f560b460fc31a07028c954b8671",
+   "ts2id.json": "f7e6cf043f28b7c76ea4d5f0f5471ed1cb57235fd3280b729deb452e498b3378"
+  },
+  "splits": {
+   "train": 386787,
+   "dev": 57979,
+   "test": 54584
+  },
+  "dev_count_note": "Chen et al. (2023) Table 4 prints the dev total as '587,979'; its per-type dev counts sum to 57,979, matching the released file. The 58,979 figure quoted in the plan is a misreading of that typo.",
+  "kg": "461,329 facts (ICEWS05-15, day granularity, 2005-01-01..2015-12-31), 10,488 entities, 251 relations, 4,017 timestamps. Use the union of kg/train.txt, valid.txt, test.txt (identical to full.txt after CSV-unquoting the one quoted entity)."
+ },
+ "inputs_allowed": {
+  "at_dev_and_test_inference": [
+   "question text (the 'question' field)",
+   "the MultiTQ KG (all 461,329 facts, all timestamps, as the benchmark is retrospective)",
+   "KG-derived artefacts (entity/relation/timestamp vocabularies, the shipped TComplEx checkpoint, our own KG statistics)",
+   "models trained on the train split under the rules below",
+   "pretrained LMs / sentence embedders (frozen or LoRA-tuned on train)"
+  ],
+  "forbidden_as_inputs_at_dev_and_test": [
+   "qtype",
+   "qlabel",
+   "answer_type",
+   "time_level",
+   "quid (order or value)",
+   "answers",
+   "any annotation derived from gold or from the metadata fields above",
+   "test question text for any training or unsupervised fitting"
+  ],
+  "train_split": "All fields of train questions (including qtype, qlabel, answer_type, time_level, answers) may be used as training labels for parsers, classifiers, rankers and readers.",
+  "dev_split": "Dev questions and answers may be used for model selection, early stopping, calibration and fitting the fusion stacker. Dev metadata may be used to stratify dev subsets and for reporting, never as a system input.",
+  "metadata_use": "qtype, qlabel, answer_type and time_level are used only by the scorer for stratified reporting."
+ },
+ "output_format": "One ranked list of >= 10 distinct strings per question: KG entity names (ent_id space form; underscore form is mapped '_'->' ') or time strings YYYY / YYYY-MM / YYYY-MM-DD. The scorer applies the official truncation to the gold granularity. Systems may emit coarse time strings at the granularity they infer from the question text; this is disclosed in the report because the official MultiQA emitted day strings only (it affects Hits@10 more than Hits@1).",
+ "scorer": {
+  "file": "multitq_eval.py",
+  "sha256": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69",
+  "unit_test": "test_multitq_eval.py",
+  "unit_test_sha256": "c4a785aafcfcdb1e10a78f4c4c5978a27a6b019f3dfa8cb0d28c55af13013a08",
+  "semantics": "official MultiQA eval_multi: hit@k iff any gold answer is in the top k after truncating every prediction to len(answers[0]) for year (4) / month (7) gold; mean over all questions; missing prediction = miss",
+  "verified": "stratum-by-stratum identity with a verbatim port of MultiQA/utils.py eval_multi (lines 365-407) on full dev and test, three synthetic prediction regimes, k = 1 and 10"
+ },
+ "selection_discipline": [
+  "Every hyper-parameter, epoch, pool size K, prompt, fact limit, stacking weight and calibration is chosen on dev only.",
+  "Hyper-parameter grids for the readers are evaluated on dev_sel, a fixed 10,000-question subset of dev stratified by qtype (seed 0; quid list saved before use). The stacker is fitted on the full dev split; dev numbers for fused arms are reported 5-fold cross-fitted.",
+  "The parser/linker is trained once (seed 0) on train, frozen, and shared by PRIOR, RULE, S and all reader arms; the 3 seeds of S vary only the LightGBM ranker.",
+  "Test predictions for ALL arms are produced in one pass after every arm is frozen. Before scoring, multitq_freeze.json records the sha256 of every test prediction file, model checkpoint and config; the test split is then scored exactly once.",
+  "Nothing is changed after any test number is read. Anything added afterwards is labelled post hoc and is not decision-relevant.",
+  "Implementation details not fixed here may be amended before the freeze, with a dated provenance note in this file's amendment log; criteria, thresholds, arms and controls may not be amended."
+ ],
+ "arms": {
+  "PRIOR": "Answer-type and frequency prior: answer type and time granularity predicted from the question text by the frozen parser; candidates are KG neighbours of the linked question entities ranked by co-occurrence count (entity answers) or by date frequency over facts among linked entities at the predicted granularity (time answers). No relation, no temporal operator. Deterministic, run once.",
+  "RULE": "Frozen parser (entities, relation, temporal constraint, answer type, granularity) + candidate retrieval from the KG + deterministic temporal operators (equal, before/after, first/last, and their multi-constraint compositions: equal_multi, after_first, before_last). Candidates ordered by operator satisfaction, ties broken by fact frequency. No learned ranker. Deterministic, run once.",
+  "S": "The RULE candidate pool (cap 1,000 candidates/question) re-ranked by LightGBM lambdarank with HR-FQA-style features: operator satisfaction and margin, history recurrence counts of (entity, relation, candidate), recency/first/last position on the timeline, granularity match, relation-match confidence, PRIOR score, optional TComplEx score. Trained on train questions; 3 seeds (0, 1, 2); report mean and per seed.",
+  "R3B": "LoRA-tuned Llama-3.2-3B-Instruct (unsloth/Llama-3.2-3B-Instruct copy of the Meta weights if the Meta repository remains gated for this account) reading the question + the top-N retrieved facts and scoring S's top-K candidates. Trained on a fixed train subsample of 60,000 questions stratified by qtype (proportional allocation, seed 0; quid list saved before training); 3 seeds (LoRA init and data order). Registered defaults: K = 20, N = 30 facts, LoRA r = 16, alpha = 32, 1 epoch; grid lr in {1e-4, 2e-4} x N in {20, 40} on dev_sel.",
+  "R7B": "As R3B with Mistral-7B-Instruct-v0.3.",
+  "F3B": "Stacking of S and R3B: logistic regression on per-candidate features [S score, S rank, R3B score, R3B rank] over S's top-K, fitted on dev; seed i of S paired with seed i of R3B; candidates outside the top K keep S's order below the fused block.",
+  "F7B": "As F3B with R7B.",
+  "controls": {
+   "QONLY_b": "Reader of backbone b trained and evaluated with the fact block removed (question + candidates only), same subsample, seeds and stacking as F_b.",
+   "SHUF_b": "Reader R_b (trained with real facts) evaluated with each question's fact block replaced by the block of another question (fixed derangement, seed 0); fused with S by a stacker refit on dev.",
+   "MASK_b": "Reader of backbone b trained and evaluated with every entity name in the question, the facts and the candidates replaced by per-question placeholders (ENT1, ENT2, ...; dates kept); fused with S by a stacker refit on dev.",
+   "PRIOR_and_RULE": "see arms"
+  }
+ },
+ "criteria": {
+  "M1_structural_advance": {
+   "test": "S - RULE on test Hits@1 (official semantics), S = per-question hit averaged over its 3 seeds",
+   "pass": "delta >= +0.020 AND paired-bootstrap 95% CI lower bound > 0",
+   "labels": {
+    "pass": "STRUCT_ADVANCE",
+    "fail": "NO_GAIN"
+   },
+   "descriptive": [
+    "S vs MultiQA 0.293 (Chen et al. 2023): label ABOVE_MULTIQA if the lower bound of S's own bootstrap 95% CI exceeds 0.293 (cross-paper, no paired test possible)",
+    "S vs the other non-LLM systems (CronKGQA 0.279, EmbedKGQA 0.206, ALBERT 0.108, DistilBERT 0.083, BERT 0.083); MultiQA is the strongest non-LLM baseline in the reference table",
+    "S - PRIOR and RULE - PRIOR (how much the operators and the ranker add over the frequency shortcut)"
+   ]
+  },
+  "M2_reader_advance": {
+   "test": "for each backbone b in {3B, 7B}: delta_b = F_b - S on test Hits@1 (seed-paired, per-question hits averaged over seeds)",
+   "pass": "delta_b >= +0.010 AND Holm-adjusted (2 backbones, family alpha 0.05) one-sided bootstrap p < 0.05; the two-sided 95% CI is reported",
+   "attribution": {
+    "FACTS_MATTER": "F_b - F_QONLY_b >= +0.005 with 95% CI lower bound > 0",
+    "SHUF_CLEAN": "F_SHUF_b is not above S: 95% CI lower bound of (F_SHUF_b - S) <= 0"
+   },
+   "labels": {
+    "READER_ADVANCE": "pass AND FACTS_MATTER AND SHUF_CLEAN",
+    "READER_ADVANCE_UNATTRIBUTED": "pass but an attribution condition fails",
+    "NO_GAIN": "pass fails"
+   },
+   "contamination_flag": "MEMORY_SUSPECT iff delta_b > 0 and (F_MASK_b - S) < 0.5 * delta_b. ICEWS05-15 (2005-2015) predates every model's training cutoff and the MultiTQ questions are public since 2023, so memorisation is possible; the flag qualifies but does not overturn the M2 label.",
+   "multiplicity": "Holm across the two backbones for the M2 pass condition; attribution conditions and the flag are conditions on an already-passed claim and are not corrected."
+  },
+  "M3_published_comparison": {
+   "type": "descriptive, cross-paper (different scorers and LLM back-ends; no paired test)",
+   "our_arm": "the arm with the highest dev Hits@1 (seed mean, cross-fitted for fused arms), declared in multitq_freeze.json before the test pass",
+   "comparators_hits@1_overall": {
+    "RTQA (Gong et al. 2025)": 0.765,
+    "TECQA": 0.811,
+    "TimeR4 (Qian et al. 2024)": 0.728,
+    "TempAgent (Hu et al. 2025)": 0.702,
+    "ARI (Chen et al. 2024)": 0.38
+   },
+   "leaderboard_entries_to_verify_in_results_track": [
+    "per-type (Single/Multiple/Entity/Time) breakdowns for MemoTime and for leaderboard entries not in the reference table",
+    "any entry published after 2026-07-02"
+   ],
+   "report": "gap to each comparator with our test 95% CI; no PASS/FAIL",
+   "leaderboard_source": {
+    "note": "project leaderboard compiled 2026-07-02, values verified against source full texts (column value_verified_in_fulltext)",
+    "entries_hits@1_overall": {
+     "AT2QA": 0.887,
+     "TKG-Thinker": 0.855,
+     "TempTool-R1": 0.851,
+     "SCoP": 0.825,
+     "TECQA": 0.811,
+     "SAR": 0.782,
+     "Temp-R1": 0.78,
+     "PoK": 0.779,
+     "MemoTime": 0.779,
+     "RTQA": 0.765,
+     "TimeR4": 0.728,
+     "TempAgent": 0.702,
+     "Regret-Now": 0.543,
+     "EvoReasoner": 0.391,
+     "ARI": 0.38,
+     "STAR-RAG": 0.305,
+     "MultiQA": 0.293,
+     "CronKGQA": 0.279,
+     "ReAct KB": 0.21,
+     "EmbedKGQA": 0.206,
+     "KG-RAG": 0.185,
+     "ALBERT": 0.108,
+     "ChatGPT": 0.102,
+     "BERT": 0.083
+    }
+   }
+  }
+ },
+ "statistic": {
+  "evaluator": "multitq_eval.py (official semantics)",
+  "primary": "Hits@1, full test split (54,584 questions)",
+  "secondary": "Hits@10",
+  "bootstrap": "paired Poisson(1) over test questions, B = 2000 (strata B = 1000), seed 0; two-sided 95% percentile CI; one-sided p = share of bootstrap deltas <= 0",
+  "seeds": "learned arms 3 seeds; decision on the per-question hit averaged over seeds; per-seed deltas reported",
+  "multiplicity": "Holm across M2's two backbones; M1 is a single test"
+ },
+ "stop_rules": {
+  "STOP_RECALL": "If the dev candidate recall of the retrieval stage (share of dev questions with >= 1 gold answer in the RULE/S candidate pool, official matching) is < 0.70 overall, report it and stop before the reader stage. PRIOR, RULE and S still receive their registered test pass and M1 is still decided; M2 is reported as NOT_RUN.",
+  "DEV_NO_GAIN": "If a fused reader's cross-fitted dev Hits@1 does not exceed S on dev after selection, the registered test pass is still run and the arm is labelled DEV_NO_GAIN in the report."
+ },
+ "reporting_format": {
+  "hard_requirement": "Table layout of the authors' reference table (TECQA Table 1, pasted 2026-10-26): Hits@1 | Overall | Question Type: Single, Multiple | Answer Type: Entity, Time; baselines grouped PLM / embedding-based / LLM-based, then ours; best in bold and second best underlined per column across all rows.",
+  "supplementary": [
+   "Hits@1 by the six qtypes (equal, before_after, first_last, equal_multi, after_first, before_last)",
+   "Hits@1 by granularity: the official granularity table (Equal / Before-After / Equal-Multi x Day / Month / Year over the official subset, as Chen et al. Table 8) plus time_level over all questions",
+   "the same three tables for Hits@10 (published Hits@10 exists only for the PLM/embedding rows of Chen et al. Table 7)",
+   "ablation table of controls (PRIOR, RULE, QONLY, SHUF, MASK) with paired deltas and CIs"
+  ],
+  "published_rows_hits@1": {
+   "PLM": {
+    "BERT": [
+     0.083,
+     0.092,
+     0.061,
+     0.101,
+     0.04
+    ],
+    "DistilBERT": [
+     0.083,
+     0.087,
+     0.074,
+     0.102,
+     0.037
+    ],
+    "ALBERT": [
+     0.108,
+     0.116,
+     0.086,
+     0.139,
+     0.032
+    ]
+   },
+   "embedding-based": {
+    "EmbedKGQA": [
+     0.206,
+     0.235,
+     0.134,
+     0.29,
+     0.001
+    ],
+    "CronKGQA": [
+     0.279,
+     0.337,
+     0.134,
+     0.328,
+     0.156
+    ],
+    "MultiQA": [
+     0.293,
+     0.347,
+     0.159,
+     0.349,
+     0.157
+    ]
+   },
+   "LLM-based": {
+    "ARI": [
+     0.38,
+     0.68,
+     0.21,
+     0.394,
+     0.344
+    ],
+    "TimeR4": [
+     0.728,
+     0.887,
+     0.335,
+     0.639,
+     0.945
+    ],
+    "TempAgent": [
+     0.702,
+     0.857,
+     0.316,
+     0.624,
+     0.87
+    ],
+    "RTQA": [
+     0.765,
+     0.902,
+     0.424,
+     0.692,
+     0.942
+    ],
+    "MemoTime": [
+     0.779,
+     null,
+     null,
+     null,
+     null
+    ],
+    "TECQA": [
+     0.811,
+     0.889,
+     0.616,
+     0.753,
+     0.939
+    ]
+   },
+   "column_order": [
+    "Overall",
+    "Single",
+    "Multiple",
+    "Entity",
+    "Time"
+   ],
+   "sources": "PLM/embedding rows from Chen et al. (2023) Table 7; LLM rows from the authors' reference table (TECQA Table 1); MemoTime overall from its paper (breakdown to verify).",
+   "transcription_note": "The reference table lists CronKGQA Single = 0.134; the original (Chen et al. 2023 Table 7) gives Single 0.337, Multiple 0.134. We use the original."
+  },
+  "published_rows_hits@10": {
+   "BERT": [
+    0.441,
+    0.461,
+    0.392,
+    0.531,
+    0.222
+   ],
+   "DistilBERT": [
+    0.482,
+    0.505,
+    0.426,
+    0.591,
+    0.216
+   ],
+   "ALBERT": [
+    0.484,
+    0.512,
+    0.415,
+    0.589,
+    0.228
+   ],
+   "EmbedKGQA": [
+    0.459,
+    0.467,
+    0.439,
+    0.648,
+    0.001
+   ],
+   "CronKGQA": [
+    0.608,
+    0.671,
+    0.453,
+    0.696,
+    0.392
+   ],
+   "MultiQA": [
+    0.635,
+    0.682,
+    0.519,
+    0.733,
+    0.396
+   ]
+  }
+ },
+ "outcome_labels": [
+  "STRUCT_ADVANCE",
+  "NO_GAIN",
+  "ABOVE_MULTIQA",
+  "READER_ADVANCE",
+  "READER_ADVANCE_UNATTRIBUTED",
+  "MEMORY_SUSPECT",
+  "DEV_NO_GAIN",
+  "NOT_RUN",
+  "NOT_TESTED"
+ ],
+ "PASS": "The track reports M1 and M2 labels separately; there is no single overall PASS. M3 is descriptive only.",
+ "deliverables": [
+  "multitq_results.json (per-arm, per-stratum Hits@1/Hits@10 with CIs)",
+  "multitq_verdict.json",
+  "multitq_report.md",
+  "comparison figure vs published systems",
+  "[internal note removed in the anonymised copy]",
+  "Archive copy 11_multitq with MANIFEST"
+ ],
+ "sha256_recipe": "sha256 = SHA-256 of json.dumps({all keys except 'sha256'}, indent=1, sort_keys=True, default=str)",
+ "amendment_log": [
+  {
+   "utc": "2026-10-26T03:41:32Z",
+   "from": "v1.0",
+   "to": "v1.1",
+   "change": "M3 (descriptive only) comparator list linked to the existing verified project leaderboard artifact; no criterion, threshold, arm or control changed.",
+   "state_at_amendment": "no system built; no dev or test system output exists"
+  }
+ ],
+ "original_registration": {
+  "registered_utc": "2026-10-26T03:38:19Z",
+  "sha256": "cff5728a7eaed970a6e4dd799f0d9e7460c961c1e022d291ab86b52eb13561a3"
+ },
+ "registered_utc": "2026-10-26T03:41:32Z",
+ "sha256": "8ccf9352b13f7200324b11d952b5124f0fdd96fc2bf6aa2bef6f9e0510284cef"
+}

@@ -1,0 +1,48 @@
+{
+ "parallel": 6,
+ "prep_levels": "k10_s0",
+ "runs": [
+  {
+   "k": "k10_s0",
+   "emb": "off",
+   "seed": 0,
+   "max_epochs": 20,
+   "patience": 10
+  },
+  {
+   "k": "k10_s0",
+   "emb": "off",
+   "seed": 1,
+   "max_epochs": 20,
+   "patience": 10
+  },
+  {
+   "k": "k10_s0",
+   "emb": "off",
+   "seed": 2,
+   "max_epochs": 20,
+   "patience": 10
+  },
+  {
+   "k": "k10_s0",
+   "emb": "full",
+   "seed": 0,
+   "max_epochs": 20,
+   "patience": 10
+  },
+  {
+   "k": "k10_s0",
+   "emb": "full",
+   "seed": 1,
+   "max_epochs": 20,
+   "patience": 10
+  },
+  {
+   "k": "k10_s0",
+   "emb": "full",
+   "seed": 2,
+   "max_epochs": 20,
+   "patience": 10
+  }
+ ]
+}

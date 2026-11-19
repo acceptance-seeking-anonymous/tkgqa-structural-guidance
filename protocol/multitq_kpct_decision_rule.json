@@ -1,0 +1,530 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_kpct",
+ "rule_version": "v1.0",
+ "plan": "TKGQA study track -- MultiTQ data-efficiency (k%) experiment; plan (both LLM arms, MultiTQ only); protocol track",
+ "question": "If every learned component is trained on only k% of MultiTQ train (k in {1, 5, 10, 100}, plus a training-free k = 0 row), does an LLM method guided by our structural pipeline (a supervised benchmark-specific semantic parser with symbolic temporal execution) still outperform the KG-matched published LLM systems on official MultiTQ test Hits@1?",
+ "status_at_registration": {
+  "kpct_results": "None. No RULE_k or S_k for k < 100, no G_k, GU_k or P_k at any k, and no P_0 or G_0 has been built, trained or run; no dev-subset, dev or test output of any of these arms exists; no GPU job of this experiment has been launched.",
+  "work_before_registration": "Subset sampling from quid + qtype fields only, and masked-template keys of train, dev and test question TEXT through the frozen linker (no answers read). The keys reproduce the fairness check counts exactly (20,840 distinct test templates, 9,922 unseen in full train, 11,175 unseen test questions).",
+  "existing_test_exposure": "Full-data arms of earlier MultiTQ tracks have been scored on test and are known to the people designing this experiment: PRIOR 0.3682, RULE 0.9273, S 0.9310 (pass 1); readers R3B 0.9066 / R7B 0.9076 and fused reader+S F3B 0.9385 / F7B 0.9372 with their QONLY/SHUF/MASK controls (pass 2, scored 2026-10-27T02:07:11Z); restricted-KG variants KGT/KGT2; fairness check (unseen-template S 0.7846, n = 11,175). Full-dev numbers of these arms also exist.",
+  "reused_rows": "RULE_100 and S_100 are the frozen full-data arms; their test predictions were already scored (RULE 0.9273, S 0.9310). Reusing them adds no test exposure, but their KP1 labels are already determined and are not new findings."
+ },
+ "parent_documents": {
+  "decision_rule_v1.1": {
+   "filename": "multitq_decision_rule.json",
+   "sha256": "8ccf9352b13f7200324b11d952b5124f0fdd96fc2bf6aa2bef6f9e0510284cef"
+  },
+  "structural_addendum": {
+   "filename": "multitq_structural_addendum.json"
+  },
+  "structural_code": {
+   "filename": "multitq_structural_code.tgz"
+  },
+  "structural_report": {
+   "filename": "multitq_structural_report.md"
+  },
+  "reader_addendum": {
+   "filename": "multitq_reader_addendum.json",
+   "sha256": "242b62ba0e48573baced4fbd555d87ad7327773f19cf54937e03e193a016528e"
+  },
+  "dataset": {
+   "filename": "multitq_dataset.tar.gz"
+  },
+  "kg_provenance_table": {
+   "filename": "kg_provenance_table.csv"
+  }
+ },
+ "data": {
+  "question_file_sha256": {
+   "train": "89ce10b4a1ca9b53b75a1a8d6935e70d8381457cfa36dfe92a51f483ebd3a044",
+   "dev": "ad0dfe7c94dfdd7c00b4df22896d8cb3df3b860f1e5e10cd1ae110ab9791bbb7",
+   "test": "d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee"
+  },
+  "kg_file_sha256": {
+   "full.txt": "b94b31a86dc9f8dd40c8a95ec5c224f85a9a0793df0d40efad710cfda2f3944e",
+   "train.txt": "54f82c6d8c71f100f1885129d724d414fe60693e6b51790d2d3e6e2eb6228bf2",
+   "valid.txt": "d8cd0e94747fbf737094991ebc76b3b38685ebc1c61fc5ae1dfcc171759ec5bd",
+   "test.txt": "70591a58f7c18e6c3cf62a60bf0c1da78ad555c2888b91f56ff620f6922f3837",
+   "entity2id.json": "50529c68e783dbc684eb2dfe249df6f5d49bf571cd24000e9aaad747b7f130bf",
+   "relation2id.json": "4b655249097806633197ce996460c67cda688f560b460fc31a07028c954b8671",
+   "ts2id.json": "f7e6cf043f28b7c76ea4d5f0f5471ed1cb57235fd3280b729deb452e498b3378"
+  },
+  "splits": {
+   "train": 386787,
+   "dev": 57979,
+   "test": 54584
+  },
+  "kg": "461,329 facts (ICEWS05-15, day granularity, 2005-01-01..2015-12-31), 10,488 entities, 251 relations, 4,017 timestamps. Use the union of kg/train.txt, valid.txt, test.txt (identical to full.txt after CSV-unquoting the one quoted entity).",
+  "scorer": {
+   "file": "multitq_eval.py",
+   "sha256": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69",
+   "semantics": "official MultiQA eval_multi: hit@k iff any gold answer is in the top k after truncating every prediction to len(answers[0]) for year (4) / month (7) gold; mean over all questions; missing prediction = miss"
+  }
+ },
+ "subsets": {
+  "manifest": {
+   "file": "multitq_kpct_subsets.json",
+   "sha256": "de8a9c22d51f4182f88063c57d408530c351660ec23caea29b8559878ee88e5a"
+  },
+  "profile": {
+   "file": "multitq_kpct_subset_profile.json",
+   "sha256": "cfd538b39322d8de23d113e6d703f8d43e5be8421b9df7247e0b71b4670e9e98"
+  },
+  "k_definition": "k% of the 386,787 train questions, qtype-stratified (largest-remainder allocation); seed-0 chain nested 1% < 5% < 10% < 100%; independent 1% draws with seeds 1 and 2",
+  "lists": {
+   "k01_s0": {
+    "n": 3868,
+    "sha256": "9cc6eb403715fd8591311e2e013b96d44e89cb2bcc961f6f21763139170e74e8"
+   },
+   "k05_s0": {
+    "n": 19339,
+    "sha256": "0a84036566f348be78dbf8e37b95477aa4ffa23f6fa1ed58b8c031faf2ff1a5b"
+   },
+   "k10_s0": {
+    "n": 38679,
+    "sha256": "6f1ba60c36fccc99b6450804b290da850015f4b2d4f27802930fa57b531a69e1"
+   },
+   "k01_s1": {
+    "n": 3868,
+    "sha256": "776514fdbd1bce16183a3ce7ffe2f15d2b24eca38678677dd83102fa361cee79"
+   },
+   "k01_s2": {
+    "n": 3868,
+    "sha256": "8f3edfd672d2c7b0585d7d9b8156df35ffca4a42903d6a4b2b2677112fe2cc16"
+   },
+   "k100": {
+    "n": 386787,
+    "sha256": "9bb19583d4b2bb1f1a0b3110760a56670eca4c7af30591bc2adcb64c374067e3"
+   }
+  },
+  "structural_train_set": {
+   "k<100": "the whole k% list (S trains on min(k%, 99,999) = the k% list)",
+   "k=100": "frozen full-data arms (parser on all train; S on s_train100k, n = 99,999, sha256 36030fdc6c51901edb4b3ff1a094f16b676c657ec2eee666d542fc683c5cc251)"
+  },
+  "llm_train_set": {
+   "k<100": "the whole k% list",
+   "k=100": "reader_train60k (n = 60,001, list sha256 0a1e618aefca3e3533d1752f6311257b7bd268b1ae3116654b21650a4b58c496)",
+   "fallback_3": {
+    "cap20k_k10": {
+     "n": 20000,
+     "sha256": "5f38f99b66b4f54a6b121074c1598d80aec146eb48da55445bb280eb5973068e"
+    },
+    "cap20k_k100": {
+     "n": 20000,
+     "sha256": "3702bf39214261d0251d24224fb3f531fe3003c519f25ed74ae5f38642e75c74"
+    }
+   }
+  },
+  "dev_selection": {
+   "name": "dev_sel2000",
+   "n": 2000,
+   "sha256": "b5b8a28d843bc6120b580a2e13505dfd56185a43e5ef28adc3d1ece78d9403b1",
+   "allocation": {
+    "after_first": 224,
+    "before_after": 402,
+    "before_last": 225,
+    "equal": 655,
+    "equal_multi": 111,
+    "first_last": 383
+   }
+  },
+  "oof": "outer 2-fold split (seed 0) and inner 2-fold split of each outer fold, per k<100 list, in the manifest (oof_splits); k = 100 reuses train_oof_fold.npy",
+  "template_unseen_share_test": {
+   "k01_s0": 0.7366,
+   "k05_s0": 0.5301,
+   "k10_s0": 0.438,
+   "k01_s1": 0.7504,
+   "k01_s2": 0.7423,
+   "k100": 0.2047
+  },
+  "template_unseen_share_dev_sel2000": {
+   "k01_s0": 0.723,
+   "k05_s0": 0.505,
+   "k10_s0": 0.4085,
+   "k01_s1": 0.7365,
+   "k01_s2": 0.727,
+   "k100": 0.183
+  },
+  "kp4_strata": {
+   "k01_s0": {
+    "n": 40205,
+    "sha256": "c3b084220c949ffcc5287940c29157d8f5483f30f702b32313edb6e2b4c8b91f"
+   },
+   "k05_s0": {
+    "n": 28936,
+    "sha256": "565f59dffeb7b8eee026f739f291de043a3153f87ec51ad6984d08cc368e7906"
+   },
+   "k10_s0": {
+    "n": 23909,
+    "sha256": "4e0367fc49a1c74d7e43b7f04016053c3756872f7084fd12ff7898d6abcaa4a3"
+   },
+   "k01_s1": {
+    "n": 40962,
+    "sha256": "05f66f1c6c54d838191c60ac7a71722f4658d46b9501650a2e5800233bcf9d88"
+   },
+   "k01_s2": {
+    "n": 40520,
+    "sha256": "2d855d79647fffebedbc85bb7bfff6b4198e95c3052220de2e644a64d15850d4"
+   },
+   "k100": {
+    "n": 11175,
+    "sha256": "5cf6c7cb128f5afb1068ba2bd293ccbe5f322966bf0e7e78255f70c88e786643"
+   }
+  }
+ },
+ "inputs_allowed": {
+  "all_arms_at_dev_and_test_inference": [
+   "question text",
+   "the full MultiTQ KG (461,329 facts, all timestamps; the benchmark is retrospective and every comparator retrieves from the full KG)",
+   "KG-derived vocabularies (entity, relation and timestamp names)",
+   "models and artefacts trained under the train-data rule below",
+   "pretrained LLMs / sentence embedders (frozen or LoRA-tuned)"
+  ],
+  "forbidden_at_dev_and_test": [
+   "qtype",
+   "qlabel",
+   "answer_type",
+   "time_level",
+   "quid (order or value; except as the seed of the fixed per-question candidate permutation)",
+   "answers",
+   "any annotation derived from gold or from the metadata fields above",
+   "dev or test question text for any training, unsupervised fitting, statistic or exemplar"
+  ],
+  "train_data_rule": "An arm at k < 100 may read train questions (all fields, including answers and metadata as labels) only for the quids of its k% list. No other train question text, answer or metadata may enter any learned component, statistic, alias, block list, vocabulary, padding list, threshold, exemplar or prompt -- except the fixed design knowledge listed in supervision_disclosure. k = 0 arms read no train question beyond the 8 hand-written exemplars.",
+  "dev_rule": "dev_sel2000 questions and answers may be used for selection, early stopping and thresholds only; the other 55,979 dev questions are not used by any new arm. Dev metadata is used only to stratify dev_sel2000."
+ },
+ "arms": {
+  "RULE_k": {
+   "what": "structural only: k%-trained parser/linker + candidate retrieval + deterministic temporal operators + RULE lexicographic ordering; no learned ranker; deterministic",
+   "grid": "k in {1 (subset seeds 0, 1, 2), 5, 10}; k = 100 = frozen RULE (reused)",
+   "retrained_on_k": [
+    "n-gram vocabulary of the classifier",
+    "classifier heads: relation x direction (EM-refined soft silver labels from gold-consistent alignment of the k% train questions), qtype, answer type, granularity",
+    "sector aliases (registered thresholds count >= 5, precision >= 0.1, top-3 per n-gram; statistics from the k% list)",
+    "block list (registered thresholds: train link precision < 0.05 with n >= 10; statistics from the k% list)",
+    "output-list padding by the most frequent train answers of the predicted answer type (k% list only)",
+    "any other train-derived statistic used by a feature (recomputed on the k% list)"
+   ],
+   "fixed_design_knowledge": [
+    "operator semantics (equal, before/after, first/last, equal_multi, after_first, before_last; structural addendum)",
+    "RULE lexicographic candidate ordering",
+    "retrieval settings (5 relation hypotheses, 3 entity alternatives per mention, role hypotheses, pool cap 1,000)",
+    "stemming / normalisation (7-char prefix stems, plural stripping, accent folding)",
+    "manual demonym table",
+    "time regexes (mtq_lib.parse_time)",
+    "keyword rules kw_ba (before/after) and kw_fl (first/last)",
+    "feature set mtq_cand.FEATS (34 features; TComplEx score not used)",
+    "classifier architecture and optimiser recipe (word 1-3-grams over entity-masked text, 96-d EmbeddingBag, Adam lr 2e-3, batch 512, seed 0)",
+    "alias / block-list thresholds",
+    "LightGBM grid and fixed parameters"
+   ],
+   "selection": "classifier epochs E in {6, 24} (first third uniform targets, rest EM), chosen per k on dev_sel2000 RULE_k Hits@1 (tie -> 6); everything else fixed",
+   "inputs_allowed": "question text + full KG at inference; k% list for every train-fit artefact"
+  },
+  "S_k": {
+   "what": "RULE_k pool (cap 1,000) re-ranked by LightGBM lambdarank on mtq_cand.FEATS (34 features)",
+   "grid": "as RULE_k; k = 100 = frozen S seeds 0, 1, 2 (reused)",
+   "train_set": "the whole k% list (= min(k%, 99,999)); candidates = RULE_k top-200 per question; questions without a positive dropped; label = official matching of the single string",
+   "oof_features": "training features use OUT-OF-FOLD classifier probabilities from the outer 2-fold split of the k% list (fold models = the classifier recipe on the other fold; linker artefacts = the k% ones, as in the frozen design); dev/test features use the full k% parser",
+   "retrained_on_k": [
+    "n-gram vocabulary of the classifier",
+    "classifier heads: relation x direction (EM-refined soft silver labels from gold-consistent alignment of the k% train questions), qtype, answer type, granularity",
+    "sector aliases (registered thresholds count >= 5, precision >= 0.1, top-3 per n-gram; statistics from the k% list)",
+    "block list (registered thresholds: train link precision < 0.05 with n >= 10; statistics from the k% list)",
+    "output-list padding by the most frequent train answers of the predicted answer type (k% list only)",
+    "any other train-derived statistic used by a feature (recomputed on the k% list)",
+    "LightGBM ranker (3 seeds)"
+   ],
+   "fixed_design_knowledge": [
+    "operator semantics (equal, before/after, first/last, equal_multi, after_first, before_last; structural addendum)",
+    "RULE lexicographic candidate ordering",
+    "retrieval settings (5 relation hypotheses, 3 entity alternatives per mention, role hypotheses, pool cap 1,000)",
+    "stemming / normalisation (7-char prefix stems, plural stripping, accent folding)",
+    "manual demonym table",
+    "time regexes (mtq_lib.parse_time)",
+    "keyword rules kw_ba (before/after) and kw_fl (first/last)",
+    "feature set mtq_cand.FEATS (34 features; TComplEx score not used)",
+    "classifier architecture and optimiser recipe (word 1-3-grams over entity-masked text, 96-d EmbeddingBag, Adam lr 2e-3, batch 512, seed 0)",
+    "alias / block-list thresholds",
+    "LightGBM grid and fixed parameters"
+   ],
+   "selection": "num_leaves in {31, 63, 127} x learning_rate in {0.05, 0.1}; min_data_in_leaf 100, feature_fraction 0.8, bagging_fraction 0.8 (freq 1), lambdarank_truncation_level 20; up to 2,000 rounds with early stopping (100) on dev_sel2000 ndcg@1; config chosen by dev_sel2000 Hits@1 at LightGBM seed 0; seeds 0, 1, 2 with that config and the seed-0 best iteration",
+   "scoring": "all pool candidates scored; ties by RULE order; S_k hit = per-question hit averaged over the 3 LightGBM seeds",
+   "inputs_allowed": "as RULE_k"
+  },
+  "G_k": {
+   "what": "guided reasoner: Llama-3.1-8B-Instruct, LoRA on the k% LLM list, reads the question plus S_k's guidance bundle and generates the answer string; it may override the parse and the candidates",
+   "grid": "k in {1 (subset seeds 0, 1, 2), 5, 10, 100}; LLM seed 0 everywhere",
+   "bundle": {
+    "parse": "linked entities (KG names), top relation-direction hypothesis, qtype/operator, answer type, granularity, time constraint or anchor",
+    "candidates": "top-20 of S_k (LightGBM seed 0) with their RULE rank and S score",
+    "facts": "first 20 supporting facts (subject | relation | object | dates) from the frozen provenance retrieval (mtq_export.provenance_facts recipe), grouped by triple with chronological dates -- 20 facts to match GU",
+    "operator_trace": "operator applied, window or anchor date, number of admissible candidates, why the top candidate satisfies the operator"
+   },
+   "train_time_bundles": {
+    "k<100": "OUT-OF-FOLD: for outer fold f in {0, 1} the whole structural stack (every train-fit artefact of RULE_k and S_k; S with OOF features from the inner split of fold 1-f, the configuration selected for S_k and the S_k seed-0 iteration count) is retrained on fold 1-f only and produces the bundles of fold f. Dev/test bundles come from the full-k% S_k stack.",
+    "k=100": "frozen reader exports for reader_train60k: OOF classifier probabilities (train_oof_fold.npy), S from the disjoint s_train100k; linker aliases and block list are in-sample (disclosed)",
+    "integrity_check": "before the first dev_sel2000 score: assert that no train quid is in the training list of any model that produced its bundle (STOP_OOF_LEAK)"
+   },
+   "target": "the gold answer ranked highest in the bundle candidate list; answers[0] if no gold is in the list",
+   "lora_recipe": "r 16, alpha 32, dropout 0.05 on q,k,v,o,gate,up,down; AdamW lr 2e-4, weight decay 0, cosine schedule, 3% warm-up, grad clip 1.0, effective batch 16, bf16; loss on answer tokens only; tokenizer chat template, one user turn; max length 2,048 tokens; seed 0 (LoRA init and data order)",
+   "epochs": "E_max = 3 (k = 1), 2 (k = 5), 1 (k = 10, 100); checkpoint scored on dev_sel2000 at every epoch end (and at 0.5 epoch when E_max = 1); best dev_sel2000 Hits@1 checkpoint (tie -> earlier)",
+   "selection": "candidate order in {S order, fixed per-question random order default_rng(quid)} (scores shown in both) chosen once at k = 1 subset seed 0 on dev_sel2000 and then fixed for every k; checkpoint as above. lr, LoRA rank, N facts, K candidates and decoding are fixed a priori",
+   "decoding": "greedy, max 48 new tokens",
+   "output": "answer string; valid iff, after stripping, whitespace collapsing, case folding and _ -> space, it equals a KG entity name or is a time string YYYY / YYYY-MM / YYYY-MM-DD within 2005-01-01..2015-12-31. Ranked list = [answer] + S_k seed-0 list (deduplicated). An invalid answer stays at rank 1 (a miss); no fallback. Invalid rate reported",
+   "inputs_allowed": "question text, the k% bundle, full KG; training on the k% LLM list with OOF bundles"
+  },
+  "GU_k": {
+   "what": "unguided control: same LLM, LoRA recipe, k% list, epochs, early stopping and seed as G_k; the facts come from a generic dense retriever; no parse, candidates, scores, trace, linker or structural artefact. Stands in for an LLM RAG method without our guidance",
+   "grid": "k in {1 (subset seed 0 only), 5, 10, 100}",
+   "retriever": "BAAI/bge-large-en-v1.5, normalised embeddings, cosine; passages = one verbalised fact each (\"<subject> <relation, _ -> space> <object> on <YYYY-MM-DD>\"), all 461,329 full-KG facts; query = \"Represent this sentence for searching relevant passages: \" + question; top-20 facts in retrieval order. Not trained or tuned; identical for every k",
+   "target": "the gold answer occurring earliest in the retrieved facts; answers[0] if none occurs",
+   "output": "as G_k (same validity rule, no fallback); ranked list = [answer] + entities and dates of the retrieved facts in retrieval order (dates at the granularity of the answer if it is a time string), deduplicated, padded with the most frequent k% train answers",
+   "selection": "checkpoint only (as G_k)",
+   "inputs_allowed": "question text + 20 retrieved full-KG facts; training on the k% LLM list"
+  },
+  "P_k": {
+   "what": "LLM parser + our operators: Llama-3.1-8B-Instruct, LoRA on the k% LLM list, emits the structured parse as JSON; the parse is executed by our deterministic operators and re-ranked by S_k",
+   "grid": "k in {1 (subset seeds 0, 1, 2), 5, 10, 100}; LLM seed 0",
+   "json_schema": "{\"mentions\": [{\"text\", \"entity\"}], \"relation\", \"answer_role\": subject|object, \"qtype\", \"answer_type\": entity|time, \"granularity\": day|month|year, \"time\": string|null, \"anchor\": KG entity|null, \"order\": before|after|first|last|null}",
+   "targets": "answer-consistent silver parses: the k%-trained structural parser's top-1 hypothesis on each k% train question, serialised to the schema, kept iff executing it with the operators and RULE ordering returns a gold answer at rank 1 (official matching). k = 100: the frozen v3 parser on reader_train60k, same filter",
+   "execution": "P parse = hypothesis rank 0, followed by the structural parser's remaining hypotheses (duplicates removed); candidates from the operators; re-ranked by each of the 3 S_k seeds (S features use the k% classifier probabilities of P's choices); P_k hit = per-question hit averaged over the 3 S seeds",
+   "fallback": "the structural parse (S_k's own output) if the JSON is invalid, a name is not in the KG vocabulary, the pool is empty, or the mean token log-prob of the JSON < tau; tau in {off, -0.30, -0.10, -0.03} chosen on dev_sel2000 (tie -> off). Fallback rate reported",
+   "lora_recipe": "as G_k (loss on JSON tokens)",
+   "epochs": "as G_k",
+   "decoding": "greedy, max 160 new tokens",
+   "selection": "checkpoint and tau on dev_sel2000",
+   "inputs_allowed": "question text + full KG + S_k; training on the k% LLM list (silver-filtered)"
+  },
+  "P_0": {
+   "what": "k = 0, training-free: Llama-3.1-70B-Instruct (bf16, vLLM tensor-parallel 2 on both cards) few-shot JSON parser + our operators + RULE ordering; no re-ranker",
+   "prompt": "instruction, the 251 KG relation names (KG schema), the JSON schema, and 8 hand-written exemplars whose question texts come from train (parses written by hand; quids and prompt text sha256 recorded before the first P_0 dev_sel2000 score; covering the 6 qtypes and both answer types)",
+   "entities": "an exact KG name is used directly; otherwise the mention is mapped by the base linker (stemming, demonyms, no sector aliases, no block list, no train statistics)",
+   "train_use": "no train answers beyond the 8 exemplars; no train-fit linker artefact, classifier or ranker",
+   "invalid": "invalid JSON or unknown names -> no prediction (a miss); invalid rate reported",
+   "selection": "up to 3 prompt designs, each fixed in writing (text + sha256) before its dev_sel2000 score is read; best dev_sel2000 Hits@1 (tie -> shortest prompt); greedy decoding, max 160 new tokens",
+   "padding": "Hits@10 padding from KG statistics only (frequent entities / dates of the linked entities' facts)"
+  },
+  "G_0": {
+   "what": "k = 0: the same 70B, zero-shot (no exemplars, no training), guided by P_0's bundle (P_0 parse, top-20 RULE-ordered candidates with RULE ranks, no S scores; 20 supporting facts; operator trace); generates the answer string",
+   "output": "as G_k; ranked list = [answer] + P_0 list",
+   "selection": "up to 3 prompt designs on dev_sel2000 as for P_0; greedy, max 48 new tokens"
+  },
+  "controls_k1": {
+   "note": "added by the protocol track under the tkg-claims-protocol LLM-reader controls; inference only with the frozen G_1 adapter; qualifiers only, never decision-relevant",
+   "SHUF_G1": "G_1 with each question's whole bundle replaced by that of another question (fixed derangement: default_rng(0) permutation over the split's quids sorted ascending, fixed points swapped with the next index); dev_sel2000 and test",
+   "QONLY_G1": "G_1 with the bundle removed (question only); dev_sel2000 and test",
+   "NOVEL_GOLD_G1": "share of test questions where G_1's answer is a hit and the answer string occurs nowhere in its bundle (computed from outputs; no GPU)"
+  }
+ },
+ "selection_discipline": [
+  "ALL selection -- S grid and early stopping, classifier epochs, LoRA checkpoint, G candidate order, P fallback threshold tau, k = 0 prompt designs and the primary-arm choice -- uses dev_sel2000 only (2,000 qtype-stratified dev questions, seed 0; manifest sha256 above). No full-dev score of any new arm is computed.",
+  "Every candidate configuration's dev_sel2000 Hits@1 is written to multitq_kpct_selection_log.json as it is computed; the log is frozen with the arms.",
+  "Fixed a priori (not selected): LoRA recipe and lr, greedy decoding, K = 20 candidates, N = 20 facts, the GU retriever, alias/block thresholds, operator semantics, the S feature set.",
+  "Fallback decisions depend on cost projections only, never on any dev_sel2000 score.",
+  "Nothing is selected on test. Nothing is changed after any test number of this experiment is read; later additions are labelled post hoc and are not decision-relevant.",
+  "Implementation details not fixed here may be amended before the freeze with a dated provenance note in amendment_log; criteria, thresholds, arms, comparators, subsets, strata and the statistic may not be amended."
+ ],
+ "test_discipline": [
+  "Test inference for an arm runs only after the arm is frozen (adapter, LightGBM models, config, prompt text, tau) by sha256; prediction files are written but not scored.",
+  "multitq_kpct_freeze.json records the sha256 of every test prediction file, adapter, ranker, config and prompt, of this rule and of the subset manifest, the declared primary LLM arm per k, and every arm dropped by a fallback (NOT_RUN).",
+  "No test scoring until every in-force arm is frozen. the analysts then scores the test split exactly once, in a single pass, with multitq_eval.py (sha256 above). RULE_100 / S_100 prediction files are hash-verified against multitq_structural_freeze.json and re-used.",
+  "No analysis step reads a test answer or a test score before that pass. If any hash differs at scoring time, scoring stops and the discrepancy is reported."
+ ],
+ "criteria": {
+  "primary_llm_arm": "At each k the primary LLM arm is the one of {G_k, P_k} with the higher dev_sel2000 Hits@1 (G: selected checkpoint; P: mean over its 3 S seeds); |difference| < 0.0005 -> G_k. At k = 0: P_0 vs G_0 (P_0 if G_0 is dropped). Declared in multitq_kpct_freeze.json before the test pass. At k = 1 the choice is made on subset seed 0 and the same arm type is used for subset seeds 1 and 2.",
+  "KP1_vs_published": {
+   "type": "descriptive cross-paper label (no paired test possible; no multiplicity correction)",
+   "applies_to": "every arm (RULE_k, S_k, G_k, GU_k, P_k, P_0, G_0) at every k and subset seed, against each comparator",
+   "statistic": "the arm's own test Hits@1 with its 95% Poisson(1) bootstrap percentile CI (B = 2000, seed 0)",
+   "labels": {
+    "ABOVE": "CI lower bound > published value",
+    "BELOW": "CI upper bound < published value",
+    "TIE": "otherwise"
+   },
+   "primary_statement": "the primary LLM arm at k = 1 (subset seed 0) vs AT2QA 0.887",
+   "derived": "k_min_above[c] = the smallest k at which the primary LLM arm is ABOVE comparator c (descriptive)",
+   "qualifier": "SUBSET_ROBUST iff the primary-statement label is identical for subset seeds 0, 1 and 2; else SUBSET_FRAGILE (NOT_TESTED if seeds are dropped)"
+  },
+  "KP2_guidance_value": {
+   "test": "delta = G_k - GU_k on test Hits@1, paired over the 54,584 test questions (LLM seed 0, subset seed 0)",
+   "pass": "delta >= +0.020 AND Holm-adjusted one-sided bootstrap p < 0.05",
+   "primary": "k = 1; k = 5, 10, 100 descriptive (unadjusted 95% CI)",
+   "labels": {
+    "pass": "GUIDANCE_VALUE",
+    "fail": "NO_GUIDANCE_VALUE"
+   },
+   "note": "G and GU both read 20 facts; they differ in fact source (structural provenance vs dense retrieval) and in the parse/candidates/scores/trace, so KP2 credits the whole guidance bundle, not a single component"
+  },
+  "KP3_llm_over_structure": {
+   "test": "delta = primary LLM arm - S_k on test Hits@1, paired (S_k = per-question hit averaged over its 3 LightGBM seeds; P_k averaged over its 3 S seeds; G_k seed 0)",
+   "pass": "delta >= +0.010 AND Holm-adjusted one-sided bootstrap p < 0.05",
+   "primary": "k = 1; other k descriptive",
+   "labels": {
+    "pass": "LLM_OVER_STRUCTURE",
+    "fail": "NO_LLM_GAIN"
+   },
+   "descriptive": [
+    "delta vs S_k LightGBM seed 0",
+    "the non-primary LLM arm - S_k",
+    "subset seeds 1, 2 at k = 1 (SUBSET_ROBUST iff delta >= +0.010 in every available subset seed)"
+   ]
+  },
+  "KP4_unseen_templates": {
+   "test": "delta = P_k - S_k on test Hits@1 restricted to U_k = test questions whose masked template does not occur in the k% structural train list (fairness check template definition; strata frozen in multitq_kpct_subset_profile.json: k=1 n = 40,205; k=100 n = 11,175)",
+   "pass": "delta >= +0.030 AND Holm-adjusted one-sided bootstrap p < 0.05 (bootstrap over the U_k questions, B = 2000)",
+   "primary": "k = 1 (U_1 from k01_s0); other k and subset seeds descriptive",
+   "labels": {
+    "pass": "UNSEEN_TEMPLATE_GAIN",
+    "fail": "NO_UNSEEN_GAIN"
+   },
+   "descriptive": [
+    "G_k - S_k on U_k",
+    "P_k - S_k on the seen complement"
+   ]
+  },
+  "multiplicity": "Holm across the three primary tests (KP2, KP3, KP4 at k = 1), family alpha 0.05, one-sided. KP1 and every non-primary k are descriptive and not corrected.",
+  "qualifiers": {
+   "DEV_NO_GAIN": "the primary LLM arm's dev_sel2000 Hits@1 <= S_k's; the test pass still runs",
+   "SHUF_CLEAN": "SHUF_G1 test Hits@1 < 0.5 x G_1 test Hits@1 (else SHUF_UNCLEAN)",
+   "MEMORY_SUSPECT": "QONLY_G1 test Hits@1 >= 0.5 x G_1 test Hits@1, or NOVEL_GOLD_G1 >= 0.010. ICEWS05-15 (2005-2015) predates the Llama-3.1 training cutoff and MultiTQ is public since 2023, so memorisation is possible; the flag qualifies but never overturns a label",
+   "LOW_SILVER": "P_k silver set < 50% of its k% LLM list (coverage reported)",
+   "PROVISIONAL": "any number affected by an in-force fallback or deviation"
+  }
+ },
+ "statistic": {
+  "evaluator": "multitq_eval.py (official MultiQA semantics; sha256 above)",
+  "primary": "Hits@1 on the full test split (54,584 questions)",
+  "secondary": "Hits@10 (descriptive for every arm)",
+  "bootstrap": "paired Poisson(1) over test questions, B = 2000, seed 0 (tkg-claims-protocol paired_poisson_bootstrap; the weights depend only on n and the seed, so every full-test comparison uses the same weights); two-sided 95% percentile CI; one-sided p = share of bootstrap deltas <= 0; single-arm CI = the same bootstrap of the mean hit; KP4 on the U_k questions with B = 2000; descriptive strata B = 1000",
+  "seeds": "LLM seed 0 at every k; S_k 3 LightGBM seeds (per-question mean hit); P_k over the 3 S seeds; subset seeds 1, 2 at k = 1 for RULE, S, G and P (mean, sd and range across the 3 subsets reported)",
+  "dev_sel2000": "Hits@1 with Poisson bootstrap CI (B = 1000) reported for transparency of selection"
+ },
+ "fallbacks": {
+  "procedure": "After stage 0, project the in-force design (incl. a 10% margin). While the projection > 40.0 GPU-h, apply the next fallback in order. Then, going backwards from the fallback applied just before the last one, undo each applied fallback only if the projection stays <= 40.0 (greedy, reverse order). Re-project from measured costs after the k = 1 core and after k = 100, applying the same procedure to not-yet-started items only. Every in-force fallback is declared in deviations; affected rows are NOT_RUN / NOT_TESTED and affected numbers PROVISIONAL.",
+  "order": [
+   "1. drop subset seeds 1-2 for P (P subset spread and P SUBSET_ROBUST NOT_TESTED)",
+   "2. drop GU at k = 5% (KP2 at 5% NOT_RUN)",
+   "3. cap LLM training at 20,000 questions: G, GU and P at k = 10 and 100 train on cap20k_k10 / cap20k_k100 (registered lists); structural rows keep the full k% list; k = 1 and 5 are unaffected",
+   "4. drop G_0 (k = 0 primary = P_0)",
+   "5. drop the SHUF_G1 and QONLY_G1 test passes (dev_sel2000 versions kept; test SHUF_CLEAN / MEMORY_SUSPECT NOT_TESTED)",
+   "6. drop G subset seeds 1-2 at k = 1",
+   "7. drop G_5 and P_5 (structural k = 5 row kept)"
+  ],
+  "never_dropped": "the k = 1 subset-seed-0 core (RULE_1, S_1, G_1 incl. its order grid, GU_1, P_1), RULE_k / S_k at every k (CPU) and the reused k = 100 structural rows. If the core cannot be completed within 40 GPU-h, the KP1 primary statement and KP2-KP4 are NOT_RUN.",
+  "a_priori_outcome": "NOT BINDING (estimates only). Full design 52.4 GPU-h > 40. Fallbacks 1-4 are needed (after 1: 50.8, 2: 48.6, 3: 41.7, 4: 29.2); undoing 3, 2, 1 in reverse order gives 36.1, 38.3, 39.9 <= 40, so only fallback 4 (drop G_0) would remain in force. The binding decision follows the stage-0 measurements."
+ },
+ "stop_rules": {
+  "STOP_BUDGET": "No job is launched if measured spend + the job's projected cost would exceed 40 GPU-h; unrun items are NOT_RUN; the single test pass still runs for every frozen arm.",
+  "STOP_CORE_FIRST": "No item of run-order steps 3-10 starts on the GPU before every k = 1 core adapter is frozen.",
+  "STOP_OOF_LEAK": "Before the first dev_sel2000 score of any G_k, assert for every train-time bundle that its quid is absent from every training list of the models that produced it; on failure, regenerate the bundles; dev_sel2000 scores computed before the fix are void and logged.",
+  "STOP_DEV_FAILURE": "If an LLM arm's best dev_sel2000 Hits@1 < 0.30 or its invalid-output rate on dev_sel2000 > 0.20, one logged bug-fix iteration is allowed (amendment_log, before any test pass); the arm is then frozen as it is and labelled DEV_FAILURE if still below.",
+  "STOP_HOST": "Host outages: resume from checkpoints (LoRA every 500 steps, inference in shards); no partial test scoring.",
+  "STOP_TEST_INTEGRITY": "Any hash mismatch between a test prediction file and the freeze stops scoring."
+ },
+ "supervision_disclosure": [
+  "Operator semantics (equal, before/after, first/last and their compositions) were derived on FULL train with oracle relations during the original development and are held fixed at every k.",
+  "Keyword rules (kw_ba, kw_fl), time regexes, the demonym table, stemming, the RULE ordering, the retrieval settings, alias / block-list thresholds, the 34 S features and the LightGBM grid were designed while inspecting full train and full-data dev diagnostics.",
+  "The guidance-bundle format, prompts, JSON schema, LoRA recipe and the k = 0 exemplars are designed by people who have seen the full-data dev and test results (RULE 0.9273, S 0.9310, fused readers F3B 0.9385 / F7B 0.9372, unseen-template S 0.785).",
+  "The 8 hand-written k = 0 exemplars use train question texts and hand-written parses (their answers may be consulted to verify the parse).",
+  "Full-KG access: every arm retrieves from all 461,329 facts at inference (as every KG-matched comparator does).",
+  "Pretrained knowledge: Llama-3.1-8B/70B-Instruct (pretraining may include MultiTQ, public since 2023, and ICEWS) and bge-large-en-v1.5.",
+  "The template key that defines KP4 strata uses the frozen full-train linker artefacts (alias rules, block list); it affects the stratification only.",
+  "The k = 100 rows reuse frozen artefacts: S trained on s_train100k; reader_train60k bundles are OOF for the classifier and S but in-sample for the linker aliases and block list.",
+  "dev_sel2000 is drawn from dev, on which full-data RULE / S / reader numbers already exist; qtype labels are used to stratify all subsets.",
+  "Comparator supervision differs: TKG-Thinker uses full-train SFT + GRPO; AT2QA, ORACLE-T and SCoP are training-free; ORACLE-T tuned two parameters on dev."
+ ],
+ "comparators": {
+  "AT2QA": {
+   "hits@1": 0.887,
+   "kg_grade": "a",
+   "supervision": "training-free (few-shot exemplars selected with the same full.txt corpus)",
+   "inference_fact_set": "FULL (brute-force cosine search over GLM embedding-3 vectors of every line of kg/full.txt, 461,329 facts)",
+   "evaluated_set_note": "reports 56,014 evaluated questions, not the official 54,584 test count; the published value is used as printed",
+   "comparable_rows": "k = 0 (training-free); at k >= 1 our arms use more supervision",
+   "primary_comparator": true
+  },
+  "ORACLE-T": {
+   "hits@1": 0.869,
+   "kg_grade": "c",
+   "supervision": "zero-shot (tau and J_max tuned on dev)",
+   "inference_fact_set": "FULL (data release = ARI data.zip with the official kg/full.txt; executor code not released)",
+   "comparable_rows": "k = 0"
+  },
+  "TKG-Thinker": {
+   "hits@1": 0.855,
+   "kg_grade": "c",
+   "status": "provisional (corpus content not checkable; FULL inferred from file/index names)",
+   "supervision": "Llama3-8B SFT + GRPO on MultiTQ train (full train supervision)",
+   "inference_fact_set": "FULL (e5/BGE dense index over corpus_full.jsonl; top-15 quadruples per query)",
+   "comparable_rows": "k = 100 (same backbone size, full-train supervision); at k < 100 our arms use less train supervision"
+  },
+  "SCoP": {
+   "hits@1": 0.825,
+   "kg_grade": "a",
+   "supervision": "training-free",
+   "inference_fact_set": "FULL (igraph + FAISS indexes built from the bundled kg/full.txt, 461,329 facts)",
+   "comparable_rows": "k = 0"
+  },
+  "source": {
+   "table": "kg_provenance_table.csv",
+   "filename": "kg_provenance_table.csv",
+   "grade_meaning": "a = KG file verified in released code; c = indirect / provisional evidence"
+  },
+  "scope_note": "Only KG-matched published LLM systems (full 461,329-fact KG at inference) are comparators. All KP1 comparisons are cross-paper (different scorers, evaluated sets and LLM back-ends); no paired test is possible."
+ },
+ "reporting_format": {
+  "table_1_data_efficiency": "rows: k in {0, 1, 5, 10, 100} x arms (RULE_k, S_k, G_k, GU_k, P_k; P_0, G_0); columns: train questions used (structural / LLM), test Hits@1 [95% CI], Hits@10, dev_sel2000 Hits@1, KP1 label vs AT2QA / ORACLE-T / TKG-Thinker / SCoP, GPU-h",
+  "table_2_KP2_KP4": "delta, 95% CI, one-sided p, Holm-adjusted p and label at k = 1; descriptive rows for the other k",
+  "table_3_reference_layout": "Hits@1 | Overall | Single, Multiple | Entity, Time (the authors' reference-table layout of rule v1.1) for the primary LLM arm and S_k at every k, with the published LLM rows; best bold, second underlined",
+  "table_4_unseen_templates": "per k: |U_k|, S_k, P_k, G_k on U_k and on the seen complement, deltas with CIs",
+  "table_5_subset_variance": "k = 1 subset seeds 0, 1, 2: RULE, S, G, P Hits@1, mean, sd, range",
+  "controls": "SHUF_G1, QONLY_G1, NOVEL_GOLD_G1, invalid-output rates, P fallback rates and silver coverage, S_k recall@20 and headroom (recall@20 - Hits@1) on dev_sel2000",
+  "figure": "test Hits@1 vs k (categorical x: 0, 1, 5, 10, 100%) with 95% CI bars for RULE, S, G, GU, P; k = 1 subset seeds as small markers; dashed horizontal lines for AT2QA, ORACLE-T, TKG-Thinker, SCoP labelled with KG grade and supervision (figure-style skill)",
+  "prose": "every claim carries its label; cross-paper caveats (scorer, evaluated set, back-end); every in-force fallback and deviation; RULE_100 / S_100 flagged as previously scored",
+  "files": [
+   "multitq_kpct_freeze.json",
+   "multitq_kpct_selection_log.json",
+   "multitq_kpct_test_results.json (per-arm Hits@1/Hits@10 with CIs, KP1-KP4 labels)",
+   "multitq_kpct_report.md",
+   "data-efficiency figure",
+   "[internal note removed in the anonymised copy]",
+   "Archive copy of test_results/multitq/kpct with MANIFEST"
+  ]
+ },
+ "outcome_labels": {
+  "ABOVE": "KP1: arm CI lower bound > published value",
+  "TIE": "KP1: CI contains the published value",
+  "BELOW": "KP1: CI upper bound < published value",
+  "GUIDANCE_VALUE": "KP2 pass",
+  "NO_GUIDANCE_VALUE": "KP2 fail",
+  "LLM_OVER_STRUCTURE": "KP3 pass",
+  "NO_LLM_GAIN": "KP3 fail",
+  "UNSEEN_TEMPLATE_GAIN": "KP4 pass",
+  "NO_UNSEEN_GAIN": "KP4 fail",
+  "SUBSET_ROBUST": "same label / margin met in all k = 1 subset seeds",
+  "SUBSET_FRAGILE": "not SUBSET_ROBUST",
+  "DEV_NO_GAIN": "qualifier",
+  "DEV_FAILURE": "qualifier",
+  "SHUF_CLEAN": "qualifier",
+  "SHUF_UNCLEAN": "qualifier",
+  "MEMORY_SUSPECT": "qualifier",
+  "LOW_SILVER": "qualifier",
+  "PROVISIONAL": "number affected by a fallback or deviation",
+  "NOT_RUN": "arm or criterion not run (fallback / stop rule)",
+  "NOT_TESTED": "qualifier not computable"
+ },
+ "PASS": "No single overall PASS. The headline is the KP1 primary statement (primary LLM arm at k = 1 vs AT2QA 0.887); KP2-KP4 at k = 1 are reported as separate Holm-corrected labels; everything else is descriptive.",
+ "sha256_recipe": "sha256 = SHA-256 of json.dumps({all keys except sha256}, indent=1, sort_keys=True, default=str)",
+ "amendment_log": [],
+ "code": {
+  "kpct_keys.py": "1612bdc9243ed2e14fe57458d78431f56f34a4cabaa3dc12f9527a73c4915f2f",
+  "kpct_subsets.py": "ad7267791e9251bb7660f1eaedecc687d20419c5a4a6a3891bda7f9632fe2f2d",
+  "kpct_manifest.py": "eb608a7f7b2f9356f863e2f0c2e95ce2652d2166b718dd808d4a5324a96c238a",
+  "kpct_rule.py": "f3a87ed543b5d58fd87c944468cb1d614c3236b749b87c0cc876932751e6f1e4",
+  "bundle": "multitq_kpct_protocol_code.tgz"
+ },
+ "registered_utc": "2026-10-27T03:59:39Z",
+ "sha256": "0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7"
+}

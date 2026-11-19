@@ -1,0 +1,43 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "amendment_id": "B2",
+ "rule": "multitq_kpct_decision_rule.json",
+ "follows": {},
+ "registered_utc": "2026-10-27T06:06:27Z",
+ "decided_by": "the authors (user), answering the analysts' GPU-hour cap question after amendment B1's binding projection",
+ "status_at_registration": "No k% dev_sel2000 or test score of any LLM arm exists. The structural track has reported structural dev_sel2000 numbers (RULE_k, S_k) for selection; these do not involve any LLM arm or G_0.",
+ "change": {
+  "gpu_cap": {
+   "old": "40 GPU-h",
+   "new": "52 GPU-h"
+  },
+  "fallbacks_in_force": {
+   "old (B1)": [
+    "1. drop subset seeds 1-2 for P",
+    "2. drop GU at k = 5%",
+    "4. drop G_0"
+   ],
+   "new": [
+    "1. drop subset seeds 1-2 for P",
+    "2. drop GU at k = 5%"
+   ]
+  },
+  "restored": [
+   "G_0 (70B TP2 zero-shot guided reasoner, 3 prompt designs on dev_sel2000 + test)"
+  ]
+ },
+ "projection_after_change_gpu_h": {
+  "B1_in_force_total": 39.509,
+  "plus_G_0": 9.022,
+  "plus_margin_increase": "10% failure margin applies to G_0 as in B1",
+  "approx_total": 49.433,
+  "cap": 52
+ },
+ "unchanged": "Criteria, thresholds, statistic, arms other than G_0, selection discipline, test discipline, stop rules and run order. G_0 keeps its registered position (8) in the run order.",
+ "consequences": [
+  "G_0 becomes the training-free guided row comparable with AT2QA, ORACLE-T and SCoP",
+  "GU_5 stays NOT_RUN (KP2 at 5% NOT_RUN)",
+  "P_1 subset seeds 1-2 stay NOT_RUN (P SUBSET_ROBUST NOT_TESTED)"
+ ],
+ "sha256_of_body_without_this_field": "6aa0be9fa7f4c3918fdadc2bd1a03e4bf2f6b64e370d4d9b9df445978df8e033"
+}

@@ -1,0 +1,679 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "cronquestions",
+ "plan": "3b27f8dc (version efba9228), Phase 4 Cron setup",
+ "rule_version": "v1.1",
+ "question": "On CronQuestions (Wikidata TKG, year-interval facts), does the HR-FQA-derived LLM-free structural pipeline's learned re-ranker S beat its own rule-only operator baseline RULE when the system reads the question text only (OWN regime) on the fixed v2 test split, and how do S and RULE compare, descriptively, with the best published non-LLM and LLM systems stratified by gold-annotation use and dataset version?",
+ "status_at_registration": "No CronQuestions system has been built and no system output (train, dev or test) exists. Only dataset statistics (cronquestions_data_profile.json), the probe subsets (metadata and gold-entity based) and scorer self-tests on synthetic predictions have been computed.",
+ "data": {
+  "source": "CronKGQA official data release (README @ github.com/apoorvumang/CronKGQA 41a93de, 2022-02-23)",
+  "zip_sha256": {
+   "data_v2.zip": "0a2f77148977afb02a159b23cc942925b9455c98fcbe61ef164706324fd4734e",
+   "data.zip": "0ca493da7bc2fe196eafaa47ffaa58031d7a963c98143bbfcac97c092883ca30"
+  },
+  "versions": {
+   "v2": "data_v2.zip, {tail2} fixed; PRIMARY (authors' recommendation)",
+   "v1": "data.zip, original; SECONDARY (the published CronKGQA numbers were computed on it)"
+  },
+  "question_file_sha256": {
+   "v1": {
+    "train": "c46cde9aeb16cbdadfb5b28bc7ed866652d42852102787176924d221cfe32e82",
+    "valid": "df9d22f870ba64e6255d4c15ac66b6f8a75c9cc3463860af39104388bae1a27a",
+    "test": "0c3be77bafef9dfd130b60966ff9977eccbb9ba77e8e20225c6eb16c85a2e204"
+   },
+   "v2": {
+    "train": "66d3f4233be4cdbf55d1b475485bdbb2246f91837ff6e8319a6a4b21a8a947fe",
+    "valid": "1fceadcdac83a72d591f29d7f85198ac6b50a2ce7f0803e3534006c7149dd9fc",
+    "test": "9fed4b912e450305b34538e709c695704d0b830a74fd4e044a9d263757d10000"
+   }
+  },
+  "kg_file_sha256": {
+   "full.txt": "491a8b2ded719a65b74c54a2d2f5b9af12eaf29e924eeb33cf44ae5906b0eb60",
+   "test": "ca62b6c898b8de1eb74463031800dab1bc501d497e2be55cd4ebe8504c4e8c6a",
+   "tkbc_processed_data/wikidata_big/ent_id": "449d1ff3a41b85c25c33b9a62466a294c585b32cfdda93f0aeb2a8601cdefa01",
+   "tkbc_processed_data/wikidata_big/rel_id": "3bb27bf981101e393ca004d10f835d677b4e387e238c99ea4db98bfa27f229b0",
+   "tkbc_processed_data/wikidata_big/ts_id": "50917b20e0446aff1c06d040f2d3370caf4826d4a0c338fd98d787bfbbc91698",
+   "train": "8324bd9d6c5de73dd4404b9ffc0522afd6a973511a0baa8b94aab9e7247db43d",
+   "valid": "ddb917adaa6c73851eed9424600a7548bff5209ffe20f31521a86919ee064f81",
+   "wd_id2entity_text.txt": "e7c269c184f5b4303716d760193e41ffbd0491902a852d13f0826e7739f2fbe5",
+   "wd_id2relation_text.txt": "b8f692d22b0d089d259287d058c3a8521a3a096d68f3082b85bc11209bc87c8a",
+   "wd_id_to_aliases.pickle": "bd3fa6fe515276bf6cbb90ef91cf62c5c0c61d8e79199f13faf0e59a1afe4ccd"
+  },
+  "tarball": {
+   "file": "cronquestions_data.tar.gz",
+   "sha256": "d514215fa8126c83e158349050f0f37ab79b1442d7cf2c7bf1a8b6bead6f0f91"
+  },
+  "splits": {
+   "train": 350000,
+   "dev": 30000,
+   "test": 30000
+  },
+  "kg": "328,635 fact lines in full.txt (327,353 unique), 125,726 entities, 203 relations, year granularity, inclusive [start, end] intervals; ts_id has 9,621 year ids (0..9620); 1,643 distinct years occur at fact endpoints. KG files are byte-identical in v1 and v2. Systems use full.txt.",
+  "qid": "0-based position in questions/<split>.pickle; v1 and v2 are position-aligned. 'uniq_id' is not unique and is not used.",
+  "profile": {
+   "file": "cronquestions_data_profile.json"
+  }
+ },
+ "linking_regimes": {
+  "OWN": {
+   "status": "PRIMARY",
+   "inputs_at_dev_and_test_inference": [
+    "paraphrases[0] (the natural-language question; in v1 the literal '{tail2}' is part of the text and is left as is)",
+    "the KG: full.txt, wd_id2entity_text.txt, wd_id2relation_text.txt, wd_id_to_aliases.pickle, ent_id/rel_id/ts_id",
+    "KG-derived statistics computed by us",
+    "models trained on the train split under the rules below",
+    "pretrained LMs / sentence embedders (frozen or tuned on train)"
+   ],
+   "note": "The 'question' field is NOT a text input in this regime: it is the template filled with Wikidata ids, i.e. gold linking."
+  },
+  "GOLD-ANN": {
+   "status": "SECONDARY (matches the CronKGQA-family protocol: 'complete entity linking is assumed')",
+   "inputs_at_dev_and_test_inference": [
+    "everything allowed in OWN",
+    "'entities' (gold set of Wikidata ids)",
+    "'times' (gold set of years)",
+    "'question' (id-substituted text, which gives the gold mention positions, as CronKGQA's getEntitiesLocations uses)"
+   ],
+   "note": "In v1 the {tail2} entity is present in 'entities' although absent from the text, so GOLD-ANN systems receive it in both versions."
+  },
+  "forbidden_in_both_regimes": [
+   "annotation (slot roles head/tail/time/adj/type/event_head)",
+   "relations",
+   "template",
+   "type",
+   "answer_type",
+   "uniq_id (value or order)",
+   "answers",
+   "any feature derived from the fields above",
+   "test question text or test annotations for any training, tuning or unsupervised fitting",
+   "dev answers as a lookup table or as training examples for any per-entity, per-relation-instance or per-candidate parameter"
+  ],
+  "train_split": "All fields of train questions (including annotation, relations, template, type, answer_type, answers) may be used as training labels for the parser, linker, classifiers and ranker.",
+  "dev_split": "Dev answers may be used for model selection, early stopping and calibration of at most 20 scalar parameters in total per arm (e.g. thresholds, tie-break weights). Reason: dev and test share entity sets for 27,109 of 30,000 test questions (profile, overlap_dev_vs_test), so fitting entity-level parameters on dev would transfer test-relevant knowledge that the train/test entity-disjoint design excludes.",
+  "metadata_use": "type, answer_type and template are used only by the scorer and for probe strata."
+ },
+ "arms": {
+  "PRIOR": "Answer-type and frequency prior. Answer type predicted from the question text by the frozen parser. Entity answers: KG neighbours of the linked question entities ranked by co-occurrence count. Time answers: years covered by facts among the linked entities, ranked by frequency. No relation, no temporal operator. Deterministic, run once per regime and version.",
+  "RULE": "Frozen parser (entities and times, relation, reasoning type, answer type, temporal anchor) + candidate retrieval from the KG + deterministic interval operators over inclusive year intervals: simple_entity (fact valid at year t), simple_time (years of the fact interval), before_after (relative to the anchor fact or event interval), first_last (earliest start / latest end), time_join (interval overlap with the anchor fact). Candidates ordered by operator satisfaction, ties broken by fact frequency. No learned ranker. Deterministic, run once per regime and version.",
+  "S": "The RULE candidate pool (cap 1,000 per question) re-ranked by LightGBM lambdarank with HR-FQA-style features (operator satisfaction and margin, interval overlap and distance, first/last position, recurrence counts, relation-match confidence, answer-type match, PRIOR score). Trained on train questions only; 3 seeds (0, 1, 2) that vary only the LightGBM ranker; report mean and per seed.",
+  "regime_sharing": "Within a regime, PRIOR, RULE and S share one parser/linker trained once on train (seed 0). GOLD-ANN arms replace the linker's entity and time output by the gold 'entities' and 'times' and keep every other parser output.",
+  "diagnostics_not_arms": {
+   "LOOKUP_TRAIN": "For each test question, the most frequent train answers of the same template, ranked by train frequency. Deterministic. Bounds how far answer memorisation from train can go.",
+   "DEV_LOOKUP": "Answers of dev questions whose entity set equals the test question's, ranked by frequency (empty list otherwise). Quantifies the dev-test leakage that the dev_split clause forbids. Never used by any arm."
+  }
+ },
+ "selection_discipline": [
+  "Every hyper-parameter, epoch, pool size, feature set, threshold and calibration is chosen on dev (v2) only. The frozen models are applied unchanged to the v1 question text; there is no re-selection on v1 dev.",
+  "The parser/linker is trained once (seed 0) on train and frozen before the S ranker is trained.",
+  "The S ranker may be trained on a fixed train subsample of up to 100,000 questions stratified by type (seed 0; qid list saved before training).",
+  "Test predictions for ALL frozen arms and both diagnostics, in both regimes and both versions, are produced in one pass after every arm is frozen. Before scoring, cronquestions_freeze.json records the sha256 of every test prediction file, model file and config. The test split is then scored exactly once, on v2 and v1 together.",
+  "Nothing is changed after any test number is read. Anything added afterwards is labelled post hoc and is not decision-relevant.",
+  "Implementation details not fixed here may be amended before the freeze, with a dated provenance note in the amendment log; criteria, thresholds, regimes, arms and probes may not be amended.",
+  "Design changes to the linker or operators driven by dev errors are logged (date, change, dev metric before/after) in cronquestions_dev_log.md, so that a reader can assess dev-guided design."
+ ],
+ "criteria": {
+  "C1_structural_advance": {
+   "test": "S - RULE on v2 test Hits@1 (official CronKGQA semantics) in the OWN regime; S = per-question hit averaged over its 3 seeds",
+   "pass": "delta >= +0.020 AND paired-bootstrap 95% CI lower bound > 0 (same thresholds as MultiTQ M1)",
+   "labels": {
+    "pass": "GAIN",
+    "fail": "NO_GAIN"
+   },
+   "headroom_flag": "HEADROOM_LIMITED (descriptive, does not change the label) if 1 - RULE(OWN, v2, test Hits@1) < 0.040, i.e. the +0.020 threshold exceeds half of the remaining headroom. The relative error reduction (S - RULE) / (1 - RULE) is reported with its bootstrap CI.",
+   "secondary_descriptive": [
+    "S - RULE in GOLD-ANN on v2",
+    "S - RULE in OWN and GOLD-ANN on v1",
+    "RULE - PRIOR and S - PRIOR in each regime and version",
+    "OWN - GOLD-ANN per arm (the cost of own linking), v2 and v1",
+    "the same deltas for Hits@10"
+   ]
+  },
+  "C2_published_comparison": {
+   "type": "descriptive, cross-paper (different linking, scorers, data versions); no paired test, no PASS/FAIL",
+   "our_arms": "for each regime, the arm with the highest dev (v2) Hits@1 (seed mean), declared in cronquestions_freeze.json before the test pass; RULE is always shown as well",
+   "strata": {
+    "gold_annotation_use": [
+     "GOLD: uses the dataset's entity/time annotations (CronKGQA protocol)",
+     "OWN-like: links from text",
+     "unclear"
+    ],
+    "dataset_version": [
+     "v1: published before the fix (2022-02-23) or states data.zip",
+     "v2: states the fixed data",
+     "unstated: published after the fix without stating the version"
+    ],
+    "family": [
+     "non-LLM (PLM, embedding-based)",
+     "LLM-based"
+    ]
+   },
+   "matching": "OWN arms are set against OWN-like rows and GOLD-ANN arms against GOLD rows. Our v1 numbers are set against v1 and unstated rows; our v2 numbers against v2 rows (none known at registration) and, labelled 'version unknown', against unstated rows.",
+   "labels": "ABOVE_BEST_<stratum> iff the lower bound of our arm's test 95% CI exceeds the best published Hits@1 in that stratum; BELOW_BEST_<stratum> iff the upper bound is below it; otherwise WITHIN_CI. Descriptive only.",
+   "best_published_at_registration": {
+    "non-LLM overall": "QC-MHM 0.971 (GOLD, version unstated, AAAI 2024)",
+    "LLM overall": "TECQA 0.980 (OWN-like, version unstated, ACL 2026)",
+    "GOLD x non-LLM": "QC-MHM 0.971",
+    "GOLD x LLM": "GenTKGQA 0.978",
+    "OWN-like x non-LLM": "none found",
+    "OWN-like x LLM": "TECQA 0.980 (then ORACLE-T 0.944, Prog-TQA 0.937)",
+    "v1 (necessarily)": "TempoQR-Hard 0.918 (GOLD); CronKGQA 0.647 (GOLD)",
+    "v2 (stated)": "none found"
+   },
+   "published_rows_verified": [
+    {
+     "model": "BERT (CronKGQA paper)",
+     "group": "PLM",
+     "gold_annotation_use": "n/a (no KG)",
+     "dataset_version": "v1 (published before 2022-02-23)",
+     "hits@1": [
+      0.071,
+      0.052,
+      0.086,
+      0.077,
+      0.06
+     ],
+     "hits@10": [
+      0.213,
+      0.225,
+      0.205,
+      0.192,
+      0.253
+     ],
+     "source": "Saxena et al. ACL 2021, Table 5, PDF p.7",
+     "verification": "primary",
+     "note": "TempoQR, QC-MHM, TECQA and ORACLE-T instead list BERT 0.243/0.249/0.239/0.277/0.179 (TempoQR Table 2 re-run); the results track must state which row is used"
+    },
+    {
+     "model": "BERT (TempoQR re-run)",
+     "group": "PLM",
+     "gold_annotation_use": "n/a",
+     "dataset_version": "v1",
+     "hits@1": [
+      0.243,
+      0.249,
+      0.239,
+      0.277,
+      0.179
+     ],
+     "hits@10": [
+      0.62,
+      0.649,
+      0.598,
+      0.628,
+      0.604
+     ],
+     "source": "Mavromatis et al. arXiv 2112.05785 (AAAI 2022), Table 2, p.6",
+     "verification": "primary (arXiv version)"
+    },
+    {
+     "model": "EmbedKGQA",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD (perfect entity linking assumed)",
+     "dataset_version": "v1",
+     "hits@1": [
+      0.288,
+      0.29,
+      0.286,
+      0.411,
+      0.057
+     ],
+     "hits@10": [
+      0.672,
+      0.725,
+      0.632,
+      0.85,
+      0.341
+     ],
+     "source": "Saxena et al. ACL 2021, Table 5, PDF p.7",
+     "verification": "primary"
+    },
+    {
+     "model": "CronKGQA",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD (question entities/times from the dataset; 'complete entity linking is assumed')",
+     "dataset_version": "v1 (the paper's numbers are on data.zip, per the README)",
+     "hits@1": [
+      0.647,
+      0.987,
+      0.392,
+      0.699,
+      0.549
+     ],
+     "hits@10": [
+      0.884,
+      0.992,
+      0.802,
+      0.898,
+      0.857
+     ],
+     "source": "Saxena et al. ACL 2021, Table 5, PDF p.7",
+     "verification": "primary"
+    },
+    {
+     "model": "TempoQR-Soft",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD (annotated entities and timestamps)",
+     "dataset_version": "v1 (arXiv Dec 2021, before the fix)",
+     "hits@1": [
+      0.799,
+      0.99,
+      0.655,
+      0.876,
+      0.653
+     ],
+     "hits@10": [
+      0.957,
+      0.993,
+      0.93,
+      0.972,
+      0.929
+     ],
+     "source": "arXiv 2112.05785, Table 2, p.6",
+     "verification": "primary (arXiv version; AAAI OJS PDF not retrievable)"
+    },
+    {
+     "model": "TempoQR-Hard",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD (+ time scope retrieved from TKG facts of the annotated entities)",
+     "dataset_version": "v1",
+     "hits@1": [
+      0.918,
+      0.99,
+      0.864,
+      0.926,
+      0.903
+     ],
+     "hits@10": [
+      0.978,
+      0.993,
+      0.967,
+      0.98,
+      0.974
+     ],
+     "source": "arXiv 2112.05785, Table 2, p.6",
+     "verification": "primary (arXiv version)"
+    },
+    {
+     "model": "TSQA",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD presumed (CronKGQA setting; to confirm)",
+     "dataset_version": "unstated (ACL 2022)",
+     "hits@1": [
+      0.831,
+      0.987,
+      0.713,
+      0.829,
+      0.836
+     ],
+     "hits@10": [
+      0.98,
+      0.997,
+      0.968,
+      0.981,
+      0.978
+     ],
+     "source": "Shang et al. ACL 2022, Table 2, PDF p.8",
+     "verification": "primary"
+    },
+    {
+     "model": "QC-MHM",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD ('we obtain annotated entities ... from each question')",
+     "dataset_version": "unstated (AAAI 2024)",
+     "hits@1": [
+      0.971,
+      0.992,
+      0.946,
+      0.962,
+      0.966
+     ],
+     "hits@10": [
+      0.992,
+      0.998,
+      0.986,
+      0.993,
+      0.987
+     ],
+     "source": "Xue et al. arXiv 2402.13188 (AAAI 2024), Table 1, p.6",
+     "verification": "primary (arXiv version)"
+    },
+    {
+     "model": "SABET-QA",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD (gold mentions used when available)",
+     "dataset_version": "unstated (arXiv 2026)",
+     "hits@1": [
+      0.843,
+      0.989,
+      0.733,
+      0.882,
+      0.77
+     ],
+     "hits@10": [
+      0.969,
+      0.994,
+      0.953,
+      0.979,
+      0.954
+     ],
+     "source": "arXiv 2608.20083, CronQuestions table, p.7",
+     "verification": "primary"
+    },
+    {
+     "model": "SABET-QA-Hard",
+     "group": "embedding-based",
+     "gold_annotation_use": "GOLD (+ coarse temporal boundaries from facts of the question entities)",
+     "dataset_version": "unstated (arXiv 2026)",
+     "hits@1": [
+      0.954,
+      0.994,
+      0.926,
+      0.941,
+      0.98
+     ],
+     "hits@10": [
+      0.989,
+      0.996,
+      0.983,
+      0.986,
+      0.994
+     ],
+     "source": "arXiv 2608.20083, CronQuestions table, p.7",
+     "verification": "primary",
+     "note": "hard supervision may leak time answers through entity-fact boundaries (its own no-boundary variant is SABET-QA)"
+    },
+    {
+     "model": "GenTKGQA",
+     "group": "LLM-based (instruction-tuned open LLM + temporal GNN)",
+     "gold_annotation_use": "GOLD ('we mark the entities provided'; dataset 'annotated entities and timestamps')",
+     "dataset_version": "unstated (Findings ACL 2024)",
+     "hits@1": [
+      0.978,
+      0.999,
+      0.962,
+      0.967,
+      0.99
+     ],
+     "hits@10": [
+      0.983,
+      0.999,
+      0.971,
+      0.974,
+      0.994
+     ],
+     "source": "Gao et al. Findings ACL 2024, Table 1, PDF p.7",
+     "verification": "primary",
+     "note": "the OpenReview preprint prints different Entity/Time values; the published Findings version is used"
+    },
+    {
+     "model": "Prog-TQA",
+     "group": "LLM-based (fine-tuned LLM program generation)",
+     "gold_annotation_use": "OWN-like (similarity-based linking of LLM-extracted mentions)",
+     "dataset_version": "unstated (LREC-COLING 2024)",
+     "hits@1": [
+      0.937,
+      0.989,
+      0.898,
+      0.914,
+      0.982
+     ],
+     "hits@10": [
+      0.973,
+      0.993,
+      0.96,
+      0.968,
+      0.982
+     ],
+     "source": "Chen et al. arXiv 2404.01720, Table 3, p.7",
+     "verification": "primary (arXiv version)"
+    },
+    {
+     "model": "ORACLE-T",
+     "group": "LLM-based (zero-shot)",
+     "gold_annotation_use": "OWN-like (states no dataset-specific annotations)",
+     "dataset_version": "unstated (KBS 2026)",
+     "hits@1": [
+      0.944,
+      0.974,
+      0.921,
+      0.941,
+      0.948
+     ],
+     "hits@10": null,
+     "source": "Li et al. KBS 352 (2026) 116917, Table 1, p.8",
+     "verification": "primary"
+    },
+    {
+     "model": "TECQA",
+     "group": "LLM-based (training-free; Gemini-2.5-flash parsing, bge grounding, Qwen3-8B reasoning)",
+     "gold_annotation_use": "OWN-like (LLM mention extraction + embedding grounding; which text field is read is not stated)",
+     "dataset_version": "unstated (ACL 2026)",
+     "hits@1": [
+      0.98,
+      0.995,
+      0.969,
+      0.988,
+      0.965
+     ],
+     "hits@10": null,
+     "source": "ACL 2026 long 1361, Table 1, PDF p.6",
+     "verification": "primary"
+    }
+   ],
+   "rows_secondary_only_to_verify_in_results_track": [
+    {
+     "model": "LGQA",
+     "hits@1": [
+      0.969,
+      0.992,
+      0.945,
+      0.962,
+      0.966
+     ],
+     "as_printed_in": "TECQA Table 1",
+     "note": "Entity/Time identical to QC-MHM's; verify against Liu et al. IJCAI 2023"
+    },
+    {
+     "model": "CTRN",
+     "hits@1_as_printed_overall_complex_simple_entity_time": [
+      0.92,
+      0.869,
+      0.9,
+      0.921,
+      0.917
+     ],
+     "as_printed_in": "QC-MHM Table 1",
+     "note": "printed Simple 0.900 is below every other TKG-embedding row's Simple (>= 0.987); possible typo; verify against the CTRN paper"
+    },
+    {
+     "model": "TMA",
+     "hits@1": [
+      0.784,
+      0.987,
+      0.632,
+      0.792,
+      0.743
+     ],
+     "as_printed_in": "QC-MHM Table 1; Prog-TQA Table 3"
+    },
+    {
+     "model": "SAR",
+     "hits@1": [
+      0.917,
+      0.958,
+      0.76,
+      0.902,
+      0.947
+     ],
+     "as_printed_in": "ORACLE-T Table 1",
+     "note": "on MultiTQ SAR used a 560-question sample; check the CronQuestions protocol"
+    },
+    {
+     "model": "ARI",
+     "hits@1": [
+      0.707,
+      0.86,
+      0.57,
+      0.66,
+      0.8
+     ],
+     "as_printed_in": "ORACLE-T Table 1; TECQA Table 1",
+     "note": "ORACLE-T codes ARI as using dataset annotations"
+    },
+    {
+     "model": "TimeR4",
+     "hits@1": [
+      0.856,
+      0.963,
+      0.764,
+      0.788,
+      0.971
+     ],
+     "as_printed_in": "TECQA Table 1",
+     "note": "ORACLE-T marks CronQuestions as not reported in the TimeR4 paper; presumably a TECQA re-run"
+    },
+    {
+     "model": "TempAgent",
+     "hits@1": [
+      0.842,
+      0.895,
+      0.64,
+      0.805,
+      0.921
+     ],
+     "as_printed_in": "TECQA Table 1",
+     "note": "TempAgent sampled 1% and used an LLM judge on MultiTQ; check"
+    }
+   ],
+   "verification_note": "Values in published_rows_verified were read from the primary full text (page cited; column order checked against each table header, which is Overall, Complex, Simple, Entity, Time in CronKGQA, TempoQR, TSQA, QC-MHM, SABET-QA, GenTKGQA and Prog-TQA, and Overall, Simple, Complex, Entity, Time in TECQA and ORACLE-T; stored here in TECQA order). No paper among them states whether it used data.zip or data_v2.zip. The ORACLE-T CronQuestions block was used only as a lead; its rows agree with the primary papers for CronKGQA, Prog-TQA and EmbedKGQA. Its BERT and ALBERT rows are the TempoQR-style re-runs, not CronKGQA's BERT row.",
+   "results_track_todo": [
+    "verify LGQA, CTRN, TMA, SAR, ARI, TimeR4 and TempAgent CronQuestions numbers in their primary papers",
+    "search for entries after 2026-07 and for v2-stated results",
+    "code gold-annotation use and test-set coverage (full 30,000 vs sample; LLM-judge scoring) for every row",
+    "rows added after registration are descriptive and enter C2 only if verified in a primary full text"
+   ]
+  }
+ },
+ "generalisation_probes": {
+  "file": {
+   "name": "cronquestions_probe_subsets.json",
+   "sha256": "2d67192cc41cfd6d212458682d16369863dec42d9129758c03f30c05a236cca1"
+  },
+  "registered_now_with_test_sizes": {
+   "TAIL2": 1407,
+   "RARE_TEMPLATE_lt100": 1638,
+   "TEMPLATE_FREQ_100_499": 5841,
+   "TEMPLATE_FREQ_500_1999": 21434,
+   "TEMPLATE_FREQ_ge2000": 1087,
+   "ENT_SEEN_IN_TRAIN": 1404,
+   "ENT_NOVEL": 28596,
+   "UNSEEN_TEMPLATE": 0,
+   "UNSEEN_TEMPLATE_ENTSET": 30000,
+   "ENTSET_SEEN_IN_DEV": 27109,
+   "ENTSET_NOT_IN_DEV": 2891
+  },
+  "definitions": {
+   "TAIL2": "v1 paraphrases[0] contains the literal '{tail2}' (unfilled slot); v2 fills it. All are time_join / entity-answer questions. Score on both versions.",
+   "RARE_TEMPLATE_lt100": "template string occurs in < 100 train questions (cut fixed from the train template-frequency distribution: 193 of 654 templates)",
+   "TEMPLATE_FREQ_100_499": "template occurs in 100-499 train questions",
+   "TEMPLATE_FREQ_500_1999": "template occurs in 500-1,999 train questions",
+   "TEMPLATE_FREQ_ge2000": "template occurs in >= 2,000 train questions",
+   "ENT_SEEN_IN_TRAIN": ">= 1 gold question entity also occurs as a gold entity of some train question. The 10 shared entities are all event entities (e.g. World War II), and the subset coincides exactly with the event questions (annotation key 'event_head').",
+   "ENT_NOVEL": "no gold question entity occurs in any train question (complement of ENT_SEEN_IN_TRAIN)",
+   "UNSEEN_TEMPLATE": "template string never occurs in train. EMPTY on CronQuestions: every test template occurs in train.",
+   "UNSEEN_TEMPLATE_ENTSET": "(template, entity set) never occurs in train. Equals the full test split.",
+   "ENTSET_SEEN_IN_DEV": "the question's gold entity set equals the entity set of at least one dev question (dev-selection overlap probe)",
+   "ENTSET_NOT_IN_DEV": "complement of ENTSET_SEEN_IN_DEV"
+  },
+  "defined_now_sizes_at_scoring_time": {
+   "AMBIG_LABEL": "test question has a gold entity whose canonical label is shared by >= 2 KG entities",
+   "ALIAS_MENTION": "some gold entity of the question is not mentioned in paraphrases[0] by its canonical label (alias only)",
+   "NOVEL_ANSWER": "entity-answer question none of whose gold answers occurs as a gold answer of any train question",
+   "ANSWER_SET_SIZE": "|answers| = 1, 2-10, > 10"
+  },
+  "key_contrasts": [
+   "TAIL2: v2 - v1 per arm and regime (paired over the 1,407 questions); OWN v1 is expected to fail where the third entity is needed",
+   "RARE_TEMPLATE_lt100 vs the rest",
+   "ENT_SEEN_IN_TRAIN (event questions) vs ENT_NOVEL",
+   "ENTSET_SEEN_IN_DEV vs ENTSET_NOT_IN_DEV (dev-selection overlap)"
+  ],
+  "note": "The MultiTQ unseen-template probe cannot be formed on CronQuestions: every test template occurs in train and no test (template, entity set) occurs in train. Generalisation here is to unseen entities under seen templates, so template-frequency buckets replace the unseen-template probe.",
+  "statistics": "descriptive: Hits@1 and Hits@10 with bootstrap 95% CI (B = 1000) per probe; paired deltas for the key contrasts; no PASS/FAIL"
+ },
+ "statistic": {
+  "evaluator": "cronquestions_eval.py v1.0.0 (official CronKGQA semantics; sha256 8de90689a9d48d9dff1f49bccd995118e58120d3d771f2938e23e37dfb77c60b; )",
+  "primary": "Hits@1, full v2 test split (30,000 questions), OWN regime",
+  "secondary": "Hits@10; v1; GOLD-ANN",
+  "bootstrap": "paired Poisson(1) over test questions, B = 2000 (strata and probes B = 1000), seed 0; two-sided 95% percentile CI; one-sided p = share of bootstrap deltas <= 0",
+  "seeds": "S: 3 seeds; decisions use the per-question hit averaged over seeds; per-seed deltas reported",
+  "multiplicity": "C1 is a single primary test; every other comparison is descriptive and uncorrected"
+ },
+ "scorer": {
+  "file": "cronquestions_eval.py",
+  "sha256": "8de90689a9d48d9dff1f49bccd995118e58120d3d771f2938e23e37dfb77c60b",
+  "semantics": "official train_qa_model.py eval (CronKGQA @ 41a93de, lines 181-233): hit@k iff set(answers) & set(ranked[:k]) is non-empty; entity answers are Wikidata ids, time answers are int years; mean over all questions in pickle order; missing prediction = miss; strata type, simple/complex ('simple' in type), answer_type",
+  "only_deviation": "canonical decimal strings are converted to int years before matching (format conversion; --raw disables)",
+  "prediction_format": "JSONL {\"qid\": int, \"ranked\": [Wikidata id str | int year, ...]}, >= 10 distinct items",
+  "verified": "identical to a verbatim port of the official loop in every stratum on dev v1/v2 (oracle, uniform random, partial-rank regimes) and on test v1/v2 (oracle only; Hits@1 = 1.000 in every stratum)",
+  "selftest_artifact": {
+   "file": "cronquestions_eval_selftest.json"
+  }
+ },
+ "stop_rules": {
+  "DEV_HEADROOM": "If RULE (OWN, v2) dev Hits@1 > 0.980, the report states before the test pass that C1 GAIN is arithmetically out of reach if test behaves like dev; C1 is still run and labelled as registered.",
+  "STOP_RECALL": "If the dev (v2, OWN) candidate recall of the RULE pool (share of dev questions with >= 1 gold answer in the pool) is < 0.90, the report states this before the test pass; all arms still receive their registered test pass.",
+  "LINKING": "If the OWN linker's dev exact entity-set accuracy is < 0.90, OWN arms are flagged LINKING_LIMITED in the report; arms and criteria are unchanged."
+ },
+ "reporting_format": {
+  "hard_requirement": "TECQA-style table: Hits@1 | Overall | Question Type: Simple, Complex | Answer Type: Entity, Time; then the same layout for Hits@10. Rows grouped PLM / embedding-based / LLM-based, then ours in its own block ('supervised, no LLM'), each row tagged with linking (GOLD / OWN-like) and dataset version (v1 / v2 / unstated). Best in bold and second best underlined per column among rows evaluated on the full test split; sampled or LLM-judged rows are shown with a mark and not ranked.",
+  "supplementary": [
+   "Hits@1 and Hits@10 by the five types (CronKGQA Table 6 layout)",
+   "probe table (registered probes, both versions, both regimes)",
+   "ablation table PRIOR / RULE / S with paired deltas and CIs",
+   "diagnostics LOOKUP_TRAIN and DEV_LOOKUP"
+  ],
+  "test_reading": "Before the single test pass, test is read only for metadata counts. Worked cases and error analysis use dev questions only. Test results are reported as scorer aggregates (overall, strata, probes); no individual test question, prediction or answer is read or quoted."
+ },
+ "outcome_labels": [
+  "GAIN",
+  "NO_GAIN",
+  "HEADROOM_LIMITED",
+  "ABOVE_BEST_<stratum>",
+  "WITHIN_CI",
+  "BELOW_BEST_<stratum>",
+  "LINKING_LIMITED"
+ ],
+ "PASS": "C1 is the only decision criterion (GAIN / NO_GAIN). C2 and the probes are descriptive.",
+ "deliverables": [
+  "cronquestions_results.json (per arm, regime, version and stratum Hits@1/Hits@10 with CIs)",
+  "cronquestions_verdict.json",
+  "cronquestions_test_table (md/csv/tex) with published rows",
+  "cronquestions_report.md with fairness check and worked cases (dev)",
+  "Archive copy 12_cronquestions with MANIFEST"
+ ],
+ "template_rules": {
+  "multitq_decision_rule": "v1.1, sha256 8ccf9352b13f7200324b11d952b5124f0fdd96fc2bf6aa2bef6f9e0510284cef",
+  "multitq_amendment_A1": "pass-split precedent; not adopted here (single test pass)"
+ },
+ "sha256_recipe": "sha256 = SHA-256 of json.dumps({all keys except 'sha256'}, indent=1, sort_keys=True, default=str)",
+ "amendment_log": [
+  {
+   "utc": "2026-10-26T08:21:14Z",
+   "from": "v1.0",
+   "to": "v1.1",
+   "change": "Added pre_registration_test_access, which discloses test reads made before v1.0 was registered: one full test record (qid 0) printed during schema inspection, a type-and-count tally of test gold answers, and the scorer oracle check. Updated the profile reference to its corrected version f2ac2a99. No criterion, threshold, regime, arm, probe or statistic changed.",
+   "state_at_amendment": "no system built; no dev or test system output exists"
+  }
+ ],
+ "pre_registration_test_access": {
+  "statement": "Test access: statistics are on train/dev, except that test metadata (type, answer type, template), test gold entity annotations (overlap counts, probe subsets), the test question text ({tail2} count) and field-level v1/v2 equality of all 11 fields (including 'answers') were read. Beyond that, test answers were touched three times, all before the decision rule was registered and before any system existed: (1) during schema inspection one full test record (qid 0, v2) was printed, including its 6 gold answer ids and its annotation; (2) a format check printed the number of test gold answers by type (478,864 entity ids, 31,958 int years); (3) the scorer's oracle regime was run on test as a representability check. No other test answer value was displayed, and none was used to build anything.",
+  "qid_0_record": "[internal note removed in the anonymised copy]",
+  "excluded_reads": "No other test answer value was displayed. No dev or test system output exists."
+ },
+ "original_registration": {
+  "registered_utc": "2026-10-26T08:19:13Z",
+  "sha256": "8ad95933b06cb8ebe9c833765bba80ea40da4a46631a342a8fb9b1f73b6f505a"
+ },
+ "registered_utc": "2026-10-26T08:21:14Z",
+ "sha256": "02d2fb9da5a9a47612a54fe4b0017c41c535ce2de99f7b92e0a88ae75fec9631"
+}

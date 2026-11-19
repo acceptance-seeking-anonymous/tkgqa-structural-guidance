@@ -1,0 +1,358 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "title": "CronQuestions Structural track (Phase 5) -- implementation addendum to cronquestions_decision_rule.json v1.1",
+ "written_utc": "2026-10-26T08:48:16Z",
+ "state_at_writing": "No dev Hits@k, dev candidate recall or dev parser accuracy of any arm has been computed. Dev v2 paraphrases[0] have been passed through the template segmenter once (counts of fallback cases and hypothesis numbers only were printed; no dev gold compared). Two dev records (qid 0 and 100, including answers) were printed during schema inspection. Test has not been loaded. All design work so far used TRAIN only (operator derivation with oracle roles, linker development on train samples, out-of-fold checks).",
+ "parser": {
+  "frozen_utc": "2026-10-26T08:45:07Z",
+  "segmenter": "train-template skeleton matcher: the 654 v2 train template strings are split into literal parts and slots {head},{tail},{tail2},{time},{event_head}; a question text (whitespace-collapsed) is matched case-insensitively against every template whose first and last literal match, enumerating all literal positions (<= 20 splits per template). Time slots must be 1-4 digit numbers. Entity-slot fillers are looked up as whole strings in the surface dictionary. Hypothesis order: (unlinked entity slots, slots whose top alternative is role-incompatible with the template frame relation, no (head, r, tail) fact among the top-3 alternatives, -literal characters, -train template frequency). Top 3 hypotheses kept. If no template matches: dictionary longest-match fallback over capitalised spans + 3-4 digit years, with roles enumerated at retrieval time.",
+  "surface_dictionary": "KG only: norm(label) and norm(alias) for all 125,726 entities (wd_id2entity_text.txt, wd_id_to_aliases.pickle); norm = NFKD accent folding, lower case, word/punctuation tokenisation; 227,519 keys.",
+  "alternative_ranking": "LightGBM binary scorer over 13 KG-derived features per (slot, alternative): label vs alias, log degree, degree rank, number of homonyms, role compatibility with the template relation, log number of relation facts, (head, r, tail) pair support with the other slot's alternatives, validity of a relation fact at the parsed year, event flag, ambiguity of the other slots. No entity identity feature. Trained on train mentions with >= 2 alternatives (label = alternative in gold 'entities'); 2-fold OOF models for train features, full-train model for dev/test. 5 alternatives kept per mention. OOF top-1 on ambiguous train slots 0.948 (dictionary order 0.593).",
+  "classifier": "fastText-style bag of word 1-3-grams (min count 3, 2,559 n-grams) over entity-masked text (ENT / TIME), 96-d EmbeddingBag, heads relation (5), reasoning type (5), answer type (2), first/last (none/first/last), before/after (none/before/after); Adam 2e-3, batch 512, 6 epochs, seed 0. Labels from train relations/type/answer_type/annotation. 2-fold OOF (fold = numpy RandomState(0).randint(0,2)) for train S features; full-train model for dev/test. Train OOF accuracy: 1.000 on every head (before/after 0.99999).",
+  "versions": "all models trained on v2 train and applied unchanged to v1 text.",
+  "artefact_sha256": {
+   "alt_fold0.txt": "d1d887f3a7f775f695b1e69c2efa418dee0da2cf4837b6ccd29af6edb1dc9392",
+   "alt_fold1.txt": "8cd81de552d6d2ec236ef88d90bb5e86620660373bead93aa0b4cf3fc1a0c734",
+   "alt_full.txt": "dfbec6c25d405a993a94c7fa0dd40f163aff15a7c184101ab342d2fb3c17f964",
+   "clf_fold0.pt": "ef4dd18d0458f0061c776c3b3fd41b87517ff3ad65bcd73ae97d91170b060e37",
+   "clf_fold1.pt": "fead99d71e5c78877ff81508b197725a501092727f9e8be5a9ada72b627ccb32",
+   "clf_full.pt": "db2454bc8a78aa643afc2bb4605e3e50e0c1186d90704309d148601105709f0f",
+   "clf_vocab.pkl": "2fcac2f2b48d3688be915dda97d924c4a230cc9fa0984bb671b002aa1cd338d8",
+   "templates.pkl": "957a1a0702aa4a0314974595b4e58c168402f0155bbf67d0cf67ed27a826a65a",
+   "train_fold.npy": "64846c686f5a0353d94587eed2785dd143b40acda36ec9a09c6ead64255444d4"
+  }
+ },
+ "GOLD_ANN_mechanics": "segmenter run on the whitespace-collapsed id-substituted 'question' text; slots filled by Q-ids take that gold entity as the only alternative (score 1.0); in v1 the single unlinked slot ('{tail2}') receives the single gold entity not placed by the text; time slots take the gold year; when no template matches, gold entities fill 'unk' slots (roles enumerated) and gold times fill time slots. Classifier outputs (relation, type, answer type, first/last, before/after) are those of the OWN parse of paraphrases[0] ('keep every other parser output').",
+ "operator_semantics_train_oracle": {
+  "description": "derived on train with gold roles, relation, type, answer type and first/last/before/after (oracle); see cron_cand.py docstring",
+  "per_group": [
+   {
+    "type": "before_after",
+    "answer_type": "entity",
+    "relation": "P108",
+    "n": 464,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "before_after",
+    "answer_type": "entity",
+    "relation": "P26",
+    "n": 105,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "before_after",
+    "answer_type": "entity",
+    "relation": "P39",
+    "n": 20971,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "before_after",
+    "answer_type": "entity",
+    "relation": "P54",
+    "n": 2329,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "entity",
+    "relation": "P108",
+    "n": 2295,
+    "exact": 0.9991,
+    "hits1": 0.9996,
+    "recall": 0.9996,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "entity",
+    "relation": "P166",
+    "n": 31915,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "entity",
+    "relation": "P26",
+    "n": 2120,
+    "exact": 0.9991,
+    "hits1": 0.9991,
+    "recall": 0.9991,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "entity",
+    "relation": "P39",
+    "n": 2928,
+    "exact": 0.9969,
+    "hits1": 0.9969,
+    "recall": 0.9969,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "entity",
+    "relation": "P54",
+    "n": 16441,
+    "exact": 0.3315,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "time",
+    "relation": "P26",
+    "n": 1736,
+    "exact": 0.9988,
+    "hits1": 0.9988,
+    "recall": 0.9988,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "time",
+    "relation": "P39",
+    "n": 33715,
+    "exact": 0.9999,
+    "hits1": 0.9999,
+    "recall": 0.9999,
+    "empty": 0
+   },
+   {
+    "type": "first_last",
+    "answer_type": "time",
+    "relation": "P54",
+    "n": 27406,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_entity",
+    "answer_type": "entity",
+    "relation": "P108",
+    "n": 1625,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_entity",
+    "answer_type": "entity",
+    "relation": "P166",
+    "n": 36193,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_entity",
+    "answer_type": "entity",
+    "relation": "P26",
+    "n": 2622,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_entity",
+    "answer_type": "entity",
+    "relation": "P39",
+    "n": 13864,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_entity",
+    "answer_type": "entity",
+    "relation": "P54",
+    "n": 36347,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_time",
+    "answer_type": "time",
+    "relation": "P108",
+    "n": 2044,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_time",
+    "answer_type": "time",
+    "relation": "P166",
+    "n": 28611,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_time",
+    "answer_type": "time",
+    "relation": "P26",
+    "n": 1557,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_time",
+    "answer_type": "time",
+    "relation": "P39",
+    "n": 13255,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "simple_time",
+    "answer_type": "time",
+    "relation": "P54",
+    "n": 16004,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "time_join",
+    "answer_type": "entity",
+    "relation": "P108",
+    "n": 1043,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "time_join",
+    "answer_type": "entity",
+    "relation": "P39",
+    "n": 31330,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "time_join",
+    "answer_type": "entity",
+    "relation": "P54",
+    "n": 23080,
+    "exact": 1.0,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   },
+   {
+    "type": "ALL",
+    "answer_type": "",
+    "relation": "",
+    "n": 350000,
+    "exact": 0.9685,
+    "hits1": 1.0,
+    "recall": 1.0,
+    "empty": 0
+   }
+  ]
+ },
+ "retrieval": {
+  "segmentation_hypotheses": 2,
+  "relation_hypotheses": 2,
+  "alternative_combinations": "top-3 alternatives per entity slot, combinations ordered by rank sum, first 6",
+  "pool_cap": 1000,
+  "near_candidates": "non-satisfying members of the same fact slices (group members, other years of the head's facts, adjacent years)",
+  "note": "fixed a priori, not tuned on dev"
+ },
+ "RULE_ordering": "per candidate, the minimum over hypotheses of (operator not satisfied, segmentation rank, relation rank, alternative-combination rank sum, operator distance in years, -number of supporting facts), then the Wikidata id / year string. Deterministic.",
+ "PRIOR": "as registered; primary alternative of every entity slot of the top segmentation hypothesis; entity answers = KG neighbours ranked by number of connecting facts; time answers = years covered by facts of the linked entities ranked by number of covering facts; ties by id/year string.",
+ "output_lists": "top-50 distinct items (Wikidata id strings, int years); RULE/S/PRIOR padded to >= 10 with PRIOR items, then the most frequent train answers of the predicted answer type.",
+ "S": {
+  "model": "LightGBM 4.6 lambdarank, features cron_cand.FEATS (39 features: the HR-FQA-style structural features plus interval features ov_len, s_rel, e_rel, iv_len, is_start, is_end, cover_cnt, side_ok)",
+  "features": [
+   "is_time",
+   "sat_top",
+   "sat_any",
+   "best_seg",
+   "best_rel_rank",
+   "best_relp",
+   "sum_relp_sat",
+   "alt_rank",
+   "alt_score",
+   "alt_margin",
+   "n_sat_hyp",
+   "q_ncand_sat",
+   "op_dist",
+   "ov_len",
+   "s_rel",
+   "e_rel",
+   "pos",
+   "pos_rel",
+   "n_support",
+   "is_qent",
+   "log_deg",
+   "log_prior",
+   "qt_p",
+   "atype_p",
+   "adj_p",
+   "ba_p",
+   "rel1_p",
+   "rel_margin",
+   "n_ment",
+   "n_seg",
+   "is_fallback",
+   "tmpl_logfreq",
+   "is_start",
+   "is_end",
+   "cover_cnt",
+   "anchor_found",
+   "side_ok",
+   "iv_len",
+   "grp_size"
+  ],
+  "train_subsample": "100,000 v2 train qids, type-stratified (s_train100k_qids.json, sha256 b82b533829834b6b27f5f73ad8e19087a6ef29e88a999b0a042ecd933d980e3e)",
+  "train_features": "OOF alternative scorer and OOF classifier probabilities; GOLD-ANN S trained on the GOLD-ANN parse of the same train qids",
+  "train_candidates": "RULE top-200 of the pool; questions without a positive dropped",
+  "label": "1 iff the candidate item is in the gold answer set (official matching)",
+  "grid_on_dev": "num_leaves {31,63,127} x learning_rate {0.05,0.1}; min_data_in_leaf 100, feature_fraction 0.8, bagging_fraction 0.8 (freq 1), lambdarank_truncation_level 20; up to 2000 rounds, early stopping 100 on dev v2 ndcg@1; selection by dev v2 Hits@1 at seed 0; then seeds 0,1,2 with the selected configuration and its seed-0 best iteration. One S per regime (OWN, GOLD-ANN). Dev-fitted scalars per S arm: 3 (num_leaves, learning_rate, rounds).",
+  "scoring": "all pool candidates scored; ties broken by RULE order"
+ },
+ "diagnostics": {
+  "LOOKUP_TRAIN": "answers of train questions whose template equals the PARSER-PREDICTED template (top segmentation hypothesis on paraphrases[0] in OWN, on the 'question' field in GOLD-ANN), ranked by train frequency, ties by string; top 50; the gold template field of dev/test is not read.",
+  "DEV_LOOKUP": "answers of dev v2 questions whose gold entity set equals the question's entity set (OWN: primary alternatives of the top hypothesis; GOLD-ANN: gold 'entities'), ranked by frequency; empty otherwise; on dev the question itself is excluded (leave-one-out)."
+ },
+ "test_discipline": "test pickles are loaded through a field filter that keeps only paraphrases, question, entities and times; answers, annotation, relations, template, type, answer_type and uniq_id are dropped on load. Test predictions for all arms and diagnostics are written in one pass after all models are frozen; nothing is scored.",
+ "dev_log": "cronquestions_dev_log.md records every dev-guided change (date, change, dev metric before/after)."
+}

@@ -1,0 +1,12 @@
+{
+ "P_5_lora0": {
+  "parser/test/k05_s0/pred_P_k05_s0_test_ep1_tauoff_seed0.jsonl": "",
+  "parser/test/k05_s0/pred_P_k05_s0_test_ep1_tauoff_seed1.jsonl": "",
+  "parser/test/k05_s0/pred_P_k05_s0_test_ep1_tauoff_seed2.jsonl": ""
+ },
+ "P_1_lora0": {
+  "parser/test/k01_s0/pred_P_k01_s0_test_ep3_tauoff_seed0.jsonl": "",
+  "parser/test/k01_s0/pred_P_k01_s0_test_ep3_tauoff_seed1.jsonl": "",
+  "parser/test/k01_s0/pred_P_k01_s0_test_ep3_tauoff_seed2.jsonl": ""
+ }
+}

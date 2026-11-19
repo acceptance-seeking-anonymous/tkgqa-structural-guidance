@@ -1,0 +1,37 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_robustness_R2",
+ "amendment_id": "A2",
+ "amends": {
+  "rule": {
+   "filename": "multitq_robustness_rule_R2.json",
+   "registered_utc": "2026-10-29T07:16:55Z",
+   "sha256": "c69d8f072e1c00268adf18231e1d22d24c93748f88224366e3775b640ddc516f"
+  },
+  "A1": {
+   "filename": "multitq_robustness_rule_R2_amendment_A1.json",
+   "registered_utc": "2026-10-29T07:23:25Z",
+   "sha256": "1b473db99f591a1c495f0f900390047d1b06d1023854c75827df14ad9958c352"
+  }
+ },
+ "supersedes": "the audit part of A1 (single-annotator audit of sheet rows 1-100, tipping-point labels AUDIT_ROBUST / AUDIT_SENSITIVE, audited-subset estimate) and the rule's blinding clause 'no Hits on R2 until the sheet returns'. A1's PRIMARY set (all judge-accepted rewrites) is kept.",
+ "reason": "On R1, adversarially removing 23-35 of 569 rewrites (4.0-6.2%) breaks the Holm test of drop(G_k) - drop(P_k) > 0, and invalid rewrites plausibly favour the parser (it snaps to the original template). The rewrites that drive the contrast must therefore be reviewed, not only a random sample. Mirrors the R1 audit protocol v2.",
+ "status_at_amendment": "as in A1: sample and pool drawn, prompts written, weights downloading; no R2 rewrite, judge call, prediction or score exists",
+ "design": {
+  "PRIMARY": "unchanged from A1: H1-H3 (drop(G_k) - drop(P_k) > 0, k = 1, 5, 100) on all judge-accepted R2 rewrites; paired Poisson(1) bootstrap B = 10,000, seed 20261029; one-sided p = share of bootstrap means <= 0; Holm over the three; CONFIRMED iff Holm-adjusted p < 0.05, else NOT_CONFIRMED; LOW_N if n < 200. Secondary descriptive analyses unchanged.",
+  "blinding_and_order": "1) generate, check and judge the rewrites and freeze the perturbed set; 2) run all frozen arms; 3) save the sha256 freeze of every R2 prediction file as an artifact; 4) only then score: the PRIMARY H1-H3 (final; no longer wait for the audit), the secondaries, and the per-question contrasts c_k(q) = drop(G_k)(q) - drop(P_k)(q), with S and P hits averaged over their 3 S-seed files and G at seed 0, as in R1; 5) build the audit kit from c_k. The annotator never sees predictions, hits, c_k, the judge output or the selection flags.",
+  "audit_selection": "T = every judge-accepted rewrite with c_k(q) > 0 at any k in {1, 5, 100}. R = a simple random sample of 100 judge-accepted rewrites: sorted(quids)[i] for i in numpy.random.default_rng([20261029, 7]).choice(n, size = min(100, n), replace = False). Audit set = T union R. Presentation: numpy.random.default_rng([20261029, 8]).permutation over the audit set in ascending quid order; audit ids A001, A002, ... in that order; no column shows targeted vs random. Analyst-only selection key (audit_id, quid, in_random100, in_targeted, favourP_k1, favourP_k5, favourP_k100) in key_do_not_open_before_review/.",
+  "annotator": "single annotator (one author), blind to model outputs, hits, the judge output, the key and the selection flags; reviews every audit row",
+  "accept_rule": "same_answer_set == Y and same_constraint_time == Y; N, unsure or blank = not accepted",
+  "audit_analyses": {
+   "random100": "acceptance rate of R with Wilson 95% CI (z = 1.959964), and the rejection rate with its Wilson CI",
+   "targeted": "acceptance rate of T with Wilson 95% CI",
+   "BOUND": "H1-H3 recomputed on the judge-accepted rewrites minus the human-rejected rows (same bootstrap B = 10,000, seed 20261029, one-sided, Holm over k); BOUND_HOLDS iff the Holm-adjusted p < 0.05, else BOUND_FAILS. The scorer asserts that every unreviewed row has c_k <= 0 at every k, so the unreviewed rows cannot create a positive contrast.",
+   "descriptive": "contrasts on the audited-and-accepted rows only; per-arm drops after removing the rejected rows; the pre-review adversarial tipping point per k (A1 algorithm, no label)"
+  },
+  "paper_wording": "'human-audited by one author: all rewrites on which the parser outperformed the reader plus a random 100'",
+  "kit": "drafts/manuscripts/pakdd2027/dossier_2026-10-28/review_kit_R2/ with AUDIT_R2_INSTRUCTIONS.md (modelled on review_kit/AUDIT_R1_INSTRUCTIONS.md), the audit sheet (.xlsx and .csv), and analyst-only files (selection key, gold, scorer, protocol) in key_do_not_open_before_review/"
+ },
+ "registered_utc": "2026-10-29T07:29:32Z",
+ "sha256": "3a983399831ba23c7986e905b224fabc69be3b6e32ca419cb089fbd357756786"
+}

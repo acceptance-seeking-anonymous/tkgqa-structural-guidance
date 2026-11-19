@@ -1,0 +1,124 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "track": "multitq_normalizer",
+ "rule_version": "v1.0",
+ "nature": "REGISTERED protocol of the question-normalizer method track. A LoRA normalizer N on Llama-3.1-8B-Instruct maps a question to benchmark-style wording and is placed in front of the UNCHANGED frozen pipeline (Rules, Ranker, Parser, Reader). Registered before any normalizer training, generation or scoring.",
+ "question": "Does putting a question normalizer (trained on the 5% training list only) in front of the unchanged pipeline reduce the Hits@1 loss under LLM rewording (R3, secondary per the R3 rule) and raise Hits@1 on rewrites, at each fitting level 5 and 100, and what does it cost on the original wording of the official test split?",
+ "parent_documents": {
+  "R3_rule": "(sha256 c5f79938...), amendments A1, A2, A3",
+  "R3_set": "(frozen file of the reported run)",
+  "R3_frozen_predictions": "(frozen file of the reported run)",
+  "R3_freeze": "(frozen file of the reported run)",
+  "dev_paraphrase_set": "(frozen file of the reported run)",
+  "dev_per_question_hits": "(frozen file of the reported run)",
+  "dev_results": "(frozen file of the reported run)",
+  "training_paraphrase_set": "(frozen file of the reported run)",
+  "kpct_rule": "(frozen file of the reported run)",
+  "kpct_subsets": "(frozen file of the reported run)",
+  "test_per_question_hits": "(frozen file of the reported run)",
+  "evaluator": "(multitq_eval.py sha256 1f85bbdc...)",
+  "R1": "rule, set, predictions",
+  "R2": "rule (+ A1 86c40986..., A2 26093e75...), set, predictions, freeze"
+ },
+ "status_at_registration": {
+  "outputs": "None: no normalizer adapter, no normalizer output, no pipeline run on normalized text, no score of any normalizer configuration exists.",
+  "work_before_registration": "Read the R3 rule and amendments, the R3 probe report, the frozen code (kpct parser / guided code, R3 code); extracted question TEXT of train.json (5% list), dev.json and test.json from a local copy of the dataset (sha256 train 89ce10b4..., dev ad0dfe7c..., test d9bf3bf2...; answers not read); built the training pairs and the text-only item files below; measured the guard pass rate on the TRAINING pairs only (paraphrase -> its own original): after splitting 'A and B' name runs and removing possessives, 17,034 / 17,146 pass, 112 fall back (adjective/demonym forms, e.g. 'South African' -> 'of South Africa'); read the 4090 LoRA throughput of an earlier track (parser seed track: 1.12 s/step at train_tok 768, peak 22.7 GB).",
+  "known_numbers": "The frozen arms' dev ORIG / dev paraphrase Hits@1 (R3 probe report) and the full-test k% results (aggregate) are known to the designers. R3 Hits are not known to anyone (R3 rule)."
+ },
+ "test_reuse": "Official MultiTQ test split (questions/test.json sha256 d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee), reused; R3 / R1 / R2 are rewrites of official test questions. Nothing is trained or selected on test, R1, R2 or R3.",
+ "normalizer": {
+  "model": "meta-llama/Llama-3.1-8B-Instruct (HF cache on the second GPU host), LoRA",
+  "training_data": {
+   "source": "the 5% training list only (k05_s0, n = 19,339, sha256 0a840365...); training paraphrases = multitq_train5pct_paraphrase_set.json (Qwen2.5-72B-Instruct-AWQ, 18,000 generated = registered-order prefix, A3), mechanically valid rows only (17,146)",
+   "pairs": "(Qwen paraphrase -> original question) for the 17,146 mech_ok rows + identity pairs (original -> original) for the SAME 17,146 questions; ratio paraphrase : identity = 1 : 1; 34,292 examples (nm_common.training_pairs)",
+   "file": "inputs/train_pairs_k05.jsonl sha256 e2e39f1bb2031d25a23e9341f7b85b0a5ae2d404546a2de978d62a0415463cc5",
+   "never_used": "dev, test, R1, R2, R3 questions; the 854 mechanically invalid and the 1,339 not generated k05_s0 questions"
+  },
+  "prompt": "one user turn = nm_common.N_HEAD + '\\nQuestion: {question}\\n' (sha256 of head|template f5ae9ba67421649de4be82ea26e7bf22c894a66dacdbfc34c1a63cfdfa39daeb); Llama-3.1 chat template with the fixed date_string '26 Jul 2024' (as the frozen Reader/Parser); target = the original question text + <|eot_id|>",
+  "recipe": "frozen Reader/Parser LoRA recipe (pk_train.py / gk_train.py loop): r 16, alpha 32, dropout 0.05 on q,k,v,o,gate,up,down; AdamW lr 2e-4, weight decay 0, cosine schedule, 3% warm-up, grad clip 1.0, effective batch 16, bf16; loss on answer tokens only; seed 0 (LoRA init and data order: per-epoch permutation default_rng(1000*seed + 7 + epoch), length-sorted chunks of 64 batches); max length 512 (short sequences); micro-batch padded-token limit 768 (24 GB card); no gradient checkpointing; peft 0.21.2, transformers 5.13.1 (tkgqa-gpu:latest on the second GPU host)",
+  "epochs_and_checkpoints": "E = 2 (the recipe's E_max for the 5% list); adapters saved at epoch 0.5, 1 and 2 = the three candidate checkpoints. Registered epoch rule after a 40-step dry run (adapter discarded): E = 2 if the projected two-epoch training time <= 1.5 h and spent + projection <= 4.5 - 1.0, else E = 1 (checkpoints ep0.5, ep1)",
+  "inference": "vLLM 0.10.2 (image vllm/vllm-openai:v0.10.2 on the second GPU host RTX 4090), bf16, LoRARequest, max_model_len 512, gpu_memory_utilization 0.85, greedy (temperature 0, seed 0), max 128 new tokens, stop at <|eot_id|>; prompt token ids of 50 training inputs must equal the training-time ids (else exit, tokenizer mismatch). Same engine and settings for dev, test, R1, R2, R3."
+ },
+ "guard": {
+  "definition": "nm_common.guard / final_text, gold-free and text-only, applied to the raw output y for input x. If y (stripped) equals x: unchanged. Otherwise y is used only if it passes: W well-formed / parseable (non-empty, one line, ends with '?', len(y) <= 2.5 len(x), finish_reason 'stop'); E names (every name piece of x = rob_common.protected_chunks with possessive removed and 'A and B' runs split, verbatim in y); T dates (frozen mtq_lib.parse_time: the time string of x verbatim in y with the same granularity and value; no time added if x has none); otherwise FALLBACK to x.",
+  "grid": "guard variant in {A = W+E+T, B = A + no new name pieces in y}; overlap floor tau in {0 (off), 0.2} (token Jaccard(x, y) >= tau); 4 guard settings (nm_common.GUARD_GRID)",
+  "fallback_text": "the input question itself (so the pipeline sees exactly what the baseline saw)"
+ },
+ "identity_reuse": {
+  "rule": "nm_common.reuse_source: if the final text equals the input, the arm's prediction is its FROZEN prediction on that input (official full-test file / dev_sel2000 selection file / frozen R1, R2, R3 rewrite predictions / frozen DEV_ACCEPTED paraphrase predictions); if a rewrite is normalized to exactly its own original question, the frozen ORIG prediction is used; every other final text is run through the unchanged frozen pipeline. Justification: the pipeline is a function of the question text (R1 rule arms.synthetic_quids), the structural rebuild is exact (R3 I1 = 1.000), and the R3 rule already uses frozen predictions as the ORIG reference.",
+  "consequence": "the per-question contrast is exactly 0 for every question whose text the normalizer leaves unchanged or sends back by fallback",
+  "identity_control": "200 control rows per root (synthetic quid 10q+0, original text) run with the normalized rows: dev controls = sorted(dev_sel2000)[i], i in default_rng([20261118, 21]).choice(2000, 200, replace=False); test controls = sorted(test quids)[i], i in default_rng([20261118, 22]).choice(54584, 200, replace=False). Structural RULE and S top-1 agreement with the frozen files >= 0.995 at k05_s0 and k100 (rob_build I1), else STOP_PIPELINE_DRIFT (one logged bug fix allowed). G / P top-1 agreement on the controls is reported (descriptive; expected >= 0.99 from an earlier spot check and R2 I2).",
+  "synthetic_quids": "normalized texts needing a run: 10 * quid + v, v = 1..9 in sorted-text order per quid (nm_common.assign_squids); deduplicated across items and checkpoints"
+ },
+ "pipeline_on_normalized_text": {
+  "levels": "5 (k05_s0) and 100 (k100). Level 1 is not run: N is fitted on the 5% list, so N + a 1% arm is not a 1%-level method.",
+  "arms": "RULE_5, RULE_100, S_5, S_100 (Ranker, LightGBM seeds 0-2) from the structural rebuild (frozen R1 rob_build.py sha256 0400d972..., CPU); Parser P_5, P_100 (frozen pk_infer.py + pk_execute.py, adapters P_k05_s0_s0/ep1 and P_k100_s0/ep0.5, tau off, fallback = the variant's own S_k lists, 3 S seeds); Reader G_5, G_100 (frozen gk_infer.py, adapters G_k05_s0_ordS_s0/ep2, G_k100_ordS_s0/ep1, order S). Exactly the R3 jobBC3 invocations (vLLM gpu_mem 0.40) on one card of the GPU host, one container per arm (nm_run_card.sh).",
+  "integrity": "nm_verify.py: sha256 of every frozen adapter, code and prediction file listed in the R3 freezes (expected_sha_r3.json, expected_sha_dev.json) and of rob_build.py before any run; mismatch = STOP_TEST_INTEGRITY",
+  "per_question_hits": "S and P: mean over the 3 S-seed files; RULE and G: single file"
+ },
+ "dev_selection": {
+  "data": "dev_sel2000 ORIG (2,000 questions) and DEV_ACCEPTED paraphrases (1,762) only (inputs/dev_items.jsonl sha256 31f7c23b...); dev gold of these quids; never R1, R2, R3 or test",
+  "candidates": "3 checkpoints (ep0.5, ep1, ep2) x 4 guard settings = 12 configurations; one normalizer decoding session over all dev items for the 3 checkpoints; G_5 and P_5 run once on the union of distinct changed texts",
+  "objective": "J = 0.5 * Hits@1(N + P_5, DEV_ACCEPTED paraphrases; mean over 3 S seeds) + 0.5 * Hits@1(N + G_5, DEV_ACCEPTED paraphrases)",
+  "constraint": "dev-original loss <= 0.3 points for BOTH arms: Hits@1(P_5, dev ORIG 2,000) - Hits@1(N + P_5, dev ORIG) <= 0.003 and the same for G_5 (baselines = frozen dev_sel2000 hits)",
+  "choice": "max J among feasible configurations; ties (|dJ| < 0.0005) -> earlier checkpoint, then guard B before A, then larger tau (closer to the baseline). No feasible configuration -> the one with the smallest dev-original loss (same tie order), flagged CONSTRAINT_UNMET; the test pass then still runs and every outcome label carries the flag (nm_common.objective / select)",
+  "reported_per_candidate": "J, Hits@1 dev ORIG and DEV_ACCEPTED for N+P_5 and N+G_5, change rate, fallback rate (by guard reason) and unchanged rate on dev ORIG and on dev paraphrases, exact-match rate of the normalized dev paraphrase vs the original dev question (exact string; and after lower-casing / punctuation removal) - diagnostic",
+  "written_before": "this rule is registered before any dev normalizer output exists"
+ },
+ "test_pass": {
+  "freeze": "after selection: N fixed (adapter sha256 recorded); ONE normalizer decoding session over all test items (inputs/test_items.jsonl sha256 52d96760...: 54,584 official test questions + 578 R3 PRIMARY rewrites + 569 R1 P3 accepted rewrites + 570 R2 accepted rewrites = 56,301 inputs); guard applied; the unchanged pipeline run on the texts needing a run; sha256 of every normalized-question file and prediction file written into multitq_normalizer_freeze.json and saved as a file BEFORE the single scoring pass",
+  "cut_order": "GPU items in the order G_5 -> P session (P_5 + P_100) -> G_100; before each item spent + projection <= 4.5 GPU-h else NOT_RUN: G_100 is dropped first, then P_100 (P_5 alone if only it fits); structural arms are CPU and always run",
+  "scoring": "ONE registered pass (nm_score.py, sha256 recorded in the freeze before it runs) with the official multitq_eval.hit_at_k and test.json answers; baseline and method R3 hits computed together in that pass (R3 rule)"
+ },
+ "statistics": {
+  "methods": "NR = N + RULE, NS = N + S, NP = N + P, NG = N + G; baseline of each = the same frozen arm without N, at the same level",
+  "R3_secondary (registered R3 analysis plan)": "R3 PRIMARY (578): for each method and level k in {5, 100}: Hits@1 on the full official test (method and baseline), Hits@1 on R3 ORIG and R3 rewrites, drop = ORIG - rewrite per question; c_drop = drop_b - drop_m (H_drop, 'm loses less'), c_rw = Hits@1_RW,m - Hits@1_RW,b (H_rw, 'm scores higher on R3'); r3_common.method_tests: paired Poisson(1) bootstrap of the mean contrast (r2_common.summarise), B = 10,000, seed 20261118, one-sided p = share of bootstrap means <= 0, two-sided 95% percentile CI and one-sided 95% lower bound; Holm within each method over its 4 tests (2 levels x {H_drop, H_rw}) at alpha 0.05; SUPPORTED / NOT_SUPPORTED. ORIG of the baseline = frozen official test predictions; ORIG of the method = N applied to the original question (from the full-test pass).",
+  "original_test_cost": "for every arm and level: d(q) = Hits@1(N + arm) - Hits@1(arm) over all 54,584 test questions; paired Poisson(1) bootstrap (r2_common.summarise, B = 10,000, seed 20261118), two-sided 95% CI; label NONINFERIOR iff CI lower bound >= -0.003, INFERIOR iff CI upper bound < -0.003, else INCONCLUSIVE; Hits@10 reported alongside",
+  "R1_R2_descriptive": "the same contrasts on R1 P3 accepted rewrites (569; generator = the API LLM (API LLM)) and R2 accepted rewrites (570; generator Qwen2.5-72B-Instruct-AWQ = the generator of the normalizer's training paraphrases -> labelled GENERATOR_MATCHED); B = 10,000, seed 20261118; unadjusted one-sided p, no labels; ORIG reference = frozen official test predictions (the R3 convention; the registered R1/R2 drops used re-run ORIG predictions, so their per-arm drops can differ slightly and are never replaced)",
+  "gold_free_diagnostics": "change / fallback / unchanged rates by input class (test ORIG, R3, R1, R2) and guard reason; share of rewrites normalized to exactly their original question"
+ },
+ "outcome_labels": {
+  "per_arm_level": "ROBUSTNESS_GAIN iff H_rw SUPPORTED (Holm, R3) and original_test_cost NONINFERIOR; GAIN_WITH_COST iff H_rw SUPPORTED and cost not NONINFERIOR; NO_GAIN iff H_rw NOT_SUPPORTED. H_drop is reported next to it. With CONSTRAINT_UNMET at selection every label carries that flag.",
+  "status": "R3 evidence is SECONDARY (robustness), never the paper's primary test result"
+ },
+ "selection_discipline": "every checkpoint, guard variant and threshold chosen on dev_sel2000 ORIG + DEV_ACCEPTED only, by the registered objective above; no change after any test, R1, R2 or R3 number is read; anything not listed here is POST_HOC and not decision-relevant; registered results of other tracks are never changed",
+ "stop_rules": {
+  "STOP_GPU_CAP": "cut order above; unrun items NOT_RUN and declared",
+  "STOP_GPU_SHARING": "one container per card; any other compute process on the card -> wait (nm_run_card.sh)",
+  "STOP_TEST_INTEGRITY": "frozen adapter / code / prediction sha256 mismatch",
+  "STOP_PIPELINE_DRIFT": "identity-control I1 top-1 < 0.995 for RULE or S at any level",
+  "STOP_TOKENIZER": "probe prompt ids differ between training and inference",
+  "DEADLINE": "all normalizer compute finished by Fri 21 Nov 2026 (R3 rule deadline); unfinished items NOT_RUN"
+ },
+ "deviations_known_at_registration": [
+  "Level 1 not run (N is fitted on the 5% list).",
+  "R1 P1 / P2 deterministic perturbations not included (the task's rewrite probes are the LLM rewrites R1 P3, R2, R3).",
+  "Training paraphrases cover 18,000 of the 19,339 5% questions (A3 prefix); 17,146 mechanically valid are used.",
+  "Normalizer decoding runs on the second GPU host RTX 4090 (vLLM 0.10.2 image) while the frozen arms run on the GPU host; the frozen arms' hardware is unchanged."
+ ],
+ "code_sha256": {
+  "mtq_lib.py": "471da9d3fd6efbe16590f143352398d0816b4877bd07b71ded258e6a4e44e29f",
+  "multitq_eval.py": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69",
+  "nm_common.py": "c28adf1fac28515fb59c9885d6186cfcb5aeaf67eec0687181482c9b69c0180f",
+  "nm_infer.py": "1478de3f509c87eba07d86e20c1c749310836f1124a671c5c61b87eadcd3dac7",
+  "nm_train.py": "b057ebc06112d091bfad7c7bcca9e29789662074f76cac56deb00fa77e87321d",
+  "pk_common_frozen.py": "0b2cc2faa72dc1f6a0171fdb4409c74ae4ff26d9cee1dd365af684f1e064371a",
+  "r2_common.py": "5622ea2cb19853e4ddcc7e64dfb9872f35e920cdf33d67c583b8ca2359b2be5c",
+  "r3_common.py": "d80d811e3031ebd8f470010d801df9d424793b5185922d9f471d32e6f3a147bc",
+  "host_b/nm_infer_job.sh": "ea22746c0dd77a4d3e55a478ab2a29ae8e3cc0a55a66aec2ea655b69e39a878b",
+  "host_b/nm_train_job.sh": "e2f431073e650d9b30bd745256363195b31db84ceda5ef49187fa7fe9c90e8aa",
+  "remote/nm_job.sh": "cac98531a8e72be9235fb763ba16f25dcb50c38dc7d8825b5a8ea148ecdf71a1",
+  "remote/nm_run_card.sh": "39cb149df71c7625db4620f4a527339ea6b06ae1c208b0a94dafd3394a33536a",
+  "remote/nm_run_cpu.sh": "e591bccdce56558a860b9199ec8b0eae24c82ff911a3e8058171d06766e865fb",
+  "remote/nm_verify.py": "d494c62bf797d1de9af665284c9086299c8fd0d4c4e535af6dc77834c04deed4",
+  "rob_common.py": "de4e76ee32cb741ac1d405501ffd8aa1b810a6b5deabe9c91dc218ed37d2cf7c"
+ },
+ "inputs_sha256": {
+  "inputs/dev_items.jsonl": "31f7c23b6287bdddbea87d985d814038c904bccd0ec1ae890f08004d95566d43",
+  "inputs/test_items.jsonl": "52d967606f8ef74ddef839676e835b254f00b36d8cd76366d093b4d516be23f8",
+  "inputs/train_pairs_k05.jsonl": "e2e39f1bb2031d25a23e9341f7b85b0a5ae2d404546a2de978d62a0415463cc5"
+ },
+ "amendment_log": [],
+ "registered_utc": "2026-11-18T17:41:16Z",
+ "sha256": "b3fc91266165124b8174b7a049f748051284b647d48a6a784a6d9163f73f691b"
+}

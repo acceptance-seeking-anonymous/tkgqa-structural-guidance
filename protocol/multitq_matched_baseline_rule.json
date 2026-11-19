@@ -1,0 +1,119 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "name": "multitq_matched_baseline_rule",
+ "track": "Matched baseline (PAKDD 2027 research track)",
+ "question": "On the official MultiTQ test split (reuse; 54,584 questions), how does the benchmark authors' supervised baseline MultiQA (Chen et al., ACL 2023), trained on exactly the registered nested 1/5/10% train-question subsets used by our arms, compare with Rules (RULE_k), Ranker (S_k seed mean), Reader (G_k) and Parser (P_k seed mean)?",
+ "nature": "DESCRIPTIVE matched comparator. No pass/fail margin, no outcome labels, no multiplicity correction; every interval is a two-sided 95% bootstrap CI.",
+ "status_at_registration": "Feasibility on train/dev only is complete. Existing outputs: NER annotations of dev_sel2000, test (from {quid, question}), train k10 members and the remaining train questions; the FULL TComplEx checkpoint; a dev-only smoke test (a GPU job: six 1% runs for 4 epochs and one 10% run for 1 epoch). The smoke runs' driver also wrote 4-epoch test prediction files on the remote host; they were never transferred, never scored, and are excluded from this track. No MultiQA test score of any kind exists.",
+ "baseline": {
+  "system": "MultiQA (Chen, Liao, Zhao. Multi-granularity Temporal Question Answering over Knowledge Graphs. ACL 2023)",
+  "code": "czy1999/MultiTQ commit 94ad61c31235467cc077a99e3a5ee105ac1dd04b",
+  "official_files_imported_unchanged_sha256": {
+   "MultiQA/qa_baselines.py": "9e2dd86554e5392fc7c56b831bbb7c66ba709e7a43f4a30fa16618668a6566d0",
+   "MultiQA/qa_datasets.py": "cbd74efec521d485ce9b44299ede56717dfacb02146dfe333c4ac360d23eea1f",
+   "MultiQA/utils.py": "46c80d7d1a0ab0510e7245b3715556db91f97efb827f67e8fd8cbb4f0d796004",
+   "MultiQA/tcomplex.py": "4003e46c02b20d04c50d75f7e05f59a07a9e1dfb923d13e12ad63b4c29fb76b8",
+   "MultiQA/ner_task.py (logic ported into mbq_ner.py)": "d915707acbc04a16a89df3901f5413639f7abac62e9924f8e1a6ff5cf82d06ba",
+   "MultiQA/models/MultiTQ/kg_embeddings/tcomplex.ckpt (shipped TComplEx)": "e10544da3dcdd88a0608c34a501e31b5b4f4e29eb7ab76c4d4d63f309682857c"
+  },
+  "driver_files_sha256": {
+   "mbq_qa.py": "c5cd49a2f22ce2b4c033d5c1f627f394ae6fa763a761303cc4c0ff2880651955",
+   "mbq_ner.py": "81d2b72a67c489b27fdf5817fc7ae837f4701286214847f4c9573d793b020eaf",
+   "mbq_tcx_full.py": "5bd515cb92beefa284c32773d1ef6718608a2450e09ef8f1341df68799008247",
+   "mbq_sched.py": "3d8a46421097544d5a051642f5a4a1642d8df0d24ed7a968bab7e0f3a54461f6",
+   "plan_C.json": "d95cf07e5b3dde76f36da0a10af0b8c6951c2d311cb255c5a4fb57a899ffba03",
+   "plan_D.json": "d262f90a32ef2cfe742ed7ac722c497997a82e4d9b704493ccb49738f3cfa930",
+   "plan_E.json": "3c1cda36c0fe73a0f1f80da894d72d65830a4360c30f9fc78c5064bfb4a7c2a8",
+   "jobQA.sh": "6f60f72e7ccb9e61fcb1389ccd97a14abe939e20bb408be7ccf6dec31df1e69c",
+   "jobA.sh": "7d5c9d1e1b4b1a8c615c7a97746e308ccc71beec4df6e1ea14877ac5b7b68aa4"
+  },
+  "architecture_as_released": "DistilBERT-base-uncased question encoder (frozen) -> relation embedding; frozen TComplEx entity/time embeddings (rank 512); multi-granularity time aggregation (2-layer month/year Transformer encoders); answer = argmax over all 10,488 entities and 4,017 days; month/year answers scored by truncating the predicted day string (official eval_multi).",
+  "official_recipe": "train_qa_model.py --model multiqa defaults: lr 2e-4, Adam, batch 100, max_epochs 10, frozen=1, lm_frozen=1, eval_k=1, validate every epoch on dev, keep the best dev Hits@1 epoch."
+ },
+ "timer4_feasibility": {
+  "code": "qianxinying/TimeR4 commit 508cc0267e55f24877b136f23f0f3c425f2d37b4 (2025-11-15), read via the GitHub API",
+  "decision": "NOT_RUN (infeasible within this track and its rules)",
+  "reasons": [
+   "Retrieve-rewrite calls the OpenAI API (gpt-3.5-turbo-0125, temperature 1.0) once per question (main.py rewrite): at least 54,584 test calls plus the k% train questions; an external API LLM with non-deterministic output, outside this track's GPU-hour cap and authorisation.",
+   "The reasoner is a full-parameter fine-tune of Llama-2-7B-chat with DeepSpeed on 2 GPUs (README: 3 epochs, batch 256, max length 1024); optimizer states of a 7B model do not fit the single 24 GB 4090, and the released retriever/LLM weights are on Baidu Pan only (and are trained on more than our subsets).",
+   "Cost projection: the project's own 8B LoRA reader arms over the same test split cost 3.28 / 3.30 / 3.33 GPU-h at k = 1/5/10% (REPRODUCE_kpct usage log); TimeR4 with full fine-tuning is at least as costly per level, i.e. >= ~10 GPU-h for three levels, against a 5.5 GPU-h allotment.",
+   "A reduced variant (no rewrite, LoRA, another base LLM) would not be TimeR4 and overlaps the Dense-RAG arm of the LLM-controls track."
+  ]
+ },
+ "subsets": {
+  "source": "multitq_kpct_subsets.json (same quids as every k% arm)",
+  "k01_s0": {
+   "n": 3868,
+   "sha256": "9cc6eb403715fd8591311e2e013b96d44e89cb2bcc961f6f21763139170e74e8"
+  },
+  "k05_s0": {
+   "n": 19339,
+   "sha256": "0a84036566f348be78dbf8e37b95477aa4ffa23f6fa1ed58b8c031faf2ff1a5b"
+  },
+  "k10_s0": {
+   "n": 38679,
+   "sha256": "6f1ba60c36fccc99b6450804b290da850015f4b2d4f27802930fa57b531a69e1"
+  },
+  "k100": {
+   "n": 386787,
+   "sha256": "9bb19583d4b2bb1f1a0b3110760a56670eca4c7af30591bc2adcb64c374067e3",
+   "status": "run only if the GPU-hour cap projection allows (cut point)"
+  },
+  "dev_selection": {
+   "name": "dev_sel2000",
+   "n": 2000,
+   "sha256": "b5b8a28d843bc6120b580a2e13505dfd56185a43e5ef28adc3d1ece78d9403b1",
+   "use": "every selection decision of this track; the other 55,979 dev questions are unused"
+  }
+ },
+ "information_access": {
+  "graph": "Through TComplEx embeddings only (MultiQA reads no fact list at inference). Two embeddings: OFF = the shipped checkpoint, trained by the authors on tkbc train.pickle (368,962 of the 461,329 facts of kg/full.txt, random split); FULL = the same TComplEx code and hyper-parameters retrained by us on all 461,329 facts of kg/full.txt (train+valid+test pickles; the graph access of our arms). FULL: rank 512 (= shipped), Adagrad lr 0.1, batch 1024, N3 1e-3, Lambda3 1e-3 (official notebook), 50 epochs (learner.py default), seed 0, no question read.",
+  "full_kg_ckpt_sha256": "224be8d6122579b9b9a3dda2ff7b93c5c56e30cb24b5ffb94100322c284831f5",
+  "question_annotation": "Official NER preprocessing: flair/ner-english-large spans + difflib.get_close_matches to KG entity names + regex/dateutil extract_time; no MultiTQ gold annotation. Test questions were sent to the remote host stripped to {quid, question}; no test answer or type field ever reaches a remote job.",
+  "labels_used_for_training": "answers (and answer_type to map them to entity/time ids) of the k% train questions only, as in the official code",
+  "labels_used_for_selection": "dev_sel2000 answers only"
+ },
+ "adaptations": [
+  "A1 validation set: dev_sel2000 (2,000) instead of the full dev split (57,979), the selection set of every k% arm.",
+  "A2 epoch limit (registered after the feasibility timing): at k <= 10% at most ~7,800 optimizer steps per run (max_epochs 200 / 40 / 20 at 1 / 5 / 10%; patience 50 / 10 / 10 epochs, never before epoch 10); at k = 100% the official 10 epochs. Rationale: 10 epochs over 3,868 questions are only 390 steps, which under-trains the baseline; the full official step limit at every k does not fit the allotment. The best-of-first-10-epochs checkpoint of each run is kept as the official-epoch-limit row.",
+  "A3 seeds: training seeds 0, 1, 2 (python/numpy/torch); the official script is unseeded.",
+  "A4 software: torch 2.8.0+cu128, transformers 4.57.6, flair 0.15.1, Python 3.12 (official pins torch 1.7.1, transformers 4.9.0, flair 0.11.3 are not installable on this stack); same HF checkpoints (distilbert-base-uncased, flair/ner-english-large).",
+  "A5 graph-access-matched embedding FULL as a dev-selected alternative to the shipped OFF embedding (see information_access).",
+  "A6 NER is run per file (dev_sel2000, test, train k10 members, remaining train) with 12 fuzzy-match workers; per-question logic identical to ner_task.py.",
+  "A7 QA_Dataset_multi.timesToIds is memoised (pure function of its argument); no other change to the official modules.",
+  "A8 output: top-10 ranked answer strings per quid, scored locally once with the project scorer multitq_eval.py (official eval_multi semantics); the remote job never computes a test score.",
+  "A9 hardware: RTX 4090 on the second GPU host (idle) instead of the GPU host GPU 0, which co-tenant jobs held at 93% utilisation at dispatch.",
+  "A10 dev selection signal: per-epoch dev_sel2000 Hits@1 is computed by a fast re-implementation of eval_multi at k = 1 (same top-1 of torch.topk, truncation and match); the official eval_multi is also run at epoch 1 and on the selected checkpoint and both values are recorded."
+ ],
+ "runs": {
+  "grid": "k01_s0, k05_s0, k10_s0: emb in {OFF, FULL} x seed in {0,1,2} (18 runs); k100: emb in {OFF, FULL} x seed 0 (2 runs, under the cut point)",
+  "per_run_checkpoints": {
+   "primary": "best dev_sel2000 Hits@1 epoch over the A2 schedule (strictly greater rule; ties keep the earlier epoch)",
+   "budget10": "best dev_sel2000 Hits@1 epoch among epochs 1-10 (official epoch limit)"
+  }
+ },
+ "selection": {
+  "embedding_per_level": "for each k, emb = argmax of the 3-seed mean dev_sel2000 Hits@1 of the primary checkpoints; ties -> OFF. Recorded in multitq_matched_baseline_selection.json BEFORE the freeze.",
+  "primary_arm": "MBQ_k = selected embedding, primary checkpoint, per-question hit = mean over the 3 seeds (values 0, 1/3, 2/3, 1), as S_k and P_k in the frozen hits file. At k100 the row is single-seed (seed 0).",
+  "secondary_descriptive_arms": [
+   "MBQ_OFF10_k (shipped embedding, official 10-epoch limit: closest to the released recipe)",
+   "MBQ_OFF_k, MBQ_FULL_k, MBQ_FULL10_k (other cells of the grid)",
+   "per-seed rows"
+  ],
+  "discipline": "Every choice above is made on dev_sel2000 only. Nothing is changed after a test number is read. Anything added later is labelled post hoc."
+ },
+ "statistic": {
+  "scorer": "multitq_eval.py (sha256 1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69), official test.json sha256 d9bf3bf23b489ecc76c7940510c718260a42350d934a6edc1c1c7efcd5238fee",
+  "metric": "Hits@1 (primary), Hits@10 (descriptive; MultiQA ranks day strings, so its Hits@10 under truncation is not comparable with our arms')",
+  "ci": "Poisson(1) bootstrap over the 54,584 test questions, B = 2,000, seed 0, two-sided 95% percentile interval",
+  "paired_contrasts": "MBQ_k - X_k for X in {RULE_k (RULE_k@1), S_k seed mean (S_k@1), G_k (G_k@1), P_k seed mean (P_k@1)} at k = 1, 5, 10 (and 100 if run), columns of the per-question hits file of the k% test pass; paired Poisson(1) bootstrap B = 2,000 seed 0, two-sided 95% CI; descriptive",
+  "strata": "Hits@1 of MBQ_k and the four comparators by qlabel (Single/Multiple), answer_type (entity/time) and qtype (6); descriptive, no CIs required",
+  "reproduction_check": "MBQ_OFF10_100 (= MBQ_OFF_100, 10 official epochs, seed 0; if run) vs the published MultiQA Hits@1 0.293; descriptive difference; known differences: A1, A3, A4, A6"
+ },
+ "test_discipline": "Label: reuse of the official MultiTQ test split, which every arm of the project has already been scored on. All test prediction files of this track are listed with sha256 in multitq_matched_baseline_freeze.json, saved before scoring, and scored exactly once.",
+ "stop_rules": [
+  "If a level's 6 runs fail twice, report that level NOT_RUN with the error."
+ ],
+ "registered_utc": "2026-11-17T18:39:50Z",
+ "sha256": "8a09d49d705f4d39e9ae7a681e1aa9591a0aa0045446bbf6f6043a852b2b717f"
+}

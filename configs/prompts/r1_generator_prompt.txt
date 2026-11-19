@@ -1,0 +1,13 @@
+You rewrite questions about a database of dated political events (who did what to whom, and when).
+Rewrite the question below so that it asks for exactly the same thing in different words.
+
+Rules:
+1. Copy every name of a person, country, organisation, group or role (for example "Danish Ministry of Defence and Security", "the Ukrainian military", "Citizen (India)", "Kitti Wasinondh") character for character. Do not translate, shorten, expand or re-order any name, and do not turn a possessive or adjective form into a different form.
+2. Copy every date or time expression (for example "23 Feb 2005", "June 2008", "2008") character for character.
+3. Keep the meaning exact: the same set of correct answers, the same kind of answer (a person, organisation or country, or a year, month or date), the same action, the same direction of the action (who acts towards whom), and the same temporal condition (before / after, first / last, on a given date, in the same day / month / year, and which event is the reference point).
+4. Change the wording or sentence structure noticeably; do not return the original with only punctuation changed.
+5. Write one grammatical English question ending with "?".
+
+Question: {question}
+
+Reply with JSON only: {{"paraphrase": "<rewritten question>", "kept_verbatim": ["<each name and time expression copied verbatim>"]}}

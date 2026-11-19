@@ -1,0 +1,213 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "amendment_id": "LC1",
+ "name": "multitq_kpct_amendment_LC1_llm_controls",
+ "track": "llm_controls (post hoc control arms, 2026-11)",
+ "rule": {
+  "file": "multitq_kpct_decision_rule.json",
+  "sha256": "0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7",
+  "registered_utc": "2026-10-27T03:59:39Z"
+ },
+ "subsets_manifest": {
+  "sha256": "de8a9c22d51f4182f88063c57d408530c351660ec23caea29b8559878ee88e5a"
+ },
+ "status_at_registration": "No GU_5 or GPLAIN_1 training output, checkpoint, dev_sel2000 prediction, dev score or test prediction exists. GU_5 was registered in the k% rule (arms.GU_k, grid k in {1,5,10,100}) and dropped under fallback 2 (amendments B1/B2: 'GU_5 stays NOT_RUN'); GPLAIN_1 is new. The frozen arms' single test pass took place on 2026-10-28T01:11:37Z; both new arms are scored once on the SAME official MultiTQ test split (54,584 questions) after a sha256 freeze -- reuse of the official test split, post hoc relative to that pass, descriptive only (no registered KP decision changes; no existing registered result changes).",
+ "question": "(a) How accurate is the generic dense-RAG LoRA control at 5% of the training questions (GU_5), and how far below G_5 and P_5 is it? (b) With the same QA rows, targets, candidate identities and <=20 facts as G_1, how much of G_1's test Hits@1 does the structural guidance (parse, RULE ranks, S scores, operator flags, candidate-fact links, trace, S order) add over a reader TRAINED on the same evidence rendered as a plain list (GPLAIN_1)?",
+ "arms": {
+  "GU_5": {
+   "what": "rule arms.GU_k at k = 5 with the frozen GU recipe exactly as GU_1 / GU_10 / GU_100",
+   "train_list": {
+    "name": "k05_s0",
+    "n": 19339,
+    "sha256": "0a84036566f348be78dbf8e37b95477aa4ffa23f6fa1ed58b8c031faf2ff1a5b",
+    "note": "nested seed-0 chain k01_s0 < k05_s0 < k10_s0; the same list as G_5 and P_5"
+   },
+   "retrieval": "frozen GU retrieval files (no re-retrieval): gu_train_union.jsonl.gz (covers all 19,339 k05_s0 quids, checked locally against gu_train_union_quids.json: 0 missing), gu_dev_sel2000.jsonl.gz, gu_test.jsonl.gz; BAAI/bge-large-en-v1.5 top-20 facts, identical for every k",
+   "model_and_recipe": "Llama-3.1-8B-Instruct; frozen gk_train.py --arm GU --list k05_s0 (LoRA r 16, alpha 32, dropout 0.05 on q,k,v,o,gate,up,down; AdamW lr 2e-4, wd 0, cosine, 3% warm-up, clip 1.0, effective batch 16, bf16, answer-token loss, max length 2,048, seed 0)",
+   "epochs": "E_max = 2 (gk_common.E_MAX['k05'], the same epochs rule as G_5); adapters at ep1 and ep2",
+   "target": "the gold answer occurring earliest in the 20 retrieved facts; answers[0] if none (frozen gu_target)",
+   "selection": "dev_sel2000 only (frozen gk_select.py): best Hits@1 checkpoint, tie -> earlier",
+   "decoding": "vLLM 0.10.2 (tkgqa-vllm:latest), greedy, max 48 new tokens, max_model_len 2,304, seed 0; frozen validity rule, no fallback",
+   "output": "frozen gu_ranked: [answer] + entities/dates of the retrieved facts in retrieval order, padded with the most frequent k05_s0 train answers",
+   "code": "frozen WORK_DIR/guided/code/{gk_train.py, gk_run_arm.py, gk_infer.py, gk_select.py, gk_common.py} with the same arguments as stageB_plan.sh train_GU / session_GU; only the output root (/kpct/llm_controls), the selection-log path and the usage log track label differ"
+  },
+  "GPLAIN_1": {
+   "what": "a 1% reader TRAINED and evaluated on the G_1 evidence rendered as a plain evidence list",
+   "same_as_G_1": "QA rows (bundles/k01_s0/train.jsonl, the out-of-fold k01_s0 train bundles, 3,868 rows; dev_sel2000 and test bundles bundles/k01_s0/{dev_sel2000,test}.jsonl); targets (frozen g_target: the gold answer ranked highest in the bundle candidate list, answers[0] if none -- identical strings and answer token ids); candidate identities (bundle candidates[:20]); facts (bundle facts[:20], lossless grouping by triple with chronological dates); model, LoRA recipe, E_max = 3 (ep1-ep3), seed 0, max length 2,048 with the same truncation rule (drop trailing displayed fact groups), decoding (greedy, 48 new tokens, max_model_len 2,304), dev_sel2000 selection (best Hits@1, tie -> earlier), validity rule",
+   "removed": [
+    "parse section",
+    "RULE ranks",
+    "S (Ranker) scores",
+    "operator-satisfied flags",
+    "candidate-fact links (F numbers)",
+    "operator trace",
+    "S candidate order",
+    "provenance fact order"
+   ],
+   "neutral_orders": {
+    "candidates": "alphabetical, key (norm_answer(c), c) with norm_answer = strip, collapse whitespace, case-fold, _ -> space (dates therefore chronological)",
+    "fact_groups": "alphabetical, key (norm(subject), norm(relation), norm(object), subject, relation, object); dates within a group chronological"
+   },
+   "header": "PLAIN_HEAD = 'Answer the temporal question about the ICEWS knowledge graph using the candidate answers and facts below.' + the frozen G_HEAD reply-format line (G_HEAD's sentences about the pipeline parse/ranking are dropped because that content is not shown)",
+   "prompt_layout": "PLAIN_HEAD / Question / 'Candidate answers (alphabetical order):' one '- <candidate>' line each / 'Facts (subject | relation | object | dates; alphabetical order):' one '- h | r | t | d1, d2' line per group",
+   "output": "Hits@1 = the generated answer (frozen validity rule, no fallback). Ranked list for the descriptive Hits@10 = [answer] + the displayed alphabetical candidates, deduplicated (no S tail; G_1's Hits@10 uses the S_1 seed-0 tail, so the two Hits@10 are not comparable)",
+   "code": "lc/gk_plain.py (renderer + gk_plain.patch(), which swaps gk_common.fit_g_prompt, g_ranked and prompt_texts_sha256 in-process) and thin wrappers gplain_train.py / gplain_run_arm.py / gplain_infer.py that call the frozen gk_train.main / gk_run_arm.main / gk_infer.main unchanged with --arm G --list k01_s0 --order S --name GPLAIN_k01_s0_s0",
+   "relation_to_ablation": "reuses the bundle rendering of the registered G_1 input-intervention ablation (rule [id], code [id]: A_facts_cand = facts + bare candidate strings) but differs in (i) training on the plain format (the ablation was inference-only with the frozen G_1 adapter), (ii) alphabetical instead of seeded-random orders, (iii) the plain header",
+   "token_report": "prompt tokens (Llama-3.1 chat template, same tokenizer) of G_1 vs GPLAIN_1 per question on train (k01_s0), dev_sel2000 and test: mean, median, p95, max, paired mean difference, truncation counts; plus checks that candidate multisets, fact groups and train answer token ids are identical (lc_tokens.py)"
+  }
+ },
+ "selection_discipline": "All choices for the new arms (checkpoint only) use dev_sel2000; no hyper-parameter, prompt, order or decoding setting is tuned; nothing is changed after any test number is read. Dev numbers are logged to multitq_llm_controls_selection_log.jsonl as computed.",
+ "test_discipline": [
+  "Test predictions are written on the GPU host only after the adapter freeze record (adapter sha256) exists; they are never scored on the remote (no test gold is read there).",
+  "Locally, a freeze record with the sha256 of every new test prediction file (and the R1/R2 variant files) is saved BEFORE any scoring; each file is then scored once with the official evaluator multitq_eval.py (sha256 1f85bbdc...) against test.json (sha256 d9bf3bf2...).",
+  "Existing frozen arms are read from the per-question hits CSV [id] (sha256 125de92f...) and the R1/R2 prediction archives; no existing registered number is changed.",
+  "Every number is labelled 'reuse of the official MultiTQ test split (post hoc control arms)'."
+ ],
+ "analyses": {
+  "statistic": "official Hits@1 (Hits@10 descriptive); paired Poisson(1) bootstrap over test questions, B = 2,000, seed 0 (multitq_eval.paired_poisson_bootstrap), two-sided 95% percentile CI and one-sided p (share of deltas <= 0); single-arm CI = the same bootstrap of the mean hit; strata (qlabel Single/Multiple, answer_type entity/time) also B = 2,000 seed 0 (task instruction; the k% rule's descriptive-strata default was B = 1,000). All analyses DESCRIPTIVE; descriptive label per contrast: POSITIVE iff CI lower > 0, NEGATIVE iff CI upper < 0, else CI_INCLUDES_0. No multiplicity correction (descriptive).",
+  "list": [
+   "GU_5 test Hits@1 with 95% CI",
+   "G_5 - GU_5 (paired)",
+   "P_5 (per-question 3-S-seed mean, column P_5@1) - GU_5 (paired)",
+   "GPLAIN_1 test Hits@1 with 95% CI",
+   "G_1 - GPLAIN_1 (paired; what the structure adds beyond the same evidence)",
+   "GPLAIN_1 - GU_1 (paired; same-size reader with structural-pipeline evidence vs dense-retrieved evidence)",
+   "every contrast and arm also per qlabel (Single, Multiple) and per answer_type (entity, time)",
+   "descriptive: Hits@10, invalid-output rate, target-in-source rate, truncation counts, dev_sel2000 selection table, prompt-token difference"
+  ]
+ },
+ "robustness_analyses": {
+  "sets": {
+   "R1": {
+    "sha256": "14b8740b3d133036fbf0b93b17cdaaeb9f69bd1d9ba4c5d97260892dca7405d5",
+    "variants": "ORIG 2,000, P1 2,000, P2 2,000, P3 569 (6,569 prompts)",
+    "inputs_on_host": "WORK_DIR/robustness/{bundles/k01_s0/variants.jsonl, gu/gu_variants.jsonl.gz, inputs/variants_questions.json} (rebuilt by the R1 track from the variant text with the frozen executor and the frozen retriever)"
+   },
+   "R2": {
+    "sha256": "7ce5f3a5f734bb74fbc73b27d8f97bab54b590cb85b1c370d8fda58a06a841d6",
+    "variants": "ORIG 2,000, RW 570 (2,570 prompts)",
+    "inputs_on_host": "WORK_DIR/robustness_r2/{bundles/k01_s0/variants.jsonl, gu/gu_variants.jsonl.gz, inputs/variants_questions.json}"
+   }
+  },
+  "runs": "frozen GU_5 adapter (frozen gk_infer.py --arm GU --split variants, GU_5 gu_pad) and frozen GPLAIN_1 adapter (gplain_infer.py --arm G --split variants, no S tail) on every variant of R1 and R2",
+  "metrics": "Hits@1 per variant; drop = ORIG - rewrite on the same quids (R1: P1, P2 on 2,000, P3 on 569; R2: RW on 570), paired bootstrap B = 2,000 seed 0; R1 labels BRITTLE iff drop >= 2 points with CI above 0, ROBUST iff CI upper < 2 points; difference-of-drops contrasts (descriptive): GPLAIN_1 vs G_1 and vs GU_1; GU_5 vs G_5, P_5 (3-seed mean), GU_1 and GU_100, all on the same rows, existing arms scored from the frozen R1/R2 prediction archives with the official hit (cross-checked against the published R1/R2 tables before use)",
+  "human_audit_removal": {
+   "rule": "a reviewed rewrite is human-rejected iff same_answer_set != 'Y' or same_constraint_time != 'Y' (N or unsure) in the annotated review sheets (R1: 269 reviewed; R2: 244 reviewed), joined to quids by the selection keys; reproduces the recorded counts (R1 18 rejected -> n = 551; R2 45 rejected -> n = 525, identical to the rejected_quids of robustness/r2/kit/audit_score_R2.py)",
+   "R1_rejected_quids": [
+    3001678,
+    3002851,
+    3007819,
+    3011281,
+    3011414,
+    3012068,
+    3015849,
+    3019567,
+    3032435,
+    3034118,
+    3035694,
+    3036063,
+    3040793,
+    3042489,
+    3048249,
+    3049646,
+    3054016,
+    3054888
+   ],
+   "R2_rejected_quids": [
+    3000990,
+    3001137,
+    3001222,
+    3003005,
+    3003099,
+    3005643,
+    3006667,
+    3007087,
+    3007730,
+    3008072,
+    3009211,
+    3010064,
+    3010812,
+    3014370,
+    3019801,
+    3021125,
+    3021396,
+    3021789,
+    3023412,
+    3025445,
+    3026749,
+    3028360,
+    3029673,
+    3030343,
+    3030702,
+    3033271,
+    3034624,
+    3036813,
+    3038725,
+    3038936,
+    3039103,
+    3039546,
+    3040109,
+    3040269,
+    3040382,
+    3042209,
+    3043761,
+    3045321,
+    3048105,
+    3049461,
+    3049907,
+    3051684,
+    3051854,
+    3052075,
+    3054083
+   ],
+   "status": "post-removal values for GU_5 and GPLAIN_1 are DESCRIPTIVE ONLY: the targeted audit rows were selected on G/P contrasts"
+  },
+  "identity_check": "gold-free, before scoring: top-1 agreement of each new arm's ORIG re-run with its own frozen test predictions on the 2,000 ORIG quids; flag PIPELINE_DRIFT if < 98% (threshold of the R1 rule for LLM arms)"
+ },
+ "stop_rules": [
+  "STOP_COVERAGE: any k05_s0 quid without GU train retrieval -> GU_5 NOT_RUN (gk_train asserts)",
+  "STOP_INPUT_IDENTITY: any GPLAIN_1 bundle whose candidate multiset or fact groups differ from G_1's, or any train target / answer-id mismatch -> GPLAIN_1 NOT_RUN (lc_tokens.py)",
+  "STOP_DEV_FAILURE (rule): best dev_sel2000 Hits@1 < 0.30 or invalid > 0.20 -> flagged in the freeze and reported; no bug-fix iteration without a new amendment",
+  "STOP_GPU_CAP: GPU-hour cap of the track (5.5 GPU-h), checked before every GPU item (lc_job.sh); finish compute by Mon 24 Nov 2026"
+ ],
+ "outputs": [
+  "this amendment",
+  "freeze record (adapter + test/variant prediction sha256) before scoring",
+  "predictions archive",
+  "per-question test hits CSV keyed by quid (GU_5@1, GU_5@10, GPLAIN_1@1, GPLAIN_1@10)",
+  "per-variant hits CSV (R1, R2)",
+  "results JSON",
+  "report md",
+  "token-length JSON",
+  "GPU usage log rows"
+ ],
+ "known_deviations_at_registration": [
+  "GU_5 is run post hoc (after the 2026-10-28 test pass) although the k% rule's fallback 2 dropped it; its numbers are descriptive and do not enter KP2",
+  "GPLAIN_1 uses PLAIN_HEAD instead of G_HEAD (the G_HEAD sentences describe content that is not shown)",
+  "GPLAIN_1 mini-batch composition differs from G_1 because the frozen length bucketing depends on prompt length; the per-epoch permutation seeds are the same",
+  "GPLAIN_1 Hits@10 uses an alphabetical tail, not the S_1 tail",
+  "robustness bootstrap for R2 uses B = 2,000 seed 0 (R1 convention) rather than the R2 rule's B = 10,000 seed 20261029",
+  "strata bootstrap B = 2,000 instead of the rule's 1,000",
+  "output root /kpct/llm_controls, selection log and usage log label differ from the guided track; the frozen tree is mounted read-only"
+ ],
+ "code_sha256": {
+  "gk_plain.py": "579d49c9c88841f06366ead0c0c186782c485bc06bccfa317ba489770a871589",
+  "gplain_infer.py": "9f089b92a1f4af0aa88188ae48137dd4af67cafe1ed8d2dae5a2d3e381d08674",
+  "gplain_run_arm.py": "0e30565731f7fff825553ba593c2153bca5e3b815e6f50fb5c5de0dde6d34204",
+  "gplain_train.py": "404d694611a7467e1acc070fed9224ff63696e2777d0d1213374bf16e76e5e82",
+  "lc_job.sh": "4a63ac3626ff1de1b2bf9068a9149cbda9546c46d4f4e5a737b7421110043db1",
+  "lc_tokens.py": "72fac6940fe68129f4051c529a5e4a3de523df8abfeccf43233f9f5860794c35",
+  "run_card_lc.sh": "e0e15186fa9f4226f07a6084317af47c7a4994e1a5858fac4871ca1d9a505199"
+ },
+ "frozen_code_sha256_expected": {
+  "gk_common.py": "3bbb684f484da4e9ccff5d7ed8ca644ccb5e8b6a918d50bd4b4ab04378e36b44",
+  "gk_train.py": "0ee1d118d71e465ff09433a41db0a08e6150d2b23ef7a301df2e3aedc200e03f",
+  "gk_infer.py": "d01270d94ea0c9bab7943426237f24bd7720b855d2ca068d8bd58d4e9c32e6a7",
+  "gk_select.py": "cd22f7b988ad7b16115d815a8971b1109c098960c351f9d7438c706014d6d32e",
+  "gk_run_arm.py": "992a6a99defedc4bd0aaa78c4b561c84c07acdaabae8bb1a4d42669c761b2115",
+  "multitq_eval.py": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69"
+ },
+ "frozen_code_sha256_note": "expected values from multitq_kpct_guided_code.tgz ([id]); the remote copies are checked in the setup item before any GPU item; a mismatch is reported (and gk_run_arm.py / gk_select.py differences, if any, documented) before training starts",
+ "registered_utc": "2026-11-17T16:50:43Z",
+ "sha256": "fbc5ed562023016bb77d0b62fa6e0c4118b0ca2df843f11fd5a5a7a43ee46bda"
+}

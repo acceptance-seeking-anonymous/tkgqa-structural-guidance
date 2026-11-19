@@ -1,0 +1,32 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "declaration": "KP1/KP3 primary LLM arm per k (multitq_kpct_decision_rule.json criteria: the LLM arm with the higher dev_sel2000 Hits@1, tie -> G)",
+ "declared_utc": "2026-10-27T20:18:32Z",
+ "status": "Declared before any test score of any k% arm. Test files of every k>0 arm are frozen by sha256 (structural 07d2bceb, guided 9dbe4742, parser 460ef53d). The k = 0 primary arm is declared in the k = 0 freeze by the same rule once P_0 and G_0 dev scores exist.",
+ "sources": {
+  "guided_dev_results": "",
+  "parser_dev_results": ""
+ },
+ "per_k": {
+  "k1": {
+   "G_dev_sel2000_hits1": 0.799,
+   "P_dev_sel2000_hits1": 0.768167,
+   "primary": "G_1"
+  },
+  "k5": {
+   "G_dev_sel2000_hits1": 0.937,
+   "P_dev_sel2000_hits1": 0.9475,
+   "primary": "P_5"
+  },
+  "k10": {
+   "G_dev_sel2000_hits1": 0.947,
+   "P_dev_sel2000_hits1": 0.952,
+   "primary": "P_10"
+  },
+  "k100": {
+   "G_dev_sel2000_hits1": 0.9585,
+   "P_dev_sel2000_hits1": 0.955667,
+   "primary": "G_100"
+  }
+ }
+}

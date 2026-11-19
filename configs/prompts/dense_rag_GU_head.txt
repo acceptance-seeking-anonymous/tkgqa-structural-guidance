@@ -1,0 +1,2 @@
+Answer the temporal question about the ICEWS knowledge graph using the retrieved facts below.
+Reply with the answer only: one entity name exactly as written, or a date written YYYY, YYYY-MM or YYYY-MM-DD.

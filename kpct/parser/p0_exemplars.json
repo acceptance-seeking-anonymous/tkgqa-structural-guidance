@@ -1,0 +1,217 @@
+{
+ "name": "p0_exemplars",
+ "track": "multitq_kpct / LLM parser (P_0, k = 0)",
+ "rule_sha256": "0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7",
+ "selection_procedure": "One exemplar per (qtype, answer_type) cell of MultiTQ train (exactly 8 cells exist: equal/entity, equal/time, before_after/entity, first_last/entity, first_last/time, equal_multi/entity, after_first/entity, before_last/entity), = the train question with the smallest quid in the cell. Only the qtype and answer_type fields of train were read to form the cells (metadata used to stratify exemplar selection, as dev metadata stratifies dev_sel2000); the question text of exactly these 8 was read.",
+ "parse_procedure": "Parses written by hand from the question text and the KG vocabularies (entity2id.json, relation2id.json names) only, before any answer was consulted; conventions follow the compact P schema of the rule and the structural parser's label conventions (answer_role = object iff the main / first-mentioned entity is the subject of the relation; granularity = answer granularity for time answers, else the granularity of the time expression, day if none; order = before/after for before_after, after_first and before_last entity questions, first/last for first_last and equal_multi). The 8 gold answers may be consulted afterwards to verify the parses (supervision_disclosure); verification result is recorded in p0_exemplar_verification.json, not here.",
+ "serialisation": "json.dumps(parse, ensure_ascii=False), key order mentions, relation, answer_role, qtype, answer_type, granularity, time, anchor, order",
+ "n": 8,
+ "quids": [
+  1000004,
+  1000000,
+  1000002,
+  1000048,
+  1000009,
+  1000034,
+  1000017,
+  1000001
+ ],
+ "exemplars": [
+  {
+   "quid": 1000004,
+   "cell": "equal/entity",
+   "question": "Who wanted to cooperate with the citizens of Brazil in 2005?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "citizens of Brazil",
+      "entity": "Citizen (Brazil)"
+     }
+    ],
+    "relation": "Express_intent_to_cooperate",
+    "answer_role": "subject",
+    "qtype": "equal",
+    "answer_type": "entity",
+    "granularity": "year",
+    "time": "2005",
+    "anchor": null,
+    "order": null
+   },
+   "json": "{\"mentions\": [{\"text\": \"citizens of Brazil\", \"entity\": \"Citizen (Brazil)\"}], \"relation\": \"Express_intent_to_cooperate\", \"answer_role\": \"subject\", \"qtype\": \"equal\", \"answer_type\": \"entity\", \"granularity\": \"year\", \"time\": \"2005\", \"anchor\": null, \"order\": null}"
+  },
+  {
+   "quid": 1000000,
+   "cell": "equal/time",
+   "question": "When did the al-Shabaab insurgency use unconventional violence against Muslims in the United Kingdom?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "al-Shabaab insurgency",
+      "entity": "Insurgency (Al-Shabaab)"
+     },
+     {
+      "text": "Muslims in the United Kingdom",
+      "entity": "Muslim (United Kingdom)"
+     }
+    ],
+    "relation": "Use_unconventional_violence",
+    "answer_role": "object",
+    "qtype": "equal",
+    "answer_type": "time",
+    "granularity": "day",
+    "time": null,
+    "anchor": null,
+    "order": null
+   },
+   "json": "{\"mentions\": [{\"text\": \"al-Shabaab insurgency\", \"entity\": \"Insurgency (Al-Shabaab)\"}, {\"text\": \"Muslims in the United Kingdom\", \"entity\": \"Muslim (United Kingdom)\"}], \"relation\": \"Use_unconventional_violence\", \"answer_role\": \"object\", \"qtype\": \"equal\", \"answer_type\": \"time\", \"granularity\": \"day\", \"time\": null, \"anchor\": null, \"order\": null}"
+  },
+  {
+   "quid": 1000002,
+   "cell": "before_after/entity",
+   "question": "To whom did John Dramani Mahama make an appeal after 2010?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "John Dramani Mahama",
+      "entity": "John Dramani Mahama"
+     }
+    ],
+    "relation": "Make_an_appeal_or_request",
+    "answer_role": "object",
+    "qtype": "before_after",
+    "answer_type": "entity",
+    "granularity": "year",
+    "time": "2010",
+    "anchor": null,
+    "order": "after"
+   },
+   "json": "{\"mentions\": [{\"text\": \"John Dramani Mahama\", \"entity\": \"John Dramani Mahama\"}], \"relation\": \"Make_an_appeal_or_request\", \"answer_role\": \"object\", \"qtype\": \"before_after\", \"answer_type\": \"entity\", \"granularity\": \"year\", \"time\": \"2010\", \"anchor\": null, \"order\": \"after\"}"
+  },
+  {
+   "quid": 1000048,
+   "cell": "first_last/entity",
+   "question": "Which country was the last one that the Foreign Affairs of France rejected?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "Foreign Affairs of France",
+      "entity": "Foreign Affairs (France)"
+     }
+    ],
+    "relation": "Reject",
+    "answer_role": "object",
+    "qtype": "first_last",
+    "answer_type": "entity",
+    "granularity": "day",
+    "time": null,
+    "anchor": null,
+    "order": "last"
+   },
+   "json": "{\"mentions\": [{\"text\": \"Foreign Affairs of France\", \"entity\": \"Foreign Affairs (France)\"}], \"relation\": \"Reject\", \"answer_role\": \"object\", \"qtype\": \"first_last\", \"answer_type\": \"entity\", \"granularity\": \"day\", \"time\": null, \"anchor\": null, \"order\": \"last\"}"
+  },
+  {
+   "quid": 1000009,
+   "cell": "first_last/time",
+   "question": "In what year did the Sudanese Ministry of Foreign Affairs last express optimism about the Government of Sudan?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "Sudanese Ministry of Foreign Affairs",
+      "entity": "Ministry (Sudan)"
+     },
+     {
+      "text": "Government of Sudan",
+      "entity": "Government (Sudan)"
+     }
+    ],
+    "relation": "Make_optimistic_comment",
+    "answer_role": "object",
+    "qtype": "first_last",
+    "answer_type": "time",
+    "granularity": "year",
+    "time": null,
+    "anchor": null,
+    "order": "last"
+   },
+   "json": "{\"mentions\": [{\"text\": \"Sudanese Ministry of Foreign Affairs\", \"entity\": \"Ministry (Sudan)\"}, {\"text\": \"Government of Sudan\", \"entity\": \"Government (Sudan)\"}], \"relation\": \"Make_optimistic_comment\", \"answer_role\": \"object\", \"qtype\": \"first_last\", \"answer_type\": \"time\", \"granularity\": \"year\", \"time\": null, \"anchor\": null, \"order\": \"last\"}"
+  },
+  {
+   "quid": 1000034,
+   "cell": "equal_multi/entity",
+   "question": "In 2015, who was the first to make Abu Sayyaf suffer from conventional military forces?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "Abu Sayyaf",
+      "entity": "Abu Sayyaf"
+     }
+    ],
+    "relation": "Use_conventional_military_force",
+    "answer_role": "subject",
+    "qtype": "equal_multi",
+    "answer_type": "entity",
+    "granularity": "year",
+    "time": "2015",
+    "anchor": null,
+    "order": "first"
+   },
+   "json": "{\"mentions\": [{\"text\": \"Abu Sayyaf\", \"entity\": \"Abu Sayyaf\"}], \"relation\": \"Use_conventional_military_force\", \"answer_role\": \"subject\", \"qtype\": \"equal_multi\", \"answer_type\": \"entity\", \"granularity\": \"year\", \"time\": \"2015\", \"anchor\": null, \"order\": \"first\"}"
+  },
+  {
+   "quid": 1000017,
+   "cell": "after_first/entity",
+   "question": "Who was the first to appeal for the indigenous people of Kenya, after the East African Community?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "indigenous people of Kenya",
+      "entity": "Indigenous People (Kenya)"
+     },
+     {
+      "text": "East African Community",
+      "entity": "East African Community"
+     }
+    ],
+    "relation": "Make_an_appeal_or_request",
+    "answer_role": "subject",
+    "qtype": "after_first",
+    "answer_type": "entity",
+    "granularity": "day",
+    "time": null,
+    "anchor": "East African Community",
+    "order": "after"
+   },
+   "json": "{\"mentions\": [{\"text\": \"indigenous people of Kenya\", \"entity\": \"Indigenous People (Kenya)\"}, {\"text\": \"East African Community\", \"entity\": \"East African Community\"}], \"relation\": \"Make_an_appeal_or_request\", \"answer_role\": \"subject\", \"qtype\": \"after_first\", \"answer_type\": \"entity\", \"granularity\": \"day\", \"time\": null, \"anchor\": \"East African Community\", \"order\": \"after\"}"
+  },
+  {
+   "quid": 1000001,
+   "cell": "before_last/entity",
+   "question": "To whom did Nicos Anastasiades make his last appeal before the Greek Prime Minister?",
+   "parse": {
+    "mentions": [
+     {
+      "text": "Nicos Anastasiades",
+      "entity": "Nicos Anastasiades"
+     },
+     {
+      "text": "Greek Prime Minister",
+      "entity": "Head of Government (Greece)"
+     }
+    ],
+    "relation": "Make_an_appeal_or_request",
+    "answer_role": "object",
+    "qtype": "before_last",
+    "answer_type": "entity",
+    "granularity": "day",
+    "time": null,
+    "anchor": "Head of Government (Greece)",
+    "order": "before"
+   },
+   "json": "{\"mentions\": [{\"text\": \"Nicos Anastasiades\", \"entity\": \"Nicos Anastasiades\"}, {\"text\": \"Greek Prime Minister\", \"entity\": \"Head of Government (Greece)\"}], \"relation\": \"Make_an_appeal_or_request\", \"answer_role\": \"object\", \"qtype\": \"before_last\", \"answer_type\": \"entity\", \"granularity\": \"day\", \"time\": null, \"anchor\": \"Head of Government (Greece)\", \"order\": \"before\"}"
+  }
+ ],
+ "question_file_sha256_train": "89ce10b4a1ca9b53b75a1a8d6935e70d8381457cfa36dfe92a51f483ebd3a044",
+ "created_utc": "2026-10-27T04:47:54Z",
+ "exemplar_block_sha256": "58fbcc66a0842f0fed372cb23d68bb4ef984a3fd0b4615521b8c9268489be556",
+ "sha256": "c17aed241160030f3292b6dd0a8948849179f18f0f32f167f8b8f1b9576b9b3b"
+}

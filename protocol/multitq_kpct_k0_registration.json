@@ -1,0 +1,208 @@
+{
+ "_anonymised_copy": "Anonymised copy of a registered protocol file: internal provenance fields (storage ids, hosts, resource accounting, internal review notes) were removed or redacted. Embedded sha256 values refer to the original registered file and do not match this copy.",
+ "name": "multitq_kpct_k0_registration",
+ "track": "k0 (training-free arms P_0 and G_0)",
+ "rule": {
+  "file": "multitq_kpct_decision_rule.json",
+  "sha256": "0f5f760450356349a7bf353301520d76de3617f1dfec0b4e4b1430c97b1d6cd7",
+  "rule_version": "v1.0"
+ },
+ "subsets_manifest_sha256": "de8a9c22d51f4182f88063c57d408530c351660ec23caea29b8559878ee88e5a",
+ "amendments_in_force": {
+  "B1": "(stage-0 benchmark; TP2 needs disable_custom_all_reduce=True)",
+  "B2": "4ee79238-..."
+ },
+ "state_at_registration": "No P_0 or G_0 generation exists; no dev_sel2000 or test score of any k = 0 arm has been computed or read. Both GPUs are held by the guided track's LoRA arms; this registration was made in a CPU-only preparation stage. A CPU plumbing dry run (5 dev_sel2000 questions, placeholder answers, stand-in generations; scores 0 by construction) is the only execution so far.",
+ "P_0": {
+  "what": "k = 0, training-free: Llama-3.1-70B-Instruct (bf16, vLLM tensor-parallel 2 on both cards) few-shot JSON parser + our operators + RULE ordering; no re-ranker",
+  "prompt_designs": {
+   "manifest": "p0_prompts/p0_prompts_manifest.json (LLM-parser track, stage A)",
+   "manifest_sha256": "b5080b862690a376af23cf21f88f3840ffbee546b4240a5cddddef9592a195e9",
+   "designs": {
+    "d1": {
+     "sha256": "c96c8261b70c72dfb9b6b8deb92d5656c6dacb064a7cc36aeddbfdd00c1dc369",
+     "chars": 12118,
+     "prompt_tokens_example": 3141
+    },
+    "d2": {
+     "sha256": "4fb0284db3616a760f620ad1fcfc298c379eff9a2afbd53035fb3949184f9328",
+     "chars": 13272,
+     "prompt_tokens_example": 3407
+    },
+    "d3": {
+     "sha256": "2b1c2bb65087d221bd95db807546d5fe40b2f5d6488109c3acb348848a237c54",
+     "chars": 13675,
+     "prompt_tokens_example": 3515
+    }
+   },
+   "check": "the three registered designs are used unchanged: the k0 copies of p0_prompts.py, pk_common.py, p0_execute.py, p0_infer_70b.py, p0_exemplars.json and p0_prompts/* are byte-identical to the parser track's CODE_MANIFEST.json and to the files on the GPU host (sha256 compared)"
+  },
+  "exemplars": {
+   "sha256": "c17aed241160030f3292b6dd0a8948849179f18f0f32f167f8b8f1b9576b9b3b",
+   "quids": [
+    1000004,
+    1000000,
+    1000002,
+    1000048,
+    1000009,
+    1000034,
+    1000017,
+    1000001
+   ],
+   "n": 8,
+   "disclosure": "forming the 8 (qtype, answer_type) cells read the qtype and answer_type fields of all train questions; question text of exactly these 8 was read; parses hand-written; the 8 answers were consulted afterwards for verification (8/8 execute to gold under k0)"
+  },
+  "decoding": "greedy, max 160 new tokens, seed 0; logprobs of sampled tokens recorded (diagnostic; P_0 has no tau)",
+  "execution": "p0_execute.py (parser track, unchanged): exact KG name else base linker (stemming, demonyms; no sector aliases, no block list, no train statistics); k0 executor = operators + retrieval + RULE ordering, no re-ranker; invalid JSON / unknown name -> empty list (a miss); Hits@10 padding from KG statistics only (executor models/k0/FB.json)",
+  "selection": "best dev_sel2000 Hits@1 (hit count); tie -> shortest prompt (registered chars: d1 12,118 < d2 13,272 < d3 13,675)"
+ },
+ "G_0": {
+  "what": "k = 0: the same 70B, zero-shot (no exemplars, no training), guided by P_0's bundle (P_0 parse, top-20 RULE-ordered candidates with RULE ranks, no S scores; 20 supporting facts; operator trace); generates the answer string",
+  "prompt_designs": {
+   "manifest": "g0_prompts/g0_prompts_manifest.json",
+   "manifest_sha256": "7f5c7c46d6e0b5e05e509ec9fc0cb0fcf0b601ba3ce27376d8ab74f1c8544717",
+   "code": "g0_prompts.py",
+   "designs": {
+    "g1": {
+     "fixed_text_sha256": "2cd1719d2820e5ea42027ccc764dd7301cbcc3b06c25202d270acc6b27c96cca",
+     "fixed_chars": 385,
+     "example_render_sha256": "102fc909900a14e36876a1aa498f4d529943b9a371e2506b480863c446277176",
+     "example_render_chars": 1191,
+     "parts": [
+      "HEAD"
+     ]
+    },
+    "g2": {
+     "fixed_text_sha256": "c2f2ad5708b9bb4a2045c523ade6671faef6fa18d1f461fa11e0e6445b7bd186",
+     "fixed_chars": 1228,
+     "example_render_sha256": "80b7eb07322a182ce5285dc4bbafc3a28c656310921e3afb71c1ccceebbda37c",
+     "example_render_chars": 2034,
+     "parts": [
+      "HEAD",
+      "GLOSS"
+     ]
+    },
+    "g3": {
+     "fixed_text_sha256": "83bb867ddf5adb0c8c84bc36d65767f28b0eb01f9fea66c3b77b9e7aa98ea0eb",
+     "fixed_chars": 1633,
+     "example_render_sha256": "b8f4a64b38b7e931894d94ccbcba84594c87e565835a8e55bbd2e6c92eeb1cbc",
+     "example_render_chars": 2439,
+     "parts": [
+      "HEAD",
+      "GLOSS",
+      "TAIL"
+     ]
+    }
+   },
+   "fixed_texts_sha256": {
+    "HEAD": "67d0802834a076d4feb3b660a803f7831eb27420fde78afb4931ea92b269603e",
+    "GLOSS": "77d37bdd1587c1da54587ed5ea30c815b495ae4812d2a1ca3eca9ae65aa477bc",
+    "TAIL": "6e55d8298f86afd15fe005f580088dabbf91869e3c343a258ed3286dcb130b31",
+    "NO_PARSE": "1dffedbebce63781f192ca16aedeed5efb58c15ec0ead8247343b0534e6e20b1"
+   },
+   "gk_common_sha256": "3bbb684f484da4e9ccff5d7ed8ca644ccb5e8b6a918d50bd4b4ab04378e36b44",
+   "head_note": "g1's instruction is the registered G_k head gk_common.G_HEAD unchanged (sha256 67d08028..., as in amendment B1)",
+   "layout": "registered G_k layout (Question; Parse; Candidates; Facts grouped losslessly by (subject, relation, object) with chronological dates; Operator trace) with the S-score column removed (k = 0 has no re-ranker): candidate | RULE rank | satisfies operator | supporting facts",
+   "g1": "registered G_k instruction + bundle",
+   "g2": "g1 + fixed glossary of the bundle fields and the date-granularity convention",
+   "g3": "g2 + fixed closing decision instruction ending 'Answer:'",
+   "status": "written and fixed by sha256 in this CPU stage, before any G_0 (or P_0) generation or dev_sel2000 score"
+  },
+  "bundle": {
+   "builder": "k0_bundles.py (structural track's kpct_core.bundle_core with s0_score=None)",
+   "source": "P_0's selected design: its mapped compact parses (p0_execute.py parse_used) -> compact_to_parse(c, question, None) -> rec_info_from_parse -> build_info (anchor override as Executor.execute) -> bundle_core",
+   "parse": "kpct_core.parse_json of the executed record + 'anchor' (P_0's anchor entity or null) + 'anchor_mention' when P_0 fixed one",
+   "candidates": "first 20 pool candidates in RULE order with RULE rank (1-based pool position) and operator_satisfied; s_score = null; s_rank = RULE-order rank (the RULE rank is placed in the slot S occupies at k > 0)",
+   "facts": "20 provenance facts (mtq_export.provenance_facts recipe) following RULE order",
+   "operator_trace": "kpct_core.operator_trace on RULE order",
+   "integrity": "per row: re-executed RULE list == P_0 prediction list (asserted; dry run 5/5)",
+   "p0_invalid_rows": "empty bundle (parse {}, no candidates, no facts) rendered 'Parse: none (...)'; ranked list = [answer] + [] (P_0's empty list)",
+   "no_train_artefact": "no S score, classifier, sector alias, block list or train statistic"
+  },
+  "decoding": "greedy, max 48 new tokens, seed 0; 2,048-token prompt+answer cap with trailing fact groups dropped first (as gk_common.fit_g_prompt)",
+  "output": "as G_k: gk_common.canon_answer validity / canonicalisation; ranked list = gk_common.g_ranked(answer, P_0 list); invalid answer stays at rank 1; invalid rate reported",
+  "selection": "best dev_sel2000 Hits@1 (hit count); tie -> shortest prompt (fixed-text chars g1 385 < g2 1,228 < g3 1,633)"
+ },
+ "primary_llm_arm_k0": "criteria.primary_llm_arm: P_0 vs G_0 on dev_sel2000 Hits@1; |difference| < 0.0005 -> G_0; declared in the freeze before the test pass",
+ "implementation_details": [
+  "Engine (both arms): vLLM 0.10.2 in tkgqa-vllm:latest, Llama-3.1-70B-Instruct bf16, tensor_parallel_size=2, gpu_memory_utilization=0.90, max_model_len=4096, enforce_eager=True, disable_custom_all_reduce=True (B1), enable_prefix_caching=True (as p0_infer_70b.py), seed 0; docker --ipc=host --shm-size=16g, VLLM_WORKER_MULTIPROC_METHOD=spawn, NCCL_P2P_DISABLE=1, HF_HUB_OFFLINE=1.",
+  "k0_infer_70b.py replaces p0_infer_70b.py only to add on-disk shards of 4,000 prompts (rule STOP_HOST: inference in shards); P_0 prompt token ids are built by the same calls (pk_common.encode_prompt(tok, p0_user(head, question))) and the raw output format is unchanged, so p0_execute.py consumes it as is.",
+  "One TP2 session per (arm, split): dev_sel2000 decodes all 3 designs in one session; test decodes the selected design only, after the pre-test freeze.",
+  "Selection CI: Poisson(1) bootstrap B = 1000 seed 0 (descriptive, as the guided and parser tracks); every design's dev_sel2000 record is appended to multitq_kpct_k0_selection_log.jsonl as computed.",
+  "STOP_DEV_FAILURE (best < 0.30 or invalid > 0.20): the driver stops before any test pass (exit 5); one logged bug-fix iteration then needs an amendment.",
+  "STOP_BUDGET: before each GPU step, usage log spend + the step's projected GPU-h must be <= 52 (projections from the B1 stage-0 rates: P_0 dev 0.85, P_0 test 7.30, G_0 dev 0.95, G_0 test 8.10).",
+  "GPU guard: both cards < 2,000 MiB used, own stale k0_* containers stopped, nothing else touched; usage log rows track 'k0' via run_card_k0.sh (container wall-clock x 2 cards).",
+  "G_0 dev bundles are built from P_0's selected dev parses after the P_0 selection; G_0 test bundles from P_0's frozen test parses after the P_0 test freeze; both bundle files are hashed in the G_0 pre-test freeze."
+ ],
+ "projected_gpu_h": {
+  "P_0": 8.15,
+  "G_0": 9.05,
+  "total": 17.2,
+  "note": "consistent with the post-core re-projection (P_0 8.103, G_0 9.022)"
+ },
+ "cpu_dry_run": {
+  "n_questions": 5,
+  "inputs": "first 5 dev_sel2000 quids; question text from the k01_s0 structural dev bundles (no gold field); placeholder answers; stand-in P_0 generations = k01_s0 structural top-1 parses serialised to compact JSON (4) + 1 non-JSON row; stand-in G_0 generations exercising canonicalisation (valid name, verbose sentence, lower-case/underscore variant, date, empty)",
+  "results": {
+   "P0_prompt_tokens": {
+    "d1": 3141.6,
+    "d2": 3407.6,
+    "d3": 3515.6
+   },
+   "P0_prompt_tokens_max": 3518,
+   "G0_prompt_tokens_mean": {
+    "g1": 700.0,
+    "g2": 882.0,
+    "g3": 966.0
+   },
+   "G0_prompt_tokens_max": 1154,
+   "G0_truncated": 0,
+   "bundles": {
+    "n": 5,
+    "n_p0_invalid": 1,
+    "mean_cands": 15.4,
+    "mean_facts": 16.0,
+    "rule_list_match_rate": 1.0
+   },
+   "every_stage": "ran: prompts (tokenizer only) -> stand-in raw -> p0_execute -> select (mock) -> pre-test freeze -> test stand-in -> exec -> test freeze (hash re-verification passed) -> bundles -> G_0 prompts -> post -> select (mock) -> freezes"
+  },
+  "note": "mock scores are 0 by construction and are not dev scores; no real dev answer and no test file was read; the dry tree is WORK_DIR/k0/dry/ (separate from the real outputs)"
+ },
+ "code": {
+  "remote": "WORK_DIR/k0/code/",
+  "files_sha256": {
+   "g0_prompts.py": "9965ec43aaa2228b808e055421510d5640e6933e1136be8ee81c73425dfe78e7",
+   "g0_prompts/g0_prompt_g1_example.txt": "102fc909900a14e36876a1aa498f4d529943b9a371e2506b480863c446277176",
+   "g0_prompts/g0_prompt_g2_example.txt": "80b7eb07322a182ce5285dc4bbafc3a28c656310921e3afb71c1ccceebbda37c",
+   "g0_prompts/g0_prompt_g3_example.txt": "b8f4a64b38b7e931894d94ccbcba84594c87e565835a8e55bbd2e6c92eeb1cbc",
+   "g0_prompts/g0_prompts_manifest.json": "c3afcb7bdb96c0c3672a75fcc5c631a2ecdaec6d549c4c42ac1be26f16847c4d",
+   "gk_common.py": "3bbb684f484da4e9ccff5d7ed8ca644ccb5e8b6a918d50bd4b4ab04378e36b44",
+   "k0_bundles.py": "b4bc274fcee4667e841f7fcab3ed81730680aa20b4de9e89e3fead6f6c1eefe8",
+   "k0_dry.py": "295ffdbdcb5881b6c9541fcffaa256d85c0ac886929c91077010c0b9261749f2",
+   "k0_freeze.py": "2e0897e96672f5ef6b359dca2cd69fb033020e01eabbb4b9c30525880c12f54a",
+   "k0_infer_70b.py": "9a8b91750da522484c0ebb756178d04e965e7481733f4bdb8b94d02c821e4a26",
+   "k0_post_g0.py": "0fe7611a4396cd16dc87ed7a0fecbc84954f7a0242354596a491fde52b7f3714",
+   "k0_run.sh": "cf4d669585ce883433f85da130d9f23ef708e93ff57277ece0a1c781a7d82e08",
+   "k0_select.py": "8ba9948a579822f7b1f071b740d4e7ffe8153cceb47839a84605cec213779ac7",
+   "multitq_eval.py": "1f85bbdcd623f1810e9df2910e042c24d6f5c269d278e82b30ef05387a1e2d69",
+   "multitq_kpct_subsets.json": "de8a9c22d51f4182f88063c57d408530c351660ec23caea29b8559878ee88e5a",
+   "parser/CODE_MANIFEST.json": "e8f610f36a6a57f3e47d21287cd31eb1262e6c91e871858c90069df618e41b8b",
+   "parser/p0_execute.py": "8f496a3a1f4be877502b8acc5dfd8401d3d0f574c446a9a7654880e651f20696",
+   "parser/p0_exemplar_verification.json": "9408c30470a3df05a57b924d57d057409ef626054d1fea9c2a9c6e4c08133d2b",
+   "parser/p0_exemplars.json": "5a3ea332767341071637ab36bdf73592d4e7ef63f3c95e0b740376fff1e4ea92",
+   "parser/p0_infer_70b.py": "ce509723cf42bda48ca94db56a91b2931e446a091a6dc4cd27595c14b8399936",
+   "parser/p0_prompts.py": "d9e1becfc8aba605b820af92abe67c3b2d6b1c7eed8175779e670ad18252396d",
+   "parser/p0_prompts/p0_prompt_d1.txt": "c96c8261b70c72dfb9b6b8deb92d5656c6dacb064a7cc36aeddbfdd00c1dc369",
+   "parser/p0_prompts/p0_prompt_d2.txt": "4fb0284db3616a760f620ad1fcfc298c379eff9a2afbd53035fb3949184f9328",
+   "parser/p0_prompts/p0_prompt_d3.txt": "2b1c2bb65087d221bd95db807546d5fe40b2f5d6488109c3acb348848a237c54",
+   "parser/p0_prompts/p0_prompts_manifest.json": "b947a72367d9370ca1dbc5fb016900a8c7b55c1d877287242166f6f0d428573b",
+   "parser/pk_common.py": "0b2cc2faa72dc1f6a0171fdb4409c74ae4ff26d9cee1dd365af684f1e064371a",
+   "run_card_k0.sh": "2d3e11f4e868b2e5c71693b2408f188b49edaddf313998c328df36ec112a2b07",
+   "run_cpu_k0.sh": "e37df0b9fad60108794e9d9539b890238ad8f01c83700f823eaf8d61aa14ee82"
+  }
+ },
+ "registered_utc": "2026-10-27T11:28:12Z",
+ "sha256": "8a3145734cc0c05e49ec9c1c25b55b4c8839240381f69ff53deb8c3ce8723c58",
+ "designer_knowledge": "Scope of 'before any score': no P_0 or G_0 generation and no k = 0 dev_sel2000 / test score existed when the G_0 designs were fixed. Dev_sel2000 scores of OTHER arms did exist: the designer had read the LLM-parser track's stage-B report (P_1/P_5/P_10/P_100 dev_sel2000 Hits@1 and per-qtype tables) and the structural / guided GPU-hour cap re-projection; the guided track's G_k / GU_k selection logs on the GPU host were listed but not opened. This is design knowledge of the kind disclosed in rule supervision_disclosure (prompts designed by people who have seen full-data dev and test results).",
+ "registered_utc_note": "registered_utc unchanged; designer_knowledge added in a second version before any k = 0 generation (sha256 recomputed)"
+}
